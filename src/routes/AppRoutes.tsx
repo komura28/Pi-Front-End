@@ -3,6 +3,7 @@ import { PublicRoutes } from "./PublicRoutes";
 import { PrivateRoutes } from "./PrivateRoutes";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 
+
 export function AppRoutes() {
     return (
         <BrowserRouter>

@@ -1,5 +1,6 @@
 import  Button  from "../../components/Button";
 
+
 export function CursoPage() {
     return (
         <div>
