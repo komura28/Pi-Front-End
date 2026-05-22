@@ -5,6 +5,7 @@ import { TurmaPage } from "../pages/turma/TurmaPage";
 import { PerfilPage } from "../pages/perfil/PerfilPage";
 import { ProtectedRoutes } from "./ProtectedRoutes";
 import { AppAdminLayout } from "../components/layouts/AppAdminLayout";
+import { MatriculaPage } from "../pages/matricula/MatriculaPage";
 
 
 
@@ -27,6 +28,10 @@ export function PrivateRoutes() {
 
                 <Route path="/perfil" element={<ProtectedRoutes allowedRoles={["admin"]}>
                     <PerfilPage />
+                </ProtectedRoutes>} />
+
+                <Route path="/matricula" element={<ProtectedRoutes allowedRoles={["admin"]}>
+                    <MatriculaPage />
                 </ProtectedRoutes>} />
 
                 <Route path="/*" element={<Navigate to="/app/home" replace />} />

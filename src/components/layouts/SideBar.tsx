@@ -3,23 +3,23 @@ import { NavLink } from "react-router-dom";
 
 const navigationItems = [
     {
-        label: "Dashboard",
-        href: "/home",
+        label: "Home",
+        href: "http://localhost:5173/app/home",
 
     },
     {
         label: "Cursos",
-        href: "/curso",
+        href: "http://localhost:5173/app/curso",
 
     },
     {
         label: "Turmas",
-        href: "/turma",
+        href: "http://localhost:5173/app/turma",
 
     },
     {
         label: "Matrículas",
-        href: "/matricula",
+        href: "http://localhost:5173/app/matricula",
 
     },
 
@@ -36,7 +36,7 @@ export function SideBar() {
                         <div>
                             <strong className="block leading-none">Aticurando</strong>
                             <span className="text-xs text-muted-foreground">
-                                Gestão de palhaços
+                                Curso de Palhaços
                             </span>
                         </div>
                     </div>
@@ -66,7 +66,7 @@ export function SideBar() {
                     <div className="rounded-lg bg-muted p-3">
                         <p className="text-sm font-medium">Organização atual</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                            Jaquin 
+                            Aticurando TOP 1 BRAZIL
                         </p>
                     </div>
                 </div>
