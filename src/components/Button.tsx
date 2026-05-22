@@ -1,19 +1,19 @@
 
 
- function Button() {
-    function clicar() {
-    alert("Curso cadastrado!");
-  }
-   return <button onClick={clicar} className="
-        bg-blue-500
-        hover:bg-blue-700
-        text-white
-        font-bold
-        py-2
-        px-4
-        rounded
-        cursor-pointer
-      ">Clique aqui</button>;
+ interface IButton {
+    isSubmitting: boolean;
+    label: string;
+    loadingLabel?: string;
+    className?: string;
 }
 
-export default Button ;
+export function Button({isSubmitting, label, loadingLabel="Enviando...", className, ...props}: IButton) {
+    return (
+        <button
+                        disabled={isSubmitting} className={className} {...props}
+                        //className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                    >
+                        {isSubmitting ? loadingLabel : label}
+                    </button>
+    )
+}

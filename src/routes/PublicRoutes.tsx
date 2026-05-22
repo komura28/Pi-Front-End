@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { HomePage } from "../pages/home/HomePage.tsx";
+import { HomePage } from "../pages/home/HomePage";
+//import { LoginPage } from "../pages/auth/LoginPage";
 
 
 export function PublicRoutes() {
