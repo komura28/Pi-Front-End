@@ -1,21 +1,13 @@
+import type { authUser, LoginRequest, LoginResponse, RegisterRequest } from "../types/auth/auth-types";
 import { api } from "./api";
 
-export interface LoginData {
-    email: string;
-    password: string;
-}
 
-export interface LoginResponse {
-    token: string,
-    user: {
-        name: string,
-        email: string,
-        role: "admin" | "user"
-    };
-}
-
-export async function loginRequest(data:LoginData): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>("/auth", data);
-
+export async function Register(data: RegisterRequest): Promise<authUser>{
+    const response = await api.post("/register", data)
     return response.data;
+}
+
+export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
+    const reponse = await api.post("/login", data)
+    return reponse.data;
 }

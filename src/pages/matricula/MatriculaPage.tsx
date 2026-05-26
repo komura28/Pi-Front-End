@@ -5,7 +5,7 @@ import { Button } from "../../components/Button";
 
 export function MatriculaPage() {
     return (
-          <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
+          <div className="min-h-screen bg-white flex items-center justify-center px-1">
             <section className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 border border-slate-300">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">
                     Lista de Matrículas

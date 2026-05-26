@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { Button } from "../../components/Button";
+import { useAuth } from "../../contexts/AuthContext";
 
- { /*
+
+ 
 interface LoginFormData {
     email: string;
     password: string;
@@ -12,7 +12,7 @@ interface LoginFormData {
 
 export function LoginPage() {
     const navigate = useNavigate();
-    const {signIn} = useAuth();
+    const { login } = useAuth();
     const [serverError, setServerError] = useState("");
 
     const {
@@ -22,14 +22,13 @@ export function LoginPage() {
     } = useForm<LoginFormData>();
 
     async function handleLogin(data: LoginFormData) {
-        console.log("Data", data);
         try {
             setServerError("");
-            await signIn(data);
+            await login(data);
             navigate("/app/home");
         } catch (error) {
             console.log(error);
-            setServerError("Erro ao realisar login. Verifique os dados informados");
+            setServerError(error instanceof Error ? error.message: "Erro ao realisar login. Verifique os dados informados");
         }
     }
 
@@ -92,22 +91,16 @@ export function LoginPage() {
                             </p>
                         )
                     }
-
-                   <button
+                    <p className="text-gray">Cadastre-se</p>
+                    <button
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
                     >
                         {isSubmitting ? "Entrando..." : "Entrar"}
                     </button>
-
-                    <Button
-                        isSubmitting={isSubmitting}
-                    ></Button>
                 </form>
             </section>
         </main>
     ); 
 } 
-*/}
- 

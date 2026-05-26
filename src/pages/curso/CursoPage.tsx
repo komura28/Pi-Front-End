@@ -6,7 +6,7 @@ const isSubmitting = false;
 
 export function CursoPage() {
     return (
-        <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-white flex items-center justify-center p-6">
             <section className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8 border border-slate-200">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">
                     Cadastro de Curso

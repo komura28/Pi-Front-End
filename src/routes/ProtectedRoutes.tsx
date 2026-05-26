@@ -1,32 +1,25 @@
 import type { ReactNode } from "react"
-import { Navigate } from "react-router-dom";
-
-
-type UserRole = "admin";
+import { Navigate, Outlet } from "react-router-dom";
+import type { userRole } from "../types/auth/auth-types";
+import { useAuth } from "../contexts/AuthContext";
 
 interface ProtectedRoutesProps{
     children: ReactNode,
-    allowedRoles: UserRole[];
+    allowedRoles: userRole[];
 }
 
-const authMock = {
-    isAuthenticated: true,
-    user: {
-        name: "Matos Teste",
-        role: "admin" as UserRole
-    },
-}
+export function ProtectedRoutes({allowedRoles}: ProtectedRoutesProps) {
 
-export function ProtectedRoutes({children, allowedRoles}: ProtectedRoutesProps) {
-    if(!authMock.isAuthenticated) {
+    const { isAuthenticated, user } = useAuth();
+
+    if(!isAuthenticated) {
         return <Navigate to="/login" replace/>
     }
 
-    if(!allowedRoles.includes(authMock.user.role)) {
+    if(!user?.role || !allowedRoles.includes(user.role)) {
         return <Navigate to="/unauthorized" replace/>
     }
 
-    return (
-        <>{children}</>
+    return ( <Outlet/>
     );
 }
