@@ -3,11 +3,11 @@ import { api } from "./api";
 
 
 export async function Register(data: RegisterRequest): Promise<authUser>{
-    const response = await api.post("/register", data)
+    const response = await api.post("/auth/register", data)
     return response.data;
 }
 
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
-    const reponse = await api.post("/login", data)
+    const reponse = await api.post("/auth/login", data)
     return reponse.data;
 }

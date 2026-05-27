@@ -1,5 +1,5 @@
 
-export type userRole = "ALUNO" | "ADMIN";
+export type userRole = "ALUNO" | "ADM";
 
 export interface authUser{
     id: string;
@@ -11,7 +11,7 @@ export interface authUser{
 
 export interface LoginRequest{
     email: string;
-    password: string;
+    senha: string;
 }
 
 export interface LoginResponse{
@@ -23,5 +23,5 @@ export interface RegisterRequest{
     name: string;
     cpf: number;
     email: string;
-    password: string;
+    senha: string;
 }

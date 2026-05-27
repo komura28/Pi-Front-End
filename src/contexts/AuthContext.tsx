@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { authUser, LoginRequest } from "../types/auth/auth-types";
 import { LoginApi } from "../services/authService";
 
-
 interface AuthContextData {
     user: authUser | null;
     isAuthenticated: boolean;
@@ -46,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const isAuthenticated = !!user;
-    const isAdmin = user?.role === "ADMIN"
+    const isAdmin = user?.role === "ADM";
 
     return (
         <AuthContext.Provider
