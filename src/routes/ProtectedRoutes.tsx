@@ -8,7 +8,7 @@ interface ProtectedRoutesProps{
     allowedRoles: userRole[];
 }
 
-export function ProtectedRoutes({allowedRoles}: ProtectedRoutesProps) {
+export function ProtectedRoutes({allowedRoles, children}: ProtectedRoutesProps) {
 
     const { isAuthenticated, user } = useAuth();
 
@@ -16,10 +16,9 @@ export function ProtectedRoutes({allowedRoles}: ProtectedRoutesProps) {
         return <Navigate to="/login" replace/>
     }
 
-    if(!user?.role || !allowedRoles.includes(user.role)) {
+    if(user?.role && !allowedRoles.includes(user.role)) {
         return <Navigate to="/unauthorized" replace/>
     }
 
-    return ( <Outlet/>
-    );
+    return children ? <>{children}</> : <Outlet/>
 }

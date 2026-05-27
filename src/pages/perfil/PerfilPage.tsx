@@ -30,9 +30,8 @@ export function PerfilPage() {
                         <input
                             id="email"
                             type="text"
-                            placeholder="erickkomura@gmail.com"
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
-                            disabled
+                            
                         />
                         <label
                             htmlFor="cpf"

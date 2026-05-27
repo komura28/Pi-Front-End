@@ -10,23 +10,23 @@ export function PrivateRoutes() {
     return (
         <Routes>
 
-            <Route path="/home" element={<ProtectedRoutes allowedRoles={["ADMIN"]}>
+            <Route path="/home" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <HomePage />
             </ProtectedRoutes>} />
 
-            <Route path="/curso" element={<ProtectedRoutes allowedRoles={["ADMIN"]}>
+            <Route path="/curso" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <CursoPage />
             </ProtectedRoutes>} />
 
-            <Route path="/turma" element={<ProtectedRoutes allowedRoles={["ADMIN"]}>
+            <Route path="/turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <TurmaPage />
             </ProtectedRoutes>} />
 
-            <Route path="/perfil" element={<ProtectedRoutes allowedRoles={["ADMIN"]}>
+            <Route path="/perfil" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <PerfilPage />
             </ProtectedRoutes>} />
 
-            <Route path="/matricula" element={<ProtectedRoutes allowedRoles={["ADMIN"]}>
+            <Route path="/matricula" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <MatriculaPage />
             </ProtectedRoutes>} />
 
