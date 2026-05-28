@@ -8,6 +8,7 @@ import type { authUser, LoginRequest, RegisterRequest } from "../types/auth/auth
 import { LoginApi, Register } from "../services/authService";
 >>>>>>> 1af11c1ad750e53eba9522caed8e09ff27b053a2
 
+
 interface AuthContextData {
     user: authUser | null;
     isAuthenticated: boolean;
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const isAuthenticated = !!user;
-    const isAdmin = user?.role === "ADM";
+    const isAdmin = user?.role === "ADM"
 
     return (
         <AuthContext.Provider

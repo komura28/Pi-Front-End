@@ -52,9 +52,14 @@ export function PerfilPage() {
                         </label>
 
                         <input
+<<<<<<< HEAD
+                            id="email"
+                            type="text"
+=======
                             value={user?.email}
+>>>>>>> main
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
-                            disabled
+                            
                         />
                         <label
                             htmlFor="cpf"
