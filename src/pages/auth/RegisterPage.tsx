@@ -143,7 +143,8 @@ export function RegistroPage() {
             </section>
         </main>
     );
-export function RegisterPage() {
+    
+function RegisterPage() {
     return (
         <main>
             <section>
@@ -162,5 +163,5 @@ export function RegisterPage() {
                 </form>
             </section>
         </main>
-    )
-}
+    );
+}};
