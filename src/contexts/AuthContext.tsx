@@ -1,12 +1,18 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+<<<<<<< HEAD
 import type { authUser, LoginRequest, LoginResponse } from "../types/auth/auth-types";
 import { LoginApi } from "../services/authService";
 import { api } from "../services/api";
+=======
+import type { authUser, LoginRequest, RegisterRequest } from "../types/auth/auth-types";
+import { LoginApi, Register } from "../services/authService";
+>>>>>>> 1af11c1ad750e53eba9522caed8e09ff27b053a2
 
 interface AuthContextData {
     user: authUser | null;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    cadastrar: (data: RegisterRequest) => Promise<void>;
     login: (data: LoginRequest) => Promise<void>;
     getMe: () => Promise<authUser>;
     logout: () => void;
@@ -38,6 +44,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(response.user);
     }
 
+    async function cadastrar(data: RegisterRequest) {
+        await Register(data);
+    }
+
     function logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -61,6 +71,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 user,
                 isAuthenticated,
                 isAdmin,
+                cadastrar,
                 login,
                 getMe,
                 logout,
