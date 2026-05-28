@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { href, NavLink } from "react-router-dom";
 
 
 const navigationItems = [
@@ -9,7 +9,11 @@ const navigationItems = [
     },
     {
         label: "Cursos",
-        href: "http://localhost:5173/app/curso",
+        isSelect: true,
+        options: [
+            {label: "Cadastrar Curso", href: "http://localhost:5173/app/curso"},
+            {label: "Listar Cursos", href: ""},
+        ]
 
     },
     {
@@ -43,11 +47,37 @@ export function SideBar() {
                 </div>
 
                 <nav className="flex-1 space-y-1 p-3">
-                    {navigationItems.map((item) => {
+                    {navigationItems.map((item, index ) => {
+                        if (item.isSelect) {
+                            return (
+                                <div 
+                                    key={index} 
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                >
+                                    <select
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                window.location.href = e.target.value;
+                                            }
+                                        }}
+                                        className="w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"
+                                        defaultValue=""
+                                    >
+                                        <option value="" disabled hidden>{item.label}</option>
+                                        
+                                        {item.options?.map((opt, i) => (
+                                            <option key={i} value={opt.href} className="bg-background text-foreground">
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            );
+                        }
                         return(
                         < NavLink
                             key={item.href}
-                            to={item.href}
+                            to={item.href!}
                             end={item.href === "/"}
                             className={({ isActive }) =>
                                 

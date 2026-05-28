@@ -7,6 +7,7 @@ export async function Register(data: RegisterRequest): Promise<authUser>{
     return response.data;
 }
 
+<<<<<<< HEAD
 /*export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> {
     
 }*/
@@ -19,5 +20,15 @@ export async function getMe() {
 
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
     const reponse = await api.post("/login", data)
+=======
+export async function getMe() {
+    const response = await api.get("/auth/me")
+
+    return response;
+}
+
+export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
+    const reponse = await api.post("/auth/login", data)
+>>>>>>> main
     return reponse.data;
 }
