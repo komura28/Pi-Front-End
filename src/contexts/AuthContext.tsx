@@ -1,12 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { authUser, LoginRequest } from "../types/auth/auth-types";
+import type { authUser, LoginRequest, LoginResponse } from "../types/auth/auth-types";
 import { LoginApi } from "../services/authService";
+import { api } from "../services/api";
 
 interface AuthContextData {
     user: authUser | null;
     isAuthenticated: boolean;
     isAdmin: boolean;
     login: (data: LoginRequest) => Promise<void>;
+    getMe: () => Promise<authUser>;
     logout: () => void;
 }
 
@@ -44,6 +46,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     }
 
+    async function getMe() {
+        const response = await api.get("/auth/me")
+        
+        return response.data;
+    }
+
     const isAuthenticated = !!user;
     const isAdmin = user?.role === "ADM";
 
@@ -54,12 +62,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 isAuthenticated,
                 isAdmin,
                 login,
+                getMe,
                 logout,
             }}
         >
             {children}
         </AuthContext.Provider>
     );
+
+    
 }
 
 export function useAuth() {

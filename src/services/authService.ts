@@ -7,6 +7,12 @@ export async function Register(data: RegisterRequest): Promise<authUser>{
     return response.data;
 }
 
+export async function getMe() {
+    const response = await api.get("/auth/me")
+
+    return response;
+}
+
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
     const reponse = await api.post("/auth/login", data)
     return reponse.data;

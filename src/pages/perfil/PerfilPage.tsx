@@ -1,22 +1,46 @@
+import { useEffect, useState } from "react"
+import { getMe } from "../../services/authService"
+import type { authUser } from "../../types/auth/auth-types"
+import { useAuth } from "../../contexts/AuthContext";
 
+interface PerfilFormData {
+    name: string,
+    email: string;
+    cpf: string
+}
 
 export function PerfilPage() {
+
+    const [user, setUser] = useState<authUser | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        async function carregarDados() {
+            try {
+                setLoading(true);
+                const data = await getMe();
+                setUser(data.data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        carregarDados();
+        console.log("user: ", user?.name);
+    }, [])
     return (
         <div>
             <h1>Meu Perfil</h1>
             <section className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8 border border-slate-200">
                 <div className="flex flex-col gap-2">
                         <label
-                            htmlFor="nome"
+                            htmlFor="name"
                             className="text-slate-800 font-medium"
                         >
                             Nome 
                         </label>
-
                         <input
-                            id="nome"
-                            type="text"
-                            placeholder="Erick Komura"
+                            value={user?.name}
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
                             disabled
                         />
@@ -28,9 +52,7 @@ export function PerfilPage() {
                         </label>
 
                         <input
-                            id="email"
-                            type="text"
-                            placeholder="erickkomura@gmail.com"
+                            value={user?.email}
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
                             disabled
                         />
@@ -42,23 +64,7 @@ export function PerfilPage() {
                         </label>
 
                         <input
-                            id="cpf"
-                            type="text"
-                            placeholder="123.456.789-00"
-                            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
-                            disabled
-                        />
-                        <label
-                            htmlFor="dtNascimento"
-                            className="text-slate-800 font-medium"
-                        >
-                            Data de Nascimento 
-                        </label>
-
-                        <input
-                            id="dtNascimento"
-                            type="text"
-                            placeholder="01/01/1990"
+                            value={user?.cpf}
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
                             disabled
                         />
