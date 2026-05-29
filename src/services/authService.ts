@@ -3,32 +3,26 @@ import { api } from "./api";
 
 
 export async function Register(data: RegisterRequest): Promise<authUser>{
-    const response = await api.post("/register", data)
+    const response = await api.post("/auth/register", data)
     return response.data;
 }
 
-<<<<<<< HEAD
+export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso>{
+    const response = await api.post("auth/register-curso", data)
+    return response.data
+}
+
 /*export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> {
     
 }*/
 
 export async function getMe() {
-    const reponse = await api.get("/me")
+    const reponse = await api.get("/auth/me")
 
     return reponse.data;
 }
 
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
-    const reponse = await api.post("/login", data)
-=======
-export async function getMe() {
-    const response = await api.get("/auth/me")
-
-    return response;
-}
-
-export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
     const reponse = await api.post("/auth/login", data)
->>>>>>> main
     return reponse.data;
 }

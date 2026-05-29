@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 
  
 interface LoginFormData {
     email: string;
-    password: string;
+    senha: string;
 }
 
 export function LoginPage() {
@@ -72,14 +72,14 @@ export function LoginPage() {
                             type="password"
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                             placeholder="Digite sua senha"
-                            {...register("password", {
+                            {...register("senha", {
                                 required: "A senha é obrigatório",
                             })}
                         />
 
-                        {errors.password && (
+                        {errors.senha && (
                             <p className="mt-1 text-sm text-red-600">
-                                {errors.password.message}
+                                {errors.senha.message}
                             </p>
                         )}
                     </div>
@@ -91,7 +91,7 @@ export function LoginPage() {
                             </p>
                         )
                     }
-                    <p className="text-gray">Cadastre-se</p>
+                    <Link to="/cadastro" className="text-gray">Cadastre-se</Link>
                     <button
                         type="submit"
                         disabled={isSubmitting}

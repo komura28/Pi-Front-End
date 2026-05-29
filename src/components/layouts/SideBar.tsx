@@ -1,35 +1,37 @@
-import { href, NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 
 const navigationItems = [
     {
         label: "Home",
-        href: "http://localhost:5173/app/home",
+        href: "/app/home",
 
     },
     {
         label: "Cursos",
         isSelect: true,
         options: [
-            {label: "Cadastrar Curso", href: "http://localhost:5173/app/curso"},
-            {label: "Listar Cursos", href: ""},
+            {label: "Cadastrar Curso", href: "/app/register-curso"},
+            {label: "Listar Cursos", href: "/app/curso"},
         ]
 
     },
     {
         label: "Turmas",
-        href: "http://localhost:5173/app/turma",
+        href: "/app/turma",
 
     },
     {
         label: "Matrículas",
-        href: "http://localhost:5173/app/matricula",
+        href: "/app/matricula",
 
     },
 
 ]
 
 export function SideBar() {
+    const navigate = useNavigate();
+
     return (
         <>
             <aside className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background">
@@ -57,7 +59,7 @@ export function SideBar() {
                                     <select
                                         onChange={(e) => {
                                             if (e.target.value) {
-                                                window.location.href = e.target.value;
+                                                navigate(e.target.value);
                                             }
                                         }}
                                         className="w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"

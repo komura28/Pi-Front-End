@@ -1,17 +1,17 @@
 
-export type userRole = "ALUNO" | "AD";
+export type userRole = "ALUNO" | "ADM";
 
 export interface authUser{
     id: string;
     name: string;
-    cpf: number;
+    cpf: string;
     email: string;
     role: userRole;
 }
 
 export interface LoginRequest{
     email: string;
-    password: string;
+    senha: string;
 }
 
 export interface LoginResponse{
@@ -21,25 +21,26 @@ export interface LoginResponse{
 
 export interface RegisterRequest{
     name: string;
-    cpf: number;
+    cpf: string;
     email: string;
-    password: string;
+    senha: string;
 }
 
 export interface authMateria{
     id: string,
+    name: string
 
 }
 
 export interface authCurso{
     id: string,
     name: string,
-    description: string,
+    descricao: string,
     materias: authMateria[]
 }
 
 export interface RegisterCursoRequest{
     name: string,
-    description: string
-    materias: []
+    descricao: string,
+    materias: authMateria[]
 }

@@ -1,12 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-<<<<<<< HEAD
-import type { authUser, LoginRequest, LoginResponse } from "../types/auth/auth-types";
-import { LoginApi } from "../services/authService";
+import type { authUser, LoginRequest, RegisterCursoRequest, RegisterRequest } from "../types/auth/auth-types";
+import { LoginApi, Register, RegisterCurso } from "../services/authService";
 import { api } from "../services/api";
-=======
-import type { authUser, LoginRequest, RegisterRequest } from "../types/auth/auth-types";
-import { LoginApi, Register } from "../services/authService";
->>>>>>> 1af11c1ad750e53eba9522caed8e09ff27b053a2
 
 
 interface AuthContextData {
@@ -14,6 +9,7 @@ interface AuthContextData {
     isAuthenticated: boolean;
     isAdmin: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
+    cadastrarCurso: (data: RegisterCursoRequest) => Promise<void>;
     login: (data: LoginRequest) => Promise<void>;
     getMe: () => Promise<authUser>;
     logout: () => void;
@@ -49,6 +45,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await Register(data);
     }
 
+    async function cadastrarCurso(data: RegisterCursoRequest) {
+        await RegisterCurso(data);
+    }
+
     function logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const isAuthenticated = !!user;
-    const isAdmin = user?.role === "ADM"
+    const isAdmin = user?.role === "ADM";
 
     return (
         <AuthContext.Provider
@@ -73,6 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 isAuthenticated,
                 isAdmin,
                 cadastrar,
+                cadastrarCurso,
                 login,
                 getMe,
                 logout,

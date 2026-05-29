@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 
 interface CadastroFormData {
     name: string;
-    cpf: number;
+    cpf: string;
     email: string;
     senha: string;
 }
@@ -30,8 +30,10 @@ export function RegistroPage() {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
         }
+    }
 
-
+    const onError = (errors: any) => {
+        console.log("Erros de validação do formulário:", errors);
     }
 
     return (
@@ -45,7 +47,7 @@ export function RegistroPage() {
                     Faça seu cadastro
                 </p>
 
-                <form onSubmit={handleSubmit(handleCadastro)} className="space-y-4">
+                <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
 
                     <div>
                         <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -109,7 +111,7 @@ export function RegistroPage() {
                             Senha
                         </label>
                         <input
-                            type="senha"
+                            type="password"
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                             placeholder="Digite sua senha"
                             {...register("senha", {
@@ -131,11 +133,10 @@ export function RegistroPage() {
                             </p>
                         )
                     }
-                    <p className="text-gray">Cadastre-se</p>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 cursor-pointer disabled:bg-blue-300"
                     >
                         {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>
@@ -144,7 +145,7 @@ export function RegistroPage() {
         </main>
     );
     
-function RegisterPage() {
+/*function RegisterPage() {
     return (
         <main>
             <section>
@@ -164,4 +165,4 @@ function RegisterPage() {
             </section>
         </main>
     );
-}};
+}*/};
