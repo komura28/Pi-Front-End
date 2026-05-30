@@ -29,19 +29,19 @@ export interface RegisterRequest{
 export interface authMateria{
     id: string,
     name: string
-    descricao: string
+    description: string
 
 }
 
 export interface authCurso{
     id: string,
     name: string,
-    descricao: string,
+    description: string,
     materias: authMateria[]
 }
 
 export interface RegisterCursoRequest{
     name: string,
-    descricao: string,
+    description: string,
     materias: authMateria[]
 }

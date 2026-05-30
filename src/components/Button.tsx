@@ -1,8 +1,11 @@
+import type { ReactNode } from "react";
+
+
 
 
  interface IButton {
     isSubmitting: boolean;
-    label: string;
+    label: ReactNode;
     loadingLabel?: string;
     className?: string;
 }

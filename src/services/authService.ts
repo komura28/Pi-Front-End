@@ -26,3 +26,9 @@ export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
     const reponse = await api.post("/auth/login", data)
     return reponse.data;
 }
+
+export async function getCurso() {
+    const response = await api.get("/auth/curso")
+
+    return response.data;
+}

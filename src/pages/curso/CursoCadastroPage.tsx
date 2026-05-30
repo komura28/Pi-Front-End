@@ -7,12 +7,12 @@ import type { RegisterCursoRequest } from "../../types/auth/auth-types";
 interface Materia {
     id: string;
     name: string;
-    descricao: string
+    description: string
 }
 
 interface CadastroCursoFormData {
     name: string;
-    descricao: string;
+    description: string;
     materias: Materia[];
 }
 
@@ -31,7 +31,7 @@ export function CursoCadastroPage() {
     } = useForm<CadastroCursoFormData>({
         defaultValues: {
             name: "",
-            descricao: "",
+            description: "",
             materias: []
         }
     });
@@ -46,8 +46,8 @@ export function CursoCadastroPage() {
             setServerError("");
             const dados: RegisterCursoRequest = {
                 name: data.name,
-                descricao: data.descricao,
-                materias: data.materias.map(materia => ({ id: "", name: materia.name, descricao: materia.descricao }))
+                description: data.description,
+                materias: data.materias.map(materia => ({ id: "", name: materia.name, description: materia.description }))
             };
             await cadastrarCurso(dados);
             navigate("/app/curso");
@@ -55,6 +55,7 @@ export function CursoCadastroPage() {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
         }
+        console.log(data);
     }
 
     const onError = (errors: any) => {
@@ -67,7 +68,7 @@ export function CursoCadastroPage() {
 
         if (!limpo) return;
 
-        append({ id: "", name: limpo, descricao: limpoDesc });
+        append({ id: "", name: limpo, description: limpoDesc });
 
         setMateriaDesc("");
         setMateria("");
@@ -109,13 +110,13 @@ export function CursoCadastroPage() {
                             type="text"
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                             placeholder="Digite a descrição"
-                            {...register("descricao", {
+                            {...register("description", {
                                 required: "A descrição é obrigatório",
                             })}
                         />
-                        {errors.descricao && (
+                        {errors.description && (
                             <p className="mt-1 text-sm text-red-600">
-                                {errors.descricao.message}
+                                {errors.description.message}
                             </p>
                         )}
                     </div>
@@ -176,7 +177,7 @@ export function CursoCadastroPage() {
                                 <input
                                     type="text"
                                     readOnly
-                                    {...register(`materias.${index}.descricao` as const, {
+                                    {...register(`materias.${index}.description` as const, {
                                         required: "A descrição da matéria é obrigatório"
                                     })}
                                 />
@@ -205,7 +206,7 @@ export function CursoCadastroPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 cursor-pointer disabled:bg-blue-300"
+                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer disabled:bg-blue-300"
                     >
                         {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>

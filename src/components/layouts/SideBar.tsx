@@ -84,7 +84,7 @@ export function SideBar() {
                             className={({ isActive }) =>
                                 
                                     `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
-                                    ${isActive ? 'bg-muted text-foreground' : ''}`
+                                    ${isActive ? 'bg-gray-400 text-foreground' : ''}`
                                 
                             }
                         >
@@ -98,7 +98,7 @@ export function SideBar() {
                     <div className="rounded-lg bg-muted p-3">
                         <p className="text-sm font-medium">Organização atual</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                            Aticurando TOP 1 BRAZIL
+                            Aticurando TOP 1 Atibaia
                         </p>
                     </div>
                 </div>
