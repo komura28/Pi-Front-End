@@ -46,7 +46,7 @@ export function CursoCadastroPage() {
             const dados: RegisterCursoRequest = {
                 name: data.name,
                 description: data.description,
-                materias: data.materias.map(materia => ({ id: "", name: materia.name, description: materia.description }))
+                materias: data.materias.map(materia => ({name: materia.name, description: materia.description }))
             };
             await cadastrarCurso(dados);
             navigate("/app/curso");
@@ -67,11 +67,13 @@ export function CursoCadastroPage() {
 
         if (!limpo) return;
 
-<<<<<<< HEAD
-        append({ id: "", name: limpo, description: limpoDesc });
-=======
-        
->>>>>>> Erick
+        append({ name: limpo, description: limpoDesc });
+
+        setMateriaDesc("");
+        setMateria("");
+    };
+
+    
     return (
         <main className="flex min-h-screen items-center justify-center bg-white px-4">
             <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
@@ -130,7 +132,7 @@ export function CursoCadastroPage() {
                                 type="text"
                                 value={materia}
                                 onChange={(e) => setMateria(e.target.value)}
-                                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                className="mb-5 flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                                 placeholder="Digite o nome da matéria"
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -192,14 +194,16 @@ export function CursoCadastroPage() {
 
                                 <div className="col-span-6 text-gray-600 break-words whitespace-normal">
                                 <input
-<<<<<<< HEAD
+
                                     type="hidden"
-                                    readOnly
-                                    {...register(`materias.${index}.description` as const, {
-=======
                                     
-                                    {...register(`materias.${index}.descricao` as const, {
->>>>>>> Erick
+                                    {...register(`materias.${index}.description` as const, {
+                                        required: "A descrição da matéria é obrigatório"
+                                    })}
+                                />
+                                {field.description}
+                                </div>
+
 
 
                                 {errors.materias?.[index]?.name && (
