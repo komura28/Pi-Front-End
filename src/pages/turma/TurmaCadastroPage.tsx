@@ -9,19 +9,20 @@ interface CadastroTurmaFormData {
     curso: string;
     turno: string;
     capacidade: number;
+    dataInicio: Date;
+    dataFim: Date;
 }
 
 export function TurmaCadastroPage() {
     const navigate = useNavigate();
     const { cadastrarTurma } = useAuth()
     const [serverError, setServerError] = useState("");
-    const [turma, setTurma] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [cursos, setCursos] = useState<authCurso[]>([]);
 
     useEffect(() => {
-            async function carregarCursos() {
+            async function carregarTurmas() {
                 try {
                     setLoading(true);
                     const data = await getCurso();
@@ -37,7 +38,7 @@ export function TurmaCadastroPage() {
                 }
             }
     
-            carregarCursos();
+            carregarTurmas();
         }, [])
 
 
@@ -56,7 +57,9 @@ export function TurmaCadastroPage() {
             const dados: RegisterTurmaRequest = {
                 curso: cursos.find(curso => curso.id === data.curso)?.id || "",
                 turno: data.turno,
-                capacidade: data.capacidade
+                capacidade: data.capacidade,
+                dataInicio: data.dataInicio,
+                dataFim: data.dataFim
             };
             await cadastrarTurma(dados);
             navigate("/app/turma");

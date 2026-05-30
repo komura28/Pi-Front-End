@@ -8,7 +8,7 @@ import {  getTurma } from "../../services/authService";
 const isSubmitting = false;
 
 export function TurmaPage() {
-    const [cursos, setTurmas] = useState<authTurma[]>([]);
+    const [turmas, setTurmas] = useState<authTurma[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -17,8 +17,21 @@ export function TurmaPage() {
             try {
                 setLoading(true);
                 const data = await getTurma();
-                setTurmas(data);
+                console.log("getTurma response:", data);
+
+                if (Array.isArray(data)) {
+                    setTurmas(data);
+                } else if (data && Array.isArray((data as any).turmas)) {
+                    setTurmas((data as any).turmas);
+                } else if (data && Array.isArray((data as any).data)) {
+                    setTurmas((data as any).data);
+                } else if (data) {
+                    setTurmas([data as any]);
+                } else {
+                    setTurmas([]);
+                }
             } catch (error) {
+                console.error("Erro ao buscar turmas", error);
                 if (error instanceof Error) {
                     setError(`Erro ao carregar os dados da turma: ${error.message}`);
                 } else {
@@ -39,7 +52,7 @@ export function TurmaPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
-    if (cursos.length === 0) {
+    if (turmas.length === 0) {
         return <div className="p-8"><p>Nenhuma turma encontrada</p></div>;
     }
 
@@ -72,16 +85,16 @@ export function TurmaPage() {
                     </thead>
 
                     <tbody className="border-b">
-                        {cursos.map((turmas) => (
-                            <tr key={turmas.id}>
+                        {turmas.map((turma) => (
+                            <tr key={turma.id}>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {turmas.turno}
+                                    {turma.turno}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {turmas.curso.name}
+                                    {turma.curso}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {turmas.capacidade}
+                                    {turma.capacidade}
                                 </td>
                                 <td className="p-2 flex gap-2 justify-center">
                                     <Button isSubmitting={isSubmitting}
