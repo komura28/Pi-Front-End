@@ -27,7 +27,6 @@ export interface RegisterRequest{
 }
 
 export interface authMateria{
-    id: string,
     name: string
     descricao: string
 
