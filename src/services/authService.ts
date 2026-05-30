@@ -2,19 +2,16 @@ import type { authCurso, authUser, LoginRequest, LoginResponse, RegisterCursoReq
 import { api } from "./api";
 
 
-export async function Register(data: RegisterRequest): Promise<authUser>{
+export async function Register(data: RegisterRequest): Promise<authUser> {
     const response = await api.post("/auth/register", data)
     return response.data;
 }
 
-export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso>{
+export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
     const response = await api.post("auth/register-curso", data)
     return response.data
 }
 
-/*export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> {
-    
-}*/
 
 export async function getMe() {
     const response = await api.get("/auth/me")
@@ -22,13 +19,13 @@ export async function getMe() {
     return response.data;
 }
 
-export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{
+export async function LoginApi(data: LoginRequest): Promise<LoginResponse> {
     const reponse = await api.post("/auth/login", data)
     return reponse.data;
 }
 
 export async function getCurso() {
-    const response = await api.get("/auth/curso")
+    const response = await api.get("/curso")
 
     return response.data;
 }

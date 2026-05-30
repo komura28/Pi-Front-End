@@ -7,14 +7,8 @@ import { getCurso } from "../../services/authService";
 
 const isSubmitting = false;
 
-interface CursoFormData {
-    name: string,
-    description: string
-}
-
 export function CursoPage() {
-    const [serverError, setServerError] = useState("");
-    const [curso, setCurso] = useState<authCurso | null>(null);
+    const [cursos, setCursos] = useState<authCurso[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -23,9 +17,13 @@ export function CursoPage() {
             try {
                 setLoading(true);
                 const data = await getCurso();
-                setCurso(data);
+                setCursos(data);
             } catch (error) {
-                setError("Erro ao carregar os dados do curso");
+                if (error instanceof Error) {
+                    setError(`Erro ao carregar os dados do curso: ${error.message}`);
+                } else {
+                    setError("Erro ao carregar os dados do curso");
+                }
             } finally {
                 setLoading(false);
             }
@@ -41,10 +39,9 @@ export function CursoPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
-    if (!curso) {
+    if (cursos.length === 0) {
         return <div className="p-8"><p>Nenhum curso encontrado</p></div>;
     }
-    ;
 
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-6">
@@ -71,23 +68,24 @@ export function CursoPage() {
                     </thead>
 
                     <tbody className="border-b">
-                        <tr>
-                            <td  className="text-slate-600 p-2 border-b">
-                                {curso.name}
-                            </td>
-                            <td  className="text-slate-600 p-2 border-b">
-                                {curso.description}
-                            </td>
-
-                            <td className="p-2 flex gap-2 justify-center">
-                                <Button isSubmitting={isSubmitting}
-                                    label={<FaPencilAlt />}
-                                    loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
-                                <Button isSubmitting={isSubmitting}
-                                    label={<FaTrash />}
-                                    loadingLabel="recusando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
-                            </td>
-                        </tr>
+                        {cursos.map((cursos) => (
+                            <tr key={cursos.id}>
+                                <td className="text-slate-600 p-2 border-b">
+                                    {cursos.name}
+                                </td>
+                                <td className="text-slate-600 p-2 border-b">
+                                    {cursos.description}
+                                </td>
+                                <td className="p-2 flex gap-2 justify-center">
+                                    <Button isSubmitting={isSubmitting}
+                                        label={<FaPencilAlt />}
+                                        loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
+                                    <Button isSubmitting={isSubmitting}
+                                        label={<FaTrash />}
+                                        loadingLabel="recusando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </section>
