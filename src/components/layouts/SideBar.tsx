@@ -18,7 +18,11 @@ const navigationItems = [
     },
     {
         label: "Turmas",
-        href: "/app/turma",
+        isSelect: true,
+        options: [
+            {label: "Cadastrar Turma", href: "/app/register-turma"},
+            {label: "Listar Turmas", href: "/app/turma"},
+        ]
 
     },
     {

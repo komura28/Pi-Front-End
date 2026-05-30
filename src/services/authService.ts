@@ -29,3 +29,8 @@ export async function getCurso() {
 
     return response.data;
 }
+
+export async function getTurma() {
+    const response = await api.get("/turma")
+    return response.data;
+}
