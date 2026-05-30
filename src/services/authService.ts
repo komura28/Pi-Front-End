@@ -17,9 +17,9 @@ export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCur
 }*/
 
 export async function getMe() {
-    const reponse = await api.get("/auth/me")
+    const response = await api.get("/auth/me")
 
-    return reponse.data;
+    return response.data;
 }
 
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse>{

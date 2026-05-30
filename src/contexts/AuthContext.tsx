@@ -8,6 +8,7 @@ interface AuthContextData {
     user: authUser | null;
     isAuthenticated: boolean;
     isAdmin: boolean;
+    control: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
     cadastrarCurso: (data: RegisterCursoRequest) => Promise<void>;
     login: (data: LoginRequest) => Promise<void>;
@@ -23,6 +24,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<authUser | null>(null);
+    const [control, setControl] = useState(true);
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user");
@@ -30,6 +32,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (savedUser) {
             setUser(JSON.parse(savedUser));
         }
+       setControl(false);
+
     }, []);
 
     async function login(data: LoginRequest) {
@@ -76,6 +80,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 cadastrarCurso,
                 login,
                 getMe,
+                control,
                 logout,
             }}
         >

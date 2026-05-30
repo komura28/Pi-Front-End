@@ -20,14 +20,29 @@ export function PerfilPage() {
             try {
                 setLoading(true);
                 const data = await getMe();
-                setUser(data.data);
+                setUser(data);
+                setError("");
             } catch (error) {
                 console.error(error);
+                setError("Erro ao carregar dados do usuário");
+            } finally {
+                setLoading(false);
             }
         }
         carregarDados();
-        console.log("user: ", user?.name);
     }, [])
+    if (loading) {
+        return <div className="p-8"><p>Carregando...</p></div>;
+    }
+
+    if (error) {
+        return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
+    }
+
+    if (!user) {
+        return <div className="p-8"><p>Nenhum usuário encontrado</p></div>;
+    }
+
     return (
         <div>
             <h1>Meu Perfil</h1>
@@ -54,8 +69,9 @@ export function PerfilPage() {
                         <input
                             id="email"
                             type="text"
+                            value={user?.email}
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
-                            
+                            disabled
                         />
                         <label
                             htmlFor="cpf"

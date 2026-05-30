@@ -3,9 +3,22 @@ import { PublicRoutes } from "./PublicRoutes";
 import { PrivateRoutes } from "./PrivateRoutes";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 import { AppAdminLayout } from "../components/layouts/AppAdminLayout";
+import { useAuth } from "../contexts/AuthContext";
 
 
 export function AppRoutes() {
+    const {control} = useAuth();
+
+    if(control) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-gray-100">
+                <p className="text-lg font-semibold text-gray-600 animate-pulse">
+                    Verificando autenticação...
+                </p>
+            </div>
+        );
+    }
+
     return (
         <BrowserRouter>
             <Routes>
