@@ -44,3 +44,16 @@ export interface RegisterCursoRequest{
     description: string,
     materias: authMateria[]
 }
+
+export interface authTurma{
+    id: string,
+    curso: string,
+    turno: string,
+    capacidade: number
+}
+
+export interface RegisterTurmaRequest{
+    curso: string,
+    turno: string,
+    capacidade: number
+}

@@ -68,13 +68,13 @@ export function CursoPage() {
                     </thead>
 
                     <tbody className="border-b">
-                        {cursos.map((cursos) => (
-                            <tr key={cursos.id}>
+                        {cursos.map((curso) => (
+                            <tr key={curso.id}>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {cursos.name}
+                                    {curso.name}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {cursos.description}
+                                    {curso.description}
                                 </td>
                                 <td className="p-2 flex gap-2 justify-center">
                                     <Button isSubmitting={isSubmitting}

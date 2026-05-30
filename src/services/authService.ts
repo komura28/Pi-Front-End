@@ -1,4 +1,4 @@
-import type { authCurso, authUser, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest } from "../types/auth/auth-types";
+import type { authCurso, authTurma, authUser, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest } from "../types/auth/auth-types";
 import { api } from "./api";
 
 
@@ -9,6 +9,11 @@ export async function Register(data: RegisterRequest): Promise<authUser> {
 
 export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
     const response = await api.post("auth/register-curso", data)
+    return response.data
+}
+
+export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
+    const response = await api.post("auth/register-turma", data)
     return response.data
 }
 

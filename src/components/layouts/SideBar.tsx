@@ -18,7 +18,7 @@ const navigationItems = [
     },
     {
         label: "Turmas",
-        href: "/app/turma",
+        href: "/app/register-turma",
 
     },
     {
