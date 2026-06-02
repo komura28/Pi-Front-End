@@ -27,37 +27,37 @@ export interface RegisterRequest{
 }
 
 export interface authMateria{
-    name: string
-    description: string
+    name: string;
+    description: string;
 
 }
 
 export interface authCurso{
-    id: string,
-    name: string,
-    description: string,
-    materias: authMateria[]
+    id: string;
+    name: string;
+    description: string;
+    materias: authMateria[];
 }
 
 export interface RegisterCursoRequest{
-    name: string,
-    description: string,
-    materias: authMateria[]
+    name: string;
+    description: string;
+    materias: authMateria[];
 }
 
 export interface authTurma{
-    id: string,
-    curso: string,
-    turno: string,
-    capacidade: number,
-    dataInicio: string,
-    dataFim: string
+    id: string;
+    curso: string;
+    turno: "Manha" | "Tarde" | "Noite";
+    capacidade: number;
+    dataInicio: string;
+    dataFim: string;
 }
 
 export interface RegisterTurmaRequest{
-    curso: string,
-    turno: string,
-    capacidade: number,
-    dataInicio: Date,
-    dataFim: Date
+    curso: string;
+    turno: string;
+    capacidade: number;
+    dataInicio: Date;
+    dataFim: Date;
 }

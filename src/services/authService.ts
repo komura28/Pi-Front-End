@@ -25,8 +25,10 @@ export async function getMe() {
 }
 
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse> {
-    const reponse = await api.post("/auth/login", data)
-    return reponse.data;
+    const response = await api.post("/auth/login", data)
+    console.log(response);
+    return response.data;
+
 }
 
 export async function getCurso() {
