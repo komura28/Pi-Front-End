@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import type { authCurso, RegisterTurmaRequest } from "../../types/auth/auth-types";
 import { getCurso } from "../../services/authService";
 
@@ -17,30 +17,9 @@ export function TurmaCadastroPage() {
     const navigate = useNavigate();
     const { cadastrarTurma } = useAuth()
     const [serverError, setServerError] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [materia, setMateria] = useState("");
+    const [materiaDesc, setMateriaDesc] = useState("");
     const [cursos, setCursos] = useState<authCurso[]>([]);
-
-    useEffect(() => {
-            async function carregarTurmas() {
-                try {
-                    setLoading(true);
-                    const data = await getCurso();
-                    setCursos(data);
-                } catch (error) {
-                    if (error instanceof Error) {
-                        setError(`Erro ao carregar os dados do curso: ${error.message}`);
-                    } else {
-                        setError("Erro ao carregar os dados do curso");
-                    }
-                } finally {
-                    setLoading(false);
-                }
-            }
-    
-            carregarTurmas();
-        }, [])
-
 
     const {
         register,
@@ -49,17 +28,16 @@ export function TurmaCadastroPage() {
         formState: { errors, isSubmitting }
     } = useForm<CadastroTurmaFormData>();
 
-    
-
     async function handleCadastro(data: CadastroTurmaFormData) {
         try {
+            console.log("Dados do formulário:", data);
             setServerError("");
             const dados: RegisterTurmaRequest = {
                 curso: cursos.find(curso => curso.id === data.curso)?.id || "",
                 turno: data.turno,
                 capacidade: data.capacidade,
                 dataInicio: data.dataInicio,
-                dataFim: data.dataFim
+                dataFim: data.dataFim,
             };
             await cadastrarTurma(dados);
             navigate("/app/turma");
@@ -67,13 +45,14 @@ export function TurmaCadastroPage() {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
         }
-        console.log("objeto: ", data);
     }
 
     const onError = (errors: any) => {
         console.log("Erros de validação do formulário:", errors);
     }
-  
+
+
+    
     return (
         <main className="flex min-h-screen items-center justify-center bg-white px-4">
             <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
@@ -85,39 +64,39 @@ export function TurmaCadastroPage() {
 
                     <div>
                         <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Curso
+                            Capacidade
                         </label>
 
-                        <select 
+                        <input
+                            type="text"
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            {...register("curso", {
-                                required: "O curso é obrigatório",
-                            })}>
-                                <option value="" disabled>Selecione um Curso</option>
-                                {cursos.map((curso) =>
-                                    <option key={curso.id} value={curso.id}>{curso.name}</option>)}
-                        </select>
-                        {errors.curso && (
+                            placeholder="Digite a capacidade"
+                            {...register("capacidade", {
+                                required: "A capacidade é obrigatória",
+                            })}
+                        />
+                        {errors.capacidade && (
                             <p className="mt-1 text-sm text-red-600">
-                                {errors.curso.message}
+                                {errors.capacidade.message}
                             </p>
                         )}
                     </div>
 
                     <div>
                         <label className="mb-1 block text-sm font-bold text-gray-700">
-                            turno
+                            Turno
                         </label>
                         <select
                             className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
+
                             {...register("turno", {
                                 required: "O turno é obrigatório",
                             })}
                         >
-                            <option value="" disabled>Selecione um Turno</option>
-                            <option value="manha" >Manhã</option>
-                            <option value="tarde" >Tarde</option>
-                            <option value="noite" >Noite</option>
+                            <option value="" disabled>Selecione o turno</option>
+                            <option value="Manha">Manhã</option>
+                            <option value="Tarde">Tarde</option>
+                            <option value="Noite">Noite</option>
                         </select>
                         {errors.turno && (
                             <p className="mt-1 text-sm text-red-600">
@@ -127,37 +106,122 @@ export function TurmaCadastroPage() {
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-bold text-gray-700">
-                            Capacidade
+                        <label className="mb-1 block text-gray-700 font-bold text-sm">
+                            Nome da Matéria
                         </label>
-                        <input
-                            type="number"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="1-35"
-                            max="35"
-                            min="1"
-                            {...register("capacidade", {
-                                valueAsNumber: true,
-                                required: "A capacidade é obrigatório",
-                                min: {value: 1, message:"Valor menor que 1. Digite acima"},
-                                max: {value: 35, message:"Valor maior que 35. Digite abaixo"},
-                                
-                            })}
-                        />
-                        
-                        {errors.capacidade && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.capacidade.message}
-                            </p>
-                        )}
+
+                        <div className="flex flex-col gap-3">
+                            {/* <input
+                                type="text"
+                                value={materia}
+                                onChange={(e) => setMateria(e.target.value)}
+                                className="mb-5 flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                placeholder="Digite o nome da matéria"
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        handleMateria();
+                                    }
+                                }} /> */}
+                            </div>
+
+                            <label className="mb-1 block text-gray-700 font-bold text-sm">
+                            Nome da Descrição (Matéria)
+                            </label>
+
+                            <div className="flex flex-wrap gap-2">
+                             {/*    <input
+                                    type="text"
+                                    value={materiaDesc}
+                                    onChange={(e) => setMateriaDesc(e.target.value)}
+                                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                    placeholder="Digite a descrição da matéria"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleMateria();
+                                        }
+                                    }} /> */}
+                                {/* <button
+                                    type="button"
+                                    onClick={handleMateria}
+                                    className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
+                                >
+                                    +
+                                </button> */}
+                        </div>
                     </div>
+
+                    {/* <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
+                        {fields.length > 0 && (
+                            <div className="grid grid-cols-12 gap-2 px-3 py-1 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                <span className="col-span-4">Nome</span>
+                                <span className="col-span-6">Descrição</span>
+                                <span className="col-span-2">Ação</span>
+                            </div>
+                            
+                        )}
+                        {fields.map((field, index) => (
+                            <div key={field.id} 
+                                 className="grid grid-cols-12 gap-2 items-center rounded-lg bg-gray-50 px-3 py-2 border border-gray-200 text-sm">
+                                <div className="col-span-4 font-medium text-gray-900 break-words whitespace-normal">
+                                <input
+                                    type="hidden"
+                                    
+                                    {...register(`materias.${index}.name` as const, {
+                                        required: "O nome da matéria é obrigatório"
+                                    })}
+                                />
+                                {field.name}
+                                </div>
+
+                                <div className="col-span-6 text-gray-600 break-words whitespace-normal">
+                                <input
+
+                                    type="hidden"
+                                    
+                                    {...register(`materias.${index}.description` as const, {
+                                        required: "A descrição da matéria é obrigatório"
+                                    })}
+                                />
+                                {field.description}
+                                </div>
+
+
+
+                                {errors.materias?.[index]?.name && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.materias[index].name.message}
+                                    </p>
+                                )}
+
+                                <div className="col-span-2 text-right">
+                                <button
+                                    type="button"
+                                    onClick={() => remove(index)}
+                                    disabled={isSubmitting}
+                                    className="w-auto rounded-lg bg-red-100 px-3 py-2 font-medium text-red-600 transition hover:bg-red-200 cursor-pointer disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                >
+                                    {isSubmitting ? "Removendo..." : "Remover"}
+                                </button>
+                                </div>
+
+                                {errors.materias?.[index]?.name && (
+                                    <p className="col-span-12 mt-1 text-xs text-red-600">
+                                        {errors.materias[index]?.name.message}
+                                    </p>
+                                )}
+                                </div>    
+                            
+                        ))}
+                    </div> */}
 
                     <button
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer disabled:bg-blue-300"
                     >
-                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                        {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>
                 </form>
             </section>
