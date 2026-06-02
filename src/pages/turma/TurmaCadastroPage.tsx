@@ -147,9 +147,9 @@ export function TurmaCadastroPage() {
                             })}
                         >
                             <option value="" disabled>Selecione o turno</option>
-                            <option value="Manha">Manhã</option>
-                            <option value="Tarde">Tarde</option>
-                            <option value="Noite">Noite</option>
+                            <option value="MANHA">Manhã</option>
+                            <option value="TARDE">Tarde</option>
+                            <option value="NOITE">Noite</option>
                         </select>
                         {errors.turno && (
                             <p className="mt-1 text-sm text-red-600">
