@@ -17,10 +17,30 @@ export function TurmaCadastroPage() {
     const navigate = useNavigate();
     const { cadastrarTurma } = useAuth()
     const [serverError, setServerError] = useState("");
-    const [materia, setMateria] = useState("");
-    const [materiaDesc, setMateriaDesc] = useState("");
     const [cursos, setCursos] = useState<authCurso[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
+    useEffect(() => {
+        async function carregarTurmas() {
+            try{
+                setLoading(true);
+                const data = await getCurso();
+                setCursos(data);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setError(`Erro ao carregar cursos: ${error.message}`);
+                } else {
+                    setError("Erro ao carregar cursos");
+                }
+            } finally {
+                setLoading(false);
+            }
+
+        }
+        carregarTurmas();
+
+    }, [])
     const {
         register,
         handleSubmit,
@@ -45,6 +65,7 @@ export function TurmaCadastroPage() {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
         }
+        console.log("objeto:", data);
     }
 
     const onError = (errors: any) => {
@@ -62,17 +83,49 @@ export function TurmaCadastroPage() {
 
                 <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
 
+
+                    <div>
+                        <label className="mb-1 block text-gray-700 font-bold text-sm">
+                            Curso
+                        </label>
+
+                        <select
+                            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
+
+                            {...register("curso", {
+                                required: "O curso é obrigatório",
+                            })}
+                        >
+                            <option value="" disabled>Selecione o curso</option>
+                            {cursos.map((curso) => (
+                                <option key={curso.id} value={curso.id}>
+                                    {curso.name}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.curso && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.curso.message}
+                            </p>
+                        )}
+                    </div>
+
+
                     <div>
                         <label className="mb-1 block text-gray-700 font-bold text-sm">
                             Capacidade
                         </label>
 
                         <input
-                            type="text"
+                            type="number"
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                             placeholder="Digite a capacidade"
                             {...register("capacidade", {
                                 required: "A capacidade é obrigatória",
+                                min: {
+                                    value: 1,
+                                    message: "A capacidade deve ser um número positivo"
+                                }
                             })}
                         />
                         {errors.capacidade && (
@@ -107,114 +160,44 @@ export function TurmaCadastroPage() {
 
                     <div>
                         <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Nome da Matéria
+                            Data de Início
                         </label>
 
-                        <div className="flex flex-col gap-3">
-                            {/* <input
-                                type="text"
-                                value={materia}
-                                onChange={(e) => setMateria(e.target.value)}
-                                className="mb-5 flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                placeholder="Digite o nome da matéria"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        handleMateria();
-                                    }
-                                }} /> */}
-                            </div>
-
-                            <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Nome da Descrição (Matéria)
-                            </label>
-
-                            <div className="flex flex-wrap gap-2">
-                             {/*    <input
-                                    type="text"
-                                    value={materiaDesc}
-                                    onChange={(e) => setMateriaDesc(e.target.value)}
-                                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                    placeholder="Digite a descrição da matéria"
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            handleMateria();
-                                        }
-                                    }} /> */}
-                                {/* <button
-                                    type="button"
-                                    onClick={handleMateria}
-                                    className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
-                                >
-                                    +
-                                </button> */}
-                        </div>
+                        <input
+                            type="date"
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                            placeholder="Digite a data de início"
+                            {...register("dataInicio", {
+                                required: "A data de início é obrigatória"
+                            })}
+                        />
+                        {errors.dataInicio && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.dataInicio.message}
+                            </p>
+                        )}
                     </div>
 
-                    {/* <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
-                        {fields.length > 0 && (
-                            <div className="grid grid-cols-12 gap-2 px-3 py-1 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                <span className="col-span-4">Nome</span>
-                                <span className="col-span-6">Descrição</span>
-                                <span className="col-span-2">Ação</span>
-                            </div>
-                            
+                     <div>
+                        <label className="mb-1 block text-gray-700 font-bold text-sm">
+                            Data de Fim
+                        </label>
+
+                        <input
+                            type="date"
+                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                            placeholder="Digite a data de fim"
+                            {...register("dataFim", {
+                                required: "A data de fim é obrigatória"
+                            })}
+                        />
+                        {errors.dataFim && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.dataFim.message}
+                            </p>
                         )}
-                        {fields.map((field, index) => (
-                            <div key={field.id} 
-                                 className="grid grid-cols-12 gap-2 items-center rounded-lg bg-gray-50 px-3 py-2 border border-gray-200 text-sm">
-                                <div className="col-span-4 font-medium text-gray-900 break-words whitespace-normal">
-                                <input
-                                    type="hidden"
-                                    
-                                    {...register(`materias.${index}.name` as const, {
-                                        required: "O nome da matéria é obrigatório"
-                                    })}
-                                />
-                                {field.name}
-                                </div>
+                    </div>
 
-                                <div className="col-span-6 text-gray-600 break-words whitespace-normal">
-                                <input
-
-                                    type="hidden"
-                                    
-                                    {...register(`materias.${index}.description` as const, {
-                                        required: "A descrição da matéria é obrigatório"
-                                    })}
-                                />
-                                {field.description}
-                                </div>
-
-
-
-                                {errors.materias?.[index]?.name && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {errors.materias[index].name.message}
-                                    </p>
-                                )}
-
-                                <div className="col-span-2 text-right">
-                                <button
-                                    type="button"
-                                    onClick={() => remove(index)}
-                                    disabled={isSubmitting}
-                                    className="w-auto rounded-lg bg-red-100 px-3 py-2 font-medium text-red-600 transition hover:bg-red-200 cursor-pointer disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                                >
-                                    {isSubmitting ? "Removendo..." : "Remover"}
-                                </button>
-                                </div>
-
-                                {errors.materias?.[index]?.name && (
-                                    <p className="col-span-12 mt-1 text-xs text-red-600">
-                                        {errors.materias[index]?.name.message}
-                                    </p>
-                                )}
-                                </div>    
-                            
-                        ))}
-                    </div> */}
 
                     <button
                         type="submit"
@@ -223,6 +206,7 @@ export function TurmaCadastroPage() {
                     >
                         {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>
+                    
                 </form>
             </section>
         </main>
