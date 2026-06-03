@@ -17,10 +17,10 @@ export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCur
     return response.data
 }
 
-export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
-    const response = await api.post("/turma", data)
+ export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
+    const response = await api.post("auth/register-turma", data)
     return response.data
-}
+ }
 
 export async function getMe() {
     const response = await api.get("/auth/me")

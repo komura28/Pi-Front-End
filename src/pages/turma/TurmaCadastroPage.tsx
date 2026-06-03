@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { authCurso, RegisterTurmaRequest } from "../../types/auth/auth-types";
 import { getCurso } from "../../services/authService";
+import { cadastrarTurma } from "../../services/admService";
 
 interface CadastroTurmaFormData {
     curso: string;
@@ -15,7 +16,6 @@ interface CadastroTurmaFormData {
 
 export function TurmaCadastroPage() {
     const navigate = useNavigate();
-    const { cadastrarTurma } = useAuth()
     const [serverError, setServerError] = useState("");
     const [cursos, setCursos] = useState<authCurso[]>([]);
     const [loading, setLoading] = useState(true);

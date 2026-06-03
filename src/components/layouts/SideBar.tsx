@@ -2,39 +2,21 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-const navigationItems = [
-    {
-        label: "Home",
-        href: "/app/home",
 
-    },
-    {
-        label: "Cursos",
-        isSelect: true,
-        options: [
-            { label: "Cadastrar Curso", href: "/app/register-curso" },
-            { label: "Listar Cursos", href: "/app/curso" },
-        ]
+interface NavigationItem {
+  label: string;
+  href?: string;
+  isSelect?: boolean;
+  options?: { label: string; href: string }[];
+}
 
-    },
-    {
-        label: "Turmas",
-        isSelect: true,
-        options: [
-            {label: "Cadastrar Turma", href: "/app/register-turma"},
-            {label: "Listar Turmas", href: "/app/turma"},
-        ]
+interface SideBarProps {
+  navigationItems: NavigationItem[];
+}
 
-    },
-    {
-        label: "Matrículas",
-        href: "/app/matricula",
 
-    },
 
-]
-
-export function SideBar() {
+export function SideBar({ navigationItems }: SideBarProps) {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [serverError, setServerError] = useState("");
