@@ -33,7 +33,7 @@ export interface authMateria{
 }
 
 export interface authCurso{
-    id: string,
+    _id: string,
     name: string,
     description: string,
     materias: authMateria[]
@@ -46,8 +46,8 @@ export interface RegisterCursoRequest{
 }
 
 export interface authTurma{
-    id: string,
-    curso: string,
+    _id: string,
+    curso: authCurso,
     turno: string,
     capacidade: number,
     dataInicio: string,

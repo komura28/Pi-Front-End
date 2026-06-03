@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { authCurso, RegisterTurmaRequest } from "../../types/auth/auth-types";
 import { getCurso } from "../../services/authService";
 
@@ -53,7 +53,7 @@ export function TurmaCadastroPage() {
             console.log("Dados do formulário:", data);
             setServerError("");
             const dados: RegisterTurmaRequest = {
-                curso: cursos.find(curso => curso.id === data.curso)?.id || "",
+                curso: cursos.find(curso => curso._id === data.curso)?._id || "",
                 turno: data.turno,
                 capacidade: data.capacidade,
                 dataInicio: data.dataInicio,
@@ -89,25 +89,25 @@ export function TurmaCadastroPage() {
                             Curso
                         </label>
 
-                        <select
-                            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
+                            <select
+                                className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
 
-                            {...register("curso", {
-                                required: "O curso é obrigatório",
-                            })}
-                        >
-                            <option value="" disabled>Selecione o curso</option>
-                            {cursos.map((curso) => (
-                                <option key={curso.id} value={curso.id}>
-                                    {curso.name}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.curso && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.curso.message}
-                            </p>
-                        )}
+                                {...register("curso", {
+                                    required: "O curso é obrigatório",
+                                })}
+                            >
+                                <option value="" disabled>Selecione o curso</option>
+                                {cursos.map((curso) => (
+                                    <option key={curso._id} value={curso._id}>
+                                        {curso.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.curso && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.curso.message}
+                                </p>
+                            )}
                     </div>
 
 

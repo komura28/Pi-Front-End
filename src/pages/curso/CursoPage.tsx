@@ -69,7 +69,7 @@ export function CursoPage() {
 
                     <tbody className="border-b">
                         {cursos.map((curso) => (
-                            <tr key={curso.id}>
+                            <tr key={curso._id}>
                                 <td className="text-slate-600 p-2 border-b">
                                     {curso.name}
                                 </td>
