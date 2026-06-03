@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-
-
  
 interface LoginFormData {
     email: string;
@@ -26,9 +24,11 @@ export function LoginPage() {
             setServerError("");
             await login(data);
             navigate("/app/home");
+            console.log("data: ", data);
         } catch (error) {
             console.log(error);
             setServerError(error instanceof Error ? error.message: "Erro ao realisar login. Verifique os dados informados");
+            console.log("data: ", data);
         }
     }
 

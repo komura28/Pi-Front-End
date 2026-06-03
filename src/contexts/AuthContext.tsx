@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { authUser, LoginRequest, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest } from "../types/auth/auth-types";
-import { LoginApi, Register, RegisterCurso, RegisterTurma } from "../services/authService";
+import { LoginApi, Register } from "../services/authService";
 import { api } from "../services/api";
 
 
@@ -10,8 +10,7 @@ interface AuthContextData {
     isAdmin: boolean;
     control: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
-    cadastrarCurso: (data: RegisterCursoRequest) => Promise<void>;
-    cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>;
+    /*cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; */
     login: (data: LoginRequest) => Promise<void>;
     getMe: () => Promise<authUser>;
     logout: () => void;
@@ -50,14 +49,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await Register(data);
     }
 
-    async function cadastrarCurso(data: RegisterCursoRequest) {
-        await RegisterCurso(data);
-    }
-
-    async function cadastrarTurma(data: RegisterTurmaRequest) {
-        await RegisterTurma(data);
-    }
-
     function logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -82,8 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 isAuthenticated,
                 isAdmin,
                 cadastrar,
-                cadastrarCurso,
-                cadastrarTurma,
+                /* cadastrarTurma, */
                 login,
                 getMe,
                 control,

@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso } from "../../types/auth/auth-types";
-import { getCurso } from "../../services/authService";
-
+import { deletarCursoAPI, getCurso } from "../../services/authService";
 
 const isSubmitting = false;
 
@@ -30,7 +29,21 @@ export function CursoPage() {
         }
 
         carregarCursos();
-    }, [])
+    }, []);
+
+    async function handleExcluir(_id: string ) {
+        try {
+            await deletarCursoAPI(_id);
+            alert("Cadastro excluido com sucesso!");
+            setCursos(cursos.filter((curso) => curso._id !== _id));
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
     }
@@ -69,7 +82,7 @@ export function CursoPage() {
 
                     <tbody className="border-b">
                         {cursos.map((curso) => (
-                            <tr key={curso.id}>
+                            <tr key={curso._id}>
                                 <td className="text-slate-600 p-2 border-b">
                                     {curso.name}
                                 </td>
@@ -79,10 +92,12 @@ export function CursoPage() {
                                 <td className="p-2 flex gap-2 justify-center">
                                     <Button isSubmitting={isSubmitting}
                                         label={<FaPencilAlt />}
+
                                         loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
                                     <Button isSubmitting={isSubmitting}
                                         label={<FaTrash />}
-                                        loadingLabel="recusando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
+                                        loadingLabel="recusando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" 
+                                        onClick={() => handleExcluir(curso._id)} />
                                 </td>
                             </tr>
                         ))}
