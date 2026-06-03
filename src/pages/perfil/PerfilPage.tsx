@@ -1,26 +1,16 @@
 import { useEffect, useState } from "react"
-import { getMe } from "../../services/authService"
-import type { authUser } from "../../types/auth/auth-types"
 import { useAuth } from "../../contexts/AuthContext";
-
-interface PerfilFormData {
-    name: string,
-    email: string;
-    cpf: string
-}
 
 export function PerfilPage() {
 
-    const [user, setUser] = useState<authUser | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const { user } = useAuth();
 
     useEffect(() => {
         async function carregarDados() {
             try {
                 setLoading(true);
-                const data = await getMe();
-                setUser(data);
                 setError("");
             } catch (error) {
                 console.error(error);

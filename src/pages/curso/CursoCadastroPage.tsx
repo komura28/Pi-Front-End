@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import type { RegisterCursoRequest } from "../../types/auth/auth-types";
+import { cadastrarCurso } from "../../services/admService";
 
 interface Materia {
     name: string;
@@ -17,7 +17,6 @@ interface CadastroCursoFormData {
 
 export function CursoCadastroPage() {
     const navigate = useNavigate();
-    const { cadastrarCurso } = useAuth()
     const [serverError, setServerError] = useState("");
     const [materia, setMateria] = useState("");
     const [materiaDesc, setMateriaDesc] = useState("");

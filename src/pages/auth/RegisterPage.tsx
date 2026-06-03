@@ -26,6 +26,8 @@ export function RegistroPage() {
             setServerError("");
             await cadastrar(data);
             navigate("/app/home");
+            alert("Cadastro realizado com sucesso!");
+            console.log("Dados do cadastro:", data);
         } catch (error) {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
@@ -39,6 +41,9 @@ export function RegistroPage() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
             <section className="w-full max-w-md rounded-2x1 bg-white p-8 shadow-lg">
+                <a href="/login" className="text-blue-500 hover:underline">
+                    ← Voltar
+                </a>
                 <h1 className="mb-2 text-center text-2x1 font-bold text-gray-800">
                     Aticurando
                 </h1>

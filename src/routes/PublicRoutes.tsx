@@ -7,7 +7,7 @@ export function PublicRoutes() {
         <Routes>
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/cadastro" element={<RegistroPage/>} />
-            <Route path="/*" element={<Navigate to="/app/home" replace/>}/>
+            <Route path="/*" element={<Navigate to="/login" replace/>}/>
         </Routes>
     )
 }

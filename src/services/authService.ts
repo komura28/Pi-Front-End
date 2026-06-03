@@ -2,6 +2,11 @@ import type { authCurso, authTurma, authUser, LoginRequest, LoginResponse, Regis
 import { api } from "./api";
 
 
+/* export async function AprovarMatricula(data: RegisterMatriculaRequest) {
+    const response = await api.post("", data)
+    return response.data;
+} */
+
 export async function Register(data: RegisterRequest): Promise<authUser> {
     const response = await api.post("/auth/register", data)
     return response.data;
@@ -17,16 +22,20 @@ export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTur
     return response.data
 }
 
-
 export async function getMe() {
     const response = await api.get("/auth/me")
 
     return response.data;
 }
 
+export async function deletarCursoAPI(_id: string) {    
+    const response = await api.delete(`/curso/${_id}`)
+    return response.data;
+}
+
 export async function LoginApi(data: LoginRequest): Promise<LoginResponse> {
-    const reponse = await api.post("/auth/login", data)
-    return reponse.data;
+    const response = await api.post("/auth/login", data)
+    return response.data;
 }
 
 export async function getCurso() {

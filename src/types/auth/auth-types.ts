@@ -33,7 +33,7 @@ export interface authMateria{
 }
 
 export interface authCurso{
-    id: string,
+    _id: string,
     name: string,
     description: string,
     materias: authMateria[]
