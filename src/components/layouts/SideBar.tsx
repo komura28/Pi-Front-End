@@ -38,6 +38,7 @@ export function SideBar() {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [serverError, setServerError] = useState("");
+    const [select, setSelect] = useState("");
 
     async function handleLogout() {
         try {
@@ -73,10 +74,11 @@ export function SideBar() {
                                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 >
                                     <select
+                                    value = {select}
                                         onChange={(e) => {
                                             if (e.target.value) {
                                                 navigate(e.target.value);
-                                            }
+                                            } setSelect("");
                                         }}
                                         className="w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"
                                         defaultValue=""

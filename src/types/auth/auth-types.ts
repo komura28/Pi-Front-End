@@ -2,7 +2,7 @@
 export type userRole = "ALUNO" | "ADM";
 
 export interface authUser{
-    id: string;
+    _id: string;
     name: string;
     cpf: string;
     email: string;

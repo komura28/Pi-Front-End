@@ -18,7 +18,7 @@ export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCur
 }
 
 export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
-    const response = await api.post("/turma", data)
+    const response = await api.post("/auth/register-turma", data)
     return response.data
 }
 
@@ -40,6 +40,12 @@ export async function LoginApi(data: LoginRequest): Promise<LoginResponse> {
 
 export async function getCurso() {
     const response = await api.get("/curso")
+
+    return response.data;
+}
+
+export async function getMatricula() {
+    const response = await api.get("/matricula")
 
     return response.data;
 }
