@@ -12,7 +12,6 @@ interface AuthContextData {
     cadastrar: (data: RegisterRequest) => Promise<void>;
     //cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; 
     login: (data: LoginRequest) => Promise<void>;
-    getMe: () => Promise<authUser>;
     logout: () => void;
 }
 
@@ -43,10 +42,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.setItem("user", JSON.stringify(response.user));
 
         setUser(response.user);
+        console.log("reponse contexto", response.user) 
     }
 
     async function cadastrar(data: RegisterRequest) {
-        await Register(data);
+        await Register(data); //UsuarioService
     }
 
     function logout() {
@@ -55,12 +55,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         setUser(null);
 
-    }
-
-    async function getMe() {
-        const response = await api.get("/auth/me")
-        
-        return response.data;
     }
 
     const isAuthenticated = !!user;
@@ -75,7 +69,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 cadastrar,
                 //cadastrarTurma,
                 login,
-                getMe,
                 control,
                 logout,
             }}

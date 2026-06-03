@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { authCurso, RegisterTurmaRequest } from "../../types/auth/auth-types";
