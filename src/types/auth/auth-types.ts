@@ -27,8 +27,8 @@ export interface RegisterRequest{
 }
 
 export interface authMateria{
-    name: string
-    description: string
+    name: string;
+    description: string;
 
 }
 
@@ -40,9 +40,9 @@ export interface authCurso{
 }
 
 export interface RegisterCursoRequest{
-    name: string,
-    description: string,
-    materias: authMateria[]
+    name: string;
+    description: string;
+    materias: authMateria[];
 }
 
 export interface authTurma{
@@ -55,9 +55,9 @@ export interface authTurma{
 }
 
 export interface RegisterTurmaRequest{
-    curso: string,
-    turno: string,
-    capacidade: number,
-    dataInicio: Date,
-    dataFim: Date
+    curso: string;
+    turno: string;
+    capacidade: number;
+    dataInicio: Date;
+    dataFim: Date;
 }
