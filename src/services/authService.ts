@@ -18,7 +18,7 @@ export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCur
 }
 
 export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
-    const response = await api.post("auth/register-turma", data)
+    const response = await api.post("/turma", data)
     return response.data
 }
 

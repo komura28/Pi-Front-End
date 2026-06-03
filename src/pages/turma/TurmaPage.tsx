@@ -78,6 +78,14 @@ export function TurmaPage() {
                                 Capacidade
                             </th>
 
+                            <th className="text-left text-slate-800 font-medium p-2 border-b">
+                                Data de Início
+                            </th>
+
+                            <th className="text-left text-slate-800 font-medium p-2 border-b">
+                                Data de Fim
+                            </th>
+
                             <th className=" text-slate-800 font-medium p-2 border-b justify-center">
                                 Ações
                             </th>
@@ -86,15 +94,21 @@ export function TurmaPage() {
 
                     <tbody className="border-b">
                         {turmas.map((turma) => (
-                            <tr key={turma.id}>
+                            <tr key={turma._id}>
                                 <td className="text-slate-600 p-2 border-b">
                                     {turma.turno}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {turma.curso}
+                                    {turma.curso.name || "Curso não definido"}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
                                     {turma.capacidade}
+                                </td>
+                                <td className="text-slate-600 p-2 border-b">
+                                    {turma.dataInicio}
+                                </td>
+                                <td className="text-slate-600 p-2 border-b">
+                                    {turma.dataFim}
                                 </td>
                                 <td className="p-2 flex gap-2 justify-center">
                                     <Button isSubmitting={isSubmitting}

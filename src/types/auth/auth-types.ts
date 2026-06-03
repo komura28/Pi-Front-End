@@ -46,8 +46,8 @@ export interface RegisterCursoRequest{
 }
 
 export interface authTurma{
-    id: string,
-    curso: string,
+    _id: string,
+    curso: authCurso,
     turno: string,
     capacidade: number,
     dataInicio: string,
