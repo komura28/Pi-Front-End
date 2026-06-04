@@ -6,6 +6,6 @@ export interface authMatricula{
     _id: string;
     user: authUser;
     turma: authTurma;
-    status: "PENDENTE" | "APROVADO" | "RECUSADO";
+    status: "PENDENTE" | "APROVADA" | "RECUSADA";
     role: userRole;
 }
