@@ -10,7 +10,6 @@ interface AuthContextData {
     isAdmin: boolean;
     control: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
-    //cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; 
     login: (data: LoginRequest) => Promise<void>;
     logout: () => void;
 }
@@ -67,7 +66,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 isAuthenticated,
                 isAdmin,
                 cadastrar,
-                //cadastrarTurma,
                 login,
                 control,
                 logout,

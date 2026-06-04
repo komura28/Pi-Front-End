@@ -63,7 +63,6 @@ export function SideBar({ navigationItems }: SideBarProps) {
                                             } setSelect("");
                                         }}
                                         className="w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"
-                                        defaultValue=""
                                     >
                                         <option value="" disabled hidden>{item.label}</option>
 

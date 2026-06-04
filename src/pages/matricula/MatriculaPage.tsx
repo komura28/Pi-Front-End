@@ -1,37 +1,30 @@
 //import { useState } from "react";
 import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import type { authUser } from "../../types/auth/auth-types";
-//import { getMatricula } from "../../services/authService";
+import { getMatricula } from "../../services/matriculaService";
+import type { authMatricula } from "../../types/matricula/matricula-types";
 
  const isSubmitting =(false);
 
 export function MatriculaPage() {
-    const [users, setUsers] = useState<authUser[]>([]);
+    const [matriculas, setMatriculas] = useState<authMatricula[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     
-        useEffect(() => {
-            async function carregarMatriculas() {
+        useEffect(() => { //useEffect é um hook
+            async function buscarMatriculasPendentes() {
                 try {
-                    setLoading(true);
-                    //const data = await getMatricula();
-                    //setUsers(data);
+                    setError("");
+                    const data = await getMatricula();
+                    setMatriculas(data);
                 } catch (error) {
-                    if (error instanceof Error) {
-                        setError(`Erro ao carregar os dados da matrícula: ${error.message}`);
-                    } else {
-                        setError("Erro ao carregar os dados da matrícula");
-                    }
+                    setError("Erro ao carregar os dados do Servidor");
                 } finally {
                     setLoading(false);
-                }
             }
-    
-            carregarMatriculas();
+            }
+
+            buscarMatriculasPendentes();
         }, []);
-    
-    
     
         if (loading) {
             return <div className="p-8"><p>Carregando...</p></div>;
@@ -41,59 +34,42 @@ export function MatriculaPage() {
             return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
         }
     
-        if (users.length === 0) {
-            return <div className="p-8"><p>Nenhum curso encontrado</p></div>;
+        if (matriculas.length === 0) {
+            return <div className="p-8"><p>NenhumA Matrícula Encontrado</p></div>;
         }
 
     return (
-          <div className="min-h-screen bg-white flex items-center justify-center px-1">
-            <section className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 border border-slate-300">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          <div>
+            <section>
+                <h1>
                     Lista de Matrículas
                 </h1>
 
-                <table className="w-full">
+                <table>
                     <thead>
                         <tr>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Nome
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                CPF
-                            </th>
-
-                            <th className=" text-slate-800 font-medium p-2 border-b justify-center">
-                                Ações
-                            </th>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Curso</th>
+                            <th>Turma</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-
-                    <tbody className="border-b">
-                        {users.map((user) => (
-                            <tr key={user._id}>
-                            <td className="text-slate-600 p-2 border-b">
-                                {user.name}
-                            </td>
-
-                            <td className="text-slate-600 p-2 border-b">
-                                {user.cpf}
-                            </td>
-
-                            <td className="p-2 flex gap-2 justify-center">
-                                <Button isSubmitting={isSubmitting} 
-                                label="Aprovar"
-                                loadingLabel="aprovando" className="bg-green-500 hover:bg-green-600 rounded-md text-white py-1 px-1"/>
-                                <Button isSubmitting={isSubmitting}
-                                label="Recusar"
-                                loadingLabel="recusando" className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"/>
-                            </td>
+                    <tbody>
+                        {matriculas.map((matricula) => (
+                        <tr key={matricula._id}>
+                            <td>{matricula.user.name}</td>
+                            <td>{matricula.user.cpf}</td>
+                            <td>{matricula.turma.curso.name}</td>
+                            <td>{matricula.turma.turno}</td>
+                            <td>{matricula.status}</td>
                         </tr>
-                        ))}
-                        
+            ))}
                     </tbody>
                 </table>
+
+
             </section>
-        </div>
+          </div>
     )
 }

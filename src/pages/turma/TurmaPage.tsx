@@ -44,6 +44,7 @@ export function TurmaPage() {
 
         carregarTurmas();
     }, [])
+    
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
     }
