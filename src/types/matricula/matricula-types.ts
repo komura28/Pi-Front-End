@@ -6,7 +6,7 @@ export interface authMatricula{
     _id: string;
     user: authUser;
     turma: authTurma;
-    status: "PENDENTE" | "APROVADO" | "RECUSADO";
+    status: "PENDENTE" | "APROVADA" | "RECUSADA";
     papelUsuario: papelUsuario;
 }
 export interface RegisterMatriculaRequest {

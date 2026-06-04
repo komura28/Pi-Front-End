@@ -7,20 +7,10 @@ export async function getMatricula(): Promise<[]> {
     return response.data;
 }
 
-
-
-
-/* export async function AprovarMatricula(data: RegisterMatriculaRequest) {
-    const response = await api.post("", data)
+export async function AtualizarMatricula(_id: string, status: "APROVADA" | "RECUSADA") {
+    const response = await api.put(`/matricula/${_id}`, { status })
     return response.data;
-} */
-
-
-
-
-/* export async function aprovarMatricula(data: RegisterMatriculaRequest) {
-    await AprovarMatricula(data);
-} */
+}
 
     export async function solicitarMatricula(data: RegisterMatriculaRequest) {
         const response = await api.post("/matricula", data);
