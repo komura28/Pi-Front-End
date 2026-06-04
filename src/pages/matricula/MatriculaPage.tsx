@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import type { authUser } from "../../types/auth/auth-types";
-import { getMatricula } from "../../services/authService";
+//import { getMatricula } from "../../services/authService";
 
  const isSubmitting =(false);
 
@@ -15,8 +15,8 @@ export function MatriculaPage() {
             async function carregarMatriculas() {
                 try {
                     setLoading(true);
-                    const data = await getMatricula();
-                    setUsers(data);
+                    //const data = await getMatricula();
+                    //setUsers(data);
                 } catch (error) {
                     if (error instanceof Error) {
                         setError(`Erro ao carregar os dados da matrícula: ${error.message}`);

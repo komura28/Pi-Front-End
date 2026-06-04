@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { HomePage } from "../pages/home/HomePage";
 import { CursoPage } from "../pages/curso/CursoPage";
-/* import { TurmaPage } from "../pages/turma/TurmaPage"; */
 import { PerfilPage } from "../pages/perfil/PerfilPage";
 import { ProtectedRoutes } from "./ProtectedRoutes";
 import { MatriculaPage } from "../pages/matricula/MatriculaPage";
 import { CursoCadastroPage } from "../pages/curso/CursoCadastroPage";
 import { TurmaCadastroPage } from "../pages/turma/TurmaCadastroPage";
+import { TurmaPage } from "../pages/turma/TurmaPage";
 
 export function PrivateRoutes() {
     return (
@@ -20,9 +20,9 @@ export function PrivateRoutes() {
                 <CursoPage />
             </ProtectedRoutes>} />
 
-           {/*  <Route path="/turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+            <Route path="/turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <TurmaPage />
-            </ProtectedRoutes>} /> */}
+            </ProtectedRoutes>} />
 
             <Route path="/perfil" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <PerfilPage />
@@ -33,11 +33,11 @@ export function PrivateRoutes() {
             </ProtectedRoutes>} />
 
             <Route path="/register-curso" element={<ProtectedRoutes allowedRoles={["ADM"]}>
-                <CursoCadastroPage/>
+                <CursoCadastroPage />
             </ProtectedRoutes>} />
 
             <Route path="/register-turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
-                <TurmaCadastroPage/>
+                <TurmaCadastroPage />
             </ProtectedRoutes>} />
 
             <Route path="/*" element={<Navigate to="/app/home" replace />} />
