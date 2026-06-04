@@ -1,12 +1,12 @@
 
-export type userRole = "ALUNO" | "ADM";
+export type papelUsuario = "ALUNO" | "ADM";
 
 export interface authUser{
     _id: string;
     name: string;
     cpf: string;
     email: string;
-    role: userRole;
+    papelUsuario: papelUsuario;
 }
 
 export interface LoginRequest{
@@ -61,3 +61,4 @@ export interface RegisterTurmaRequest{
     dataInicio: Date;
     dataFim: Date;
 }
+

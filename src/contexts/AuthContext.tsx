@@ -10,7 +10,12 @@ interface AuthContextData {
     isAdmin: boolean;
     control: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
+<<<<<<< HEAD
     login: (data: LoginRequest) => Promise<void>;
+=======
+    //cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; 
+    login: (data: LoginRequest) => Promise<authUser>;
+>>>>>>> komura
     logout: () => void;
 }
 
@@ -42,6 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         setUser(response.user);
         console.log("reponse contexto", response.user) 
+        return response.user;
     }
 
     async function cadastrar(data: RegisterRequest) {
@@ -57,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     const isAuthenticated = !!user;
-    const isAdmin = user?.role === "ADM";
+    const isAdmin = user?.papelUsuario === "ADM";
 
     return (
         <AuthContext.Provider
