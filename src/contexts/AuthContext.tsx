@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { authUser, LoginRequest, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest } from "../types/auth/auth-types";
+import type { authUser, LoginRequest, RegisterRequest } from "../types/auth/auth-types";
 import { LoginApi, Register } from "../services/authService";
-import { api } from "../services/api";
+
 
 
 interface AuthContextData {
@@ -10,12 +10,8 @@ interface AuthContextData {
     isAdmin: boolean;
     control: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
-<<<<<<< HEAD
-    login: (data: LoginRequest) => Promise<void>;
-=======
     //cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; 
     login: (data: LoginRequest) => Promise<authUser>;
->>>>>>> komura
     logout: () => void;
 }
 
