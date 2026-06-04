@@ -8,10 +8,9 @@ import { AppAlunoLayout } from "../components/layouts/AppAlunoLayout";
 import { AlunoPrivateRoutes } from "./AlunoPrivateRoutes";
 
 
-
 export function AppRoutes() {
     const { control } = useAuth();
-  
+
     if (control) {
         return (
             <div className="flex h-screen items-center justify-center bg-gray-100">
@@ -22,8 +21,6 @@ export function AppRoutes() {
         );
     }
 
-
-
     return (
         <BrowserRouter>
             <Routes>
@@ -31,8 +28,6 @@ export function AppRoutes() {
                     <Route path="/app/*" element={<PrivateRoutes />} />
                     <Route path="/unauthorized" element={<UnauthorizedPage />} />
                 </Route>
-
-
 
                 <Route element={<AppAlunoLayout />}>
                     <Route path="/api/*" element={<AlunoPrivateRoutes />} />

@@ -12,8 +12,6 @@ export function LoginPage() {
     const navigate = useNavigate();
     const { login } = useAuth();
     const [serverError, setServerError] = useState("");
-    const [user, setUser] = useState<any>(null);
-
     const {
         register,
         handleSubmit,

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AtualizarMatricula, getMatricula } from "../../services/matriculaService";
 import type { authMatricula } from "../../types/matricula/matricula-types";
 
- const isSubmitting =(false);
+
 
 export function MatriculaPage() {
     const [matriculas, setMatriculas] = useState<authMatricula[]>([]);
