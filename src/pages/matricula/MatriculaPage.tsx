@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { AtualizarMatricula, getMatricula } from "../../services/matriculaService";
 import type { authMatricula } from "../../types/matricula/matricula-types";
+import { api } from "../../services/api";
 
  const isSubmitting =(false);
 
@@ -10,21 +11,18 @@ export function MatriculaPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") {
+    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") { //Aqui 
         try {
-            AtualizarMatricula(_id, status);
+            await AtualizarMatricula(_id, status);
             setMatriculas((listaAtual) => 
                 listaAtual.map((matricula) =>
             matricula._id === _id ? { ...matricula, status: status } : matricula
+        
         ));
         } catch (error) {
             setError("Erro ao atualizar o status da matrícula");
-        } finally {
-            setLoading(false);
         }
-        AtualizarMatricula(_id, status);
-    }
-    
+    }    
         useEffect(() => { //useEffect é um hook
             async function buscarMatriculasPendentes() {
                 try {
@@ -77,9 +75,9 @@ export function MatriculaPage() {
                             <td className="text-slate-600 p-2 border-b">{matricula.user.name}</td>
                             <td className="text-slate-600 p-2 border-b text-center">{matricula.user.cpf}</td>
                             <td className="text-slate-600 p-2 border-b text-center">{matricula.turma.curso.name}</td>
-                            <td>{matricula.turma.turno}</td>
+                            <td className="text-slate-600 p-2 border-b text-center">{matricula.turma.turno}</td>
                             <td>{matricula.status}</td>
-                            <td className="p-2 flex gap-2 justify-center">
+                            <td className="p-2 flex gap-2 justify-center border-b.">
                                 {matricula.status === "PENDENTE" && (
                                     <div>
                                 <button className="cursor-pointer border-2 border-green-500 text-green-500 rounded-md px-2 py-1 mr-2"
