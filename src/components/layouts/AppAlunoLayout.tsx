@@ -5,8 +5,7 @@ import { SideBar } from "./SideBar";
 
 const alunoNavItems = [
   { label: "Home", href: "/app/aluno/home" },
-  { label: "Meus Cursos", href: "/app/aluno/cursos" },
-  { label: "Minhas Turmas", href: "/app/aluno/turmas" },
+  { label: "Meus Cursos", href: "/app/aluno/cursos" }
 ];
 
 export function AppAlunoLayout() {

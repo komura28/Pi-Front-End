@@ -11,6 +11,3 @@ export async function cadastrarTurma(data: RegisterTurmaRequest) {
     await RegisterTurma(data);
 }
 
-/* export async function aprovarMatricula(data: RegisterMatriculaRequest) {
-    await AprovarMatricula(data);
-} */

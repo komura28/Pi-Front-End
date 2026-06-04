@@ -2,23 +2,18 @@ import type { authCurso, authTurma, authUser, LoginRequest, LoginResponse, Regis
 import { api } from "./api";
 
 
-/* export async function AprovarMatricula(data: RegisterMatriculaRequest) {
-    const response = await api.post("", data)
-    return response.data;
-} */
-
 export async function Register(data: RegisterRequest): Promise<authUser> {
     const response = await api.post("/auth/register", data)
     return response.data;
 }
 
 export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
-    const response = await api.post("auth/register-curso", data)
+    const response = await api.post("/curso", data)
     return response.data
 }
 
  export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
-    const response = await api.post("auth/register-turma", data)
+    const response = await api.post("/turma", data)
     return response.data
  }
 

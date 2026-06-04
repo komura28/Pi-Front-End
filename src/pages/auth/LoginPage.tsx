@@ -12,6 +12,7 @@ export function LoginPage() {
     const navigate = useNavigate();
     const { login } = useAuth();
     const [serverError, setServerError] = useState("");
+    const [user, setUser] = useState<any>(null);
 
     const {
         register,
@@ -22,15 +23,20 @@ export function LoginPage() {
     async function handleLogin(data: LoginFormData) {
         try {
             setServerError("");
-            await login(data);
-            navigate("/app/home");
+             const loggedUser= await login(data);
+                if (loggedUser.papelUsuario === "ALUNO") {
+                    navigate("/api/home");
+                } else if (loggedUser.papelUsuario === "ADM") {
+                    navigate("/app/home");
+                }
             console.log("data: ", data);
         } catch (error) {
             console.log(error);
             setServerError(error instanceof Error ? error.message: "Erro ao realisar login. Verifique os dados informados");
             console.log("data: ", data);
-        }
+        } 
     }
+
 
 
     return (
