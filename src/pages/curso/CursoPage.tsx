@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso } from "../../types/auth/auth-types";
-import { deletarCursoAPI, getCurso } from "../../services/authService";
+import { deletarCursoAPI, getCurso, editarCursoAPI } from "../../services/authService"; // Adicionei o editarCursoAPI aqui
 
 const isSubmitting = false;
 
@@ -11,9 +11,15 @@ export function CursoPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    //Novos estados para o Modal de Exclusão
+    // Estados do Modal de Exclusão
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cursoToDelete, setCursoToDelete] = useState<string | null>(null);
+
+    // --- NOVOS ESTADOS PARA O MODAL DE EDIÇÃO ---
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [cursoToEditId, setCursoToEditId] = useState<string | null>(null);
+    const [editName, setEditName] = useState("");
+    const [editDescription, setEditDescription] = useState("");
 
     useEffect(() => {
         async function carregarCursos() {
@@ -35,21 +41,19 @@ export function CursoPage() {
         carregarCursos();
     }, []);
 
-    //Função que apenas abre o modal e guarda o ID do curso
+    // --- FUNÇÕES DE EXCLUSÃO ---
     function confirmarExclusao(id: string) {
         setCursoToDelete(id);
         setIsModalOpen(true);
     }
 
-    //Função para fechar o modal e limpar o ID selecionado
     function fecharModal() {
         setIsModalOpen(false);
         setCursoToDelete(null);
     }
 
-    //Função que realmente deleta após o usuário confirmar
     async function handleConfirmarExclusao() {
-        if (!cursoToDelete) return; // Segurança extra
+        if (!cursoToDelete) return;
 
         try {
             await deletarCursoAPI(cursoToDelete);
@@ -59,9 +63,54 @@ export function CursoPage() {
             console.log(error);
             alert("Erro ao excluir o curso.");
         } finally {
-            fecharModal(); // Fecha o modal independentemente de dar certo ou errado
+            fecharModal();
         }
     }
+
+    // --- NOVAS FUNÇÕES DE EDIÇÃO ---
+
+    // 1. Abre o modal e preenche os inputs com os dados atuais do curso
+    function abrirModalEdicao(curso: authCurso) {
+        setCursoToEditId(curso._id);
+        setEditName(curso.name);
+        setEditDescription(curso.description);
+        setIsEditModalOpen(true);
+    }
+
+    // 2. Limpa os campos e fecha o modal
+    function fecharModalEdicao() {
+        setIsEditModalOpen(false);
+        setCursoToEditId(null);
+        setEditName("");
+        setEditDescription("");
+    }
+
+    // 3. Envia os dados para a API e atualiza a lista na tela
+    async function handleSalvarEdicao() {
+        if (!cursoToEditId) return;
+
+        try {
+            // Chama a API passando o ID e os novos dados. 
+            // Ajuste os parâmetros de acordo com o que sua API espera receber.
+            await editarCursoAPI(cursoToEditId, { name: editName, description: editDescription });
+            
+            alert("Curso atualizado com sucesso!");
+            
+            // Atualiza a lista na tela (procura o curso pelo ID e altera apenas ele)
+            setCursos(cursos.map((curso) => 
+                curso._id === cursoToEditId 
+                    ? { ...curso, name: editName, description: editDescription } 
+                    : curso
+            ));
+            
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao atualizar o curso.");
+        } finally {
+            fecharModalEdicao();
+        }
+    }
+
 
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
@@ -100,8 +149,10 @@ export function CursoPage() {
                                     <Button 
                                         isSubmitting={isSubmitting}
                                         label={<FaPencilAlt />}
-                                        loadingLabel="aprovando" 
+                                        loadingLabel="salvando" 
                                         className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" 
+                                        // AQUI: Adicionei o evento de clique para abrir a edição passando o curso atual
+                                        onClick={() => abrirModalEdicao(curso)}
                                     />
                                     <Button 
                                         isSubmitting={isSubmitting}
@@ -117,8 +168,9 @@ export function CursoPage() {
                 </table>
             </section>
 
+            {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                         <h3 className="text-xl font-semibold text-slate-900 mb-2">Confirmar Exclusão</h3>
                         <p className="text-slate-600 mb-6">
@@ -137,6 +189,55 @@ export function CursoPage() {
                                 className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors"
                             >
                                 Sim, excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* NOVO MODAL DE EDIÇÃO */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Curso</h3>
+                        
+                        <div className="flex flex-col gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Nome do Curso
+                                </label>
+                                <input 
+                                    type="text" 
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Descrição
+                                </label>
+                                <textarea 
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3">
+                            <button 
+                                onClick={fecharModalEdicao}
+                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button 
+                                onClick={handleSalvarEdicao}
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                Salvar Alterações
                             </button>
                         </div>
                     </div>
