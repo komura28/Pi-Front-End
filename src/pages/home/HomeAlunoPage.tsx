@@ -15,7 +15,7 @@ export function HomeAlunoPage() {
 
 
     useEffect(() => {
-        async function carregarCursos() {
+        /* async function carregarCursos() {
             try {
                 setLoading(true);
                 const data = await getCurso();
@@ -29,9 +29,9 @@ export function HomeAlunoPage() {
             } finally {
                 setLoading(false);
             }
-        }
+        } */
 
-        carregarCursos();
+        //carregarCursos();
 
         async function carregarTurmas() {
             try {
