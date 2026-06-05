@@ -100,7 +100,7 @@ export function TurmaPage() {
                                     {turma.turno}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
-                                    {turma.curso.name || "Curso não definido"}
+                                    {turma.curso?.name || "Curso não definido"}
                                 </td>
                                 <td className="text-slate-600 p-2 border-b">
                                     {turma.capacidade}

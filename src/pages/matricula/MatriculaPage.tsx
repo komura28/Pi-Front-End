@@ -2,29 +2,31 @@
 import { useEffect, useState } from "react";
 import { AtualizarMatricula, getMatricula } from "../../services/matriculaService";
 import type { authMatricula } from "../../types/matricula/matricula-types";
-import { api } from "../../services/api";
+import { Modal } from "../../components/Modal";
+
+export function MatriculaPage() { //Aqui onde criamos a página de matrículas, começando pelos estados
+    const [matriculas, setMatriculas] = useState<authMatricula[]>([]); //EStado para armazenar as matrículas
+    const [loading, setLoading] = useState(true); //Estado para carregar os dados
+    const [error, setError] = useState(""); //Estado para erros
+    const [decisao, setDecisao] = useState<"APROVADA" | "RECUSADA" | null>(null); //Estado para decisão do ADM
+    const [isModalOpen, setIsModalOpen] = useState(false); //Estado do noss componente modal, para abrir e fechar ele
+    const [idSelecionado, setIdSelecionado] = useState<string | null>(null); //Aqui onde ele controla o ID que selecionamos, e o que fazer com ele
 
 
-
-export function MatriculaPage() {
-    const [matriculas, setMatriculas] = useState<authMatricula[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-
-    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") { //Aqui 
+    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") { //Aqui onde ele atualiza o status da matricula e do BD
         try {
-            await AtualizarMatricula(_id, status);
-            setMatriculas((listaAtual) => 
+            await AtualizarMatricula(_id, status); //Aguarda o BD autorizar os dados
+            setMatriculas((listaAtual) => //Atualiza o estado da lista para armazenar a nova lista, com o novo status
                 listaAtual.map((matricula) =>
             matricula._id === _id ? { ...matricula, status: status } : matricula
         
         ));
-        } catch (error) {
+        } catch (error) { //Trata Erros
             setError("Erro ao atualizar o status da matrícula");
         }
     }    
         useEffect(() => { //useEffect é um hook
-            async function buscarMatriculasPendentes() {
+            async function buscarMatriculasPendentes() { //Função para trazer as matrículas
                 try {
                     setError("");
                     const data = await getMatricula();
@@ -69,23 +71,33 @@ export function MatriculaPage() {
                             <th className="text-left text-slate-800 font-medium p-2 border-b">Ações</th>
                         </tr>
                     </thead>
-                    <tbody className="border-b">
+                    {/*Aqui onde lista as matrículas solicitadas */}
+                    <tbody className="border-b"> 
                         {matriculas.map((matricula) => (
                         <tr key={matricula._id}>
                             <td className="text-slate-600 p-2 border-b">{matricula.user.name}</td>
                             <td className="text-slate-600 p-2 border-b text-center">{matricula.user.cpf}</td>
-                            <td className="text-slate-600 p-2 border-b text-center">{matricula.turma.curso.name}</td>
+                            <td className="text-slate-600 p-2 border-b text-center">{matricula.turma.curso?.name}</td>
                             <td className="text-slate-600 p-2 border-b text-center">{matricula.turma.turno}</td>
                             <td>{matricula.status}</td>
                             <td className="p-2 flex gap-2 justify-center border-b.">
-                                {matricula.status === "PENDENTE" && (
+
+                                {matricula.status === "PENDENTE" && ( //Aqui onde tem uma codição, se status for PENDENTE, ele cria 2 botões, aceitar ou recusar
                                     <div>
                                 <button className="cursor-pointer border-2 border-green-500 text-green-500 rounded-md px-2 py-1 mr-2"
-                                onClick={() => handleDecisao(matricula._id, "APROVADA")}
+                                onClick={() => { //Atualiza os estados, para abrir o modal(true), receber a matrícula selecionada e a decisao selecionada
+                                    setIsModalOpen(true);
+                                    setIdSelecionado(matricula._id);
+                                    setDecisao("APROVADA");
+                                }}
                                 type="button">
                                     Aceitar</button>
                                 <button className="cursor-pointer border-2 border-red-500 text-red-500 rounded-md px-2 py-1"
-                                onClick={() => handleDecisao(matricula._id, "RECUSADA")}
+                                onClick={() => {
+                                    setIsModalOpen(true);
+                                    setIdSelecionado(matricula._id);
+                                    setDecisao("RECUSADA");
+                                }}
                                 type="button">
                                     Recusar</button>
                                 </div>
@@ -98,6 +110,19 @@ export function MatriculaPage() {
 
 
             </section>
+
+            {/*Aqui onde ele abre o Modal (Componente) para o ADM fazer a validação do usuário */}
+            {isModalOpen && (
+                <Modal
+                decisao = {decisao}
+                opSim = {() => { handleDecisao(idSelecionado!, decisao!);
+                                setIsModalOpen(false) }}
+                opNao = {() => {setIsModalOpen(false);
+                               setDecisao(null);
+                               setIdSelecionado(null)}}
+                
+
+                 /> )}
           </div>
     )
 }
