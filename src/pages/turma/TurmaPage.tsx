@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authTurma } from "../../types/auth/auth-types";
-import {  getTurma } from "../../services/authService";
+import {  deletarTurmaAPI, getTurma } from "../../services/authService";
+import { Modal } from "../../components/Modal";
 
 
 const isSubmitting = false;
@@ -11,6 +12,19 @@ export function TurmaPage() {
     const [turmas, setTurmas] = useState<authTurma[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [idSelecionado, setIdSelecionado] = useState<string | null>(null);
+
+    async function handleExclusao() {   
+            try {
+                await deletarTurmaAPI(idSelecionado!);
+                alert("Cadastro excluído com sucesso!");
+                setTurmas(turmas.filter((turma) => turma._id !== idSelecionado));
+            } catch (error) {
+                console.log(error);
+                alert("Erro ao excluir a turma.");
+            }
+        }
 
     useEffect(() => {
         async function carregarTurmas() {
@@ -117,13 +131,27 @@ export function TurmaPage() {
                                         loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
                                     <Button isSubmitting={isSubmitting}
                                         label={<FaTrash />}
-                                        loadingLabel="recusando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
+                                        onClick={() => {
+                                        setIsModalOpen(true);
+                                        setIdSelecionado(turma._id)}}
+                                        loadingLabel = "excluindo"
+                                        className = "bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1" 
+                                        />
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </section>
+            {isModalOpen && (
+                            <Modal
+                            decisao = {null}
+                            titulo = {`Tem certeza que deseja excluir esta matrícula?`}
+                            opSim = {() => {setIsModalOpen(false);
+                                            handleExclusao()}}
+                            opNao = {() => {setIsModalOpen(false);
+                                           setIdSelecionado(null)}}
+                                         /> )}
         </div>
     );
 }

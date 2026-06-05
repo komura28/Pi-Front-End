@@ -1,17 +1,18 @@
 
 interface IModal {
+    titulo: string;
     decisao: "APROVADA" | "RECUSADA" | null;
     opSim: () => void;
     opNao: () => void;
 }
 
 
-export function Modal({ decisao, opSim, opNao}: IModal) {
+export function Modal({titulo, decisao, opSim, opNao}: IModal) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 flex flex-col items-center">
             <h1 className="text-xl font-semibold text-slate-900 mb-4 text-center">
-                Tem Cereteza que deseja {decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?
+                {titulo}
             </h1>
             <div className="flex gap-3 justify-center w-full">
             <button onClick={opSim}

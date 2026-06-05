@@ -28,6 +28,11 @@ export async function deletarCursoAPI(_id: string) {
     return response.data;
 }
 
+export async function deletarTurmaAPI(_id: string) {    
+    const response = await api.delete(`/turma/${_id}`)
+    return response.data;
+}
+
 export async function editarCursoAPI(_id: string, data: { name: string; description: string }) {
     const response = await api.put(`/curso/${_id}`, data);
     return response.data;
