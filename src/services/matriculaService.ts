@@ -12,7 +12,12 @@ export async function AtualizarMatricula(_id: string, status: "APROVADA" | "RECU
     return response.data;
 }
 
-    export async function solicitarMatricula(data: RegisterMatriculaRequest) {
-        const response = await api.post("/matricula", data);
-        return response.data;
-    }
+export async function solicitarMatricula(data: RegisterMatriculaRequest) {
+    const response = await api.post("/matricula", data);
+    return response.data;
+}
+
+export async function meusCursos() {
+    const response = await api.get("/matricula/candidaturas");
+    return response.data;
+}

@@ -75,6 +75,19 @@ export function PerfilPage() {
                             className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
                             disabled
                         />
+
+                        <label
+                            htmlFor="papelUsuario"
+                            className="text-slate-800 font-medium"
+                        >
+                            Papel do Usuário 
+                        </label>
+
+                        <input
+                            value={user?.papelUsuario}
+                            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
+                            disabled
+                        />
                     </div>
             </section>
         </div>

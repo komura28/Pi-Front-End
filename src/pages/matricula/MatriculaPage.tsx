@@ -4,7 +4,7 @@ import { AtualizarMatricula, getMatricula } from "../../services/matriculaServic
 import type { authMatricula } from "../../types/matricula/matricula-types";
 import { api } from "../../services/api";
 
- const isSubmitting =(false);
+
 
 export function MatriculaPage() {
     const [matriculas, setMatriculas] = useState<authMatricula[]>([]);

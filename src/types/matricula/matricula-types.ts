@@ -8,6 +8,7 @@ export interface authMatricula{
     turma: authTurma;
     status: "PENDENTE" | "APROVADA" | "RECUSADA";
     papelUsuario: papelUsuario;
+    createdAt: string;
 }
 export interface RegisterMatriculaRequest {
     turma: string;
