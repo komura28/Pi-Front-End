@@ -148,7 +148,8 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
             {/*Aqui onde ele abre o Modal (Componente) para o ADM fazer a validação do usuário */}
             {isModalOpen && (
                 <Modal
-                    titulo={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
+                    titulo = {`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
+                    message={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
                     decisao={decisao}
                     opSim={() => {
                         handleDecisao(idSelecionado!, decisao!);

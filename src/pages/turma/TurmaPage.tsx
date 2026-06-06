@@ -197,8 +197,9 @@ export function TurmaPage() {
             </section>
             {isModalOpen && (
                 <Modal
+                    titulo={`Confirmar Exclusão de Turma`}
                     decisao={null}
-                    titulo={`Tem certeza que deseja excluir esta matrícula?`}
+                    message={`Tem certeza que deseja excluir esta turma?`}
                     opSim={() => {
                         setIsModalOpen(false);
                         handleExclusao()
