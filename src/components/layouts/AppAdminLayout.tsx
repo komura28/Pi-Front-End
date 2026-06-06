@@ -41,7 +41,7 @@ export function AppAdminLayout() {
             <div className="min-h-screen bg-muted/40">
                 <SideBar navigationItems={adminNavItems} link="/app/home" />
                 <div className="flex min-h-screen flex-col pl-64">
-                    <Header />
+                    <Header   mode="ADM"/>
                     <main className="flex-1 p-6">
                         <Outlet />
                     </main>

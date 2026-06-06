@@ -1,23 +1,24 @@
 import { Outlet } from "react-router-dom";
-import { SideBar } from "../SideBar";
 import { Header } from "../Header";
+import { Footer } from "../Footer";
 
 
 const alunoNavItems = [
-  { label: "Home", href: "/api/home" },
-  { label: "Meus Cursos", href: "/api/cursos" }
+    { label: "Home", href: "/api/home" },
+    { label: "Meus Cursos", href: "/api/cursos" }
 ];
 
 export function AppAlunoLayout() {
     return (
         <>
-            <div className="min-h-screen bg-muted/40">
-                <SideBar navigationItems={alunoNavItems} link="/api/home" />
-                <div className="flex min-h-screen flex-col pl-64">
-                    <Header />
+            <div className="min-h-screen bg-slate-50 flex flex-col">
+                <Header navigationItems={alunoNavItems} link="/api/home" mode="ALUNO" />
+                <div className="flex-1">
+
                     <main className="flex-1 p-6">
                         <Outlet />
                     </main>
+                    <Footer />
                 </div>
             </div>
         </>
