@@ -221,23 +221,25 @@ export function CursoPage() {
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl font-semibold text-slate-900 mb-2">Confirmar Exclusão</h3>
-                        <p className="text-slate-600 mb-6">
+                        <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">Confirmar Exclusão de Curso</h3>
+                        <p className="text-slate-600 mb-6 justify-center text-center">
                             Tem certeza que deseja excluir este curso? Esta ação não poderá ser desfeita.
                         </p>
 
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-center gap-3">
+
+                            <button
+                                onClick={handleConfirmarExclusao}
+                                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors"
+                            >
+                                Sim
+                            </button>
+
                             <button
                                 onClick={fecharModal}
                                 className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
                             >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleConfirmarExclusao}
-                                className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors"
-                            >
-                                Sim, excluir
+                                Não
                             </button>
                         </div>
                     </div>

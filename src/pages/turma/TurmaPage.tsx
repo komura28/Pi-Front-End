@@ -4,6 +4,7 @@ import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso, authTurma } from "../../types/auth/auth-types";
 import { deletarTurmaAPI, editarTurmaAPI, getCurso, getTurma } from "../../services/authService";
 import { Modal } from "../../components/Modal";
+import { formatDate } from "../../utils/formatters";
 
 
 const isSubmitting = false;
@@ -223,10 +224,10 @@ export function TurmaPage() {
                                     {turma.capacidade}
                                 </td>
                                 <td className="text-slate-600 p-2">
-                                    {turma.dataInicio.split("T")[0]}
+                                    {formatDate(turma.dataInicio)}
                                 </td>
                                 <td className="text-slate-600 p-2">
-                                    {turma.dataFim.split("T")[0]}
+                                    {formatDate(turma.dataFim)}
                                 </td>
                                 <td className="p-2 gap-2">
                                     <div className="flex justify-center items-center gap-2">

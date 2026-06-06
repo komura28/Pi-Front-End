@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { getCurso, getTurma } from "../../services/authService";
 import type { authCurso, authTurma } from "../../types/auth/auth-types";
-import { Card } from "../../components/Card";
-
-
+import { CardTurma } from "../../components/CardTurma";
+import { Carousel } from "../../components/Carousel";
 
 
 export function HomeAlunoPage() {
@@ -67,29 +66,40 @@ export function HomeAlunoPage() {
 
     return (
         <main className="min-h-screen bg-gray-100 p-8">
-            <h1 className="mb-6 text-3xl font-bold text-gray-800">
-                Bem-vindo a Aticurando!
-            </h1>
+            <div className="mb-8 rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-700 p-8 text-white shadow-lg">
+                <h1 className="text-4xl font-bold">
+                    Bem-vindo à Aticurando!
+                </h1>
 
-            <p className="mb-8 text-gray-600">
-                Confira as oportunidades disponíveis e candidate-se.
-            </p>
+                <p className="mt-2 text-blue-100">
+                    Descubra novas turmas e desenvolva seu talento artístico.
+                </p>
+            </div>
 
-        {
-            turmas.length > 0 ? (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {turmas.map((turma) => (
-                        <Card
-                            key={turma._id}
-                            turma={turma}
-                            
-                        />
-                    ))}
-                </div>
-            ) : (
-                <p className="text-gray-600">Nenhuma turma disponível no momento.</p>
-            )
-        }
+             <div className="mb-10 overflow-hidden rounded-2xl shadow-lg">
+                <Carousel />
+            </div> 
+
+            <h2 className="mb-6 text-2xl font-semibold text-gray-800">
+                Confira as oportunidades disponíveis e candidate-se:
+            </h2>
+
+
+            {
+                turmas.length > 0 ? (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {turmas.map((turma) => (
+                            <CardTurma
+                                key={turma._id}
+                                turma={turma}
+
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-gray-600">Nenhuma turma disponível no momento.</p>
+                )
+            }
         </main>
     );
 }

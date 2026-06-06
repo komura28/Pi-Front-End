@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { Link, NavLink } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa6";
+import logo from "../assets/logo.png";
 
 
 interface NavigationItem {
@@ -13,25 +13,25 @@ interface NavigationItem {
 
 interface SideBarProps {
     navigationItems: NavigationItem[];
+    link: string;
 }
 
 
 
-export function SideBar({ navigationItems }: SideBarProps) {
+export function SideBar({ navigationItems, link }: SideBarProps) {
     const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
 
 
 
     return (
         <>
-            <aside className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background">
+            <aside className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background bg-[#0F172A]">
                 <div className="flex h-16 items-center border-b px-6">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 p-12">
                         <div>
-                            <strong className="block leading-none">Aticurando</strong>
-                            <span className="text-xs text-muted-foreground">
-                                Curso de Palhaços
-                            </span>
+                            <Link to={link}>
+                                <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -52,9 +52,11 @@ export function SideBar({ navigationItems }: SideBarProps) {
                                             }))
                                         }
                                         className="flex w-full items-center justify-between
-    rounded-lg px-3 py-2
-    text-sm font-medium text-muted-foreground
-    transition-colors hover:bg-muted hover:text-foreground
+rounded-lg px-3 py-2
+text-sm font-medium text-slate-300
+transition-all duration-200
+hover:bg-blue-500/20
+hover:text-white
                                                 "
                                     >
                                         <span>{item.label}</span>
@@ -66,13 +68,13 @@ export function SideBar({ navigationItems }: SideBarProps) {
                                         />
                                     </button>
                                     {openMenus[index] && (
-                                        <div className="ml-2 mt-1 border-l border-slate-200 pl-3">
+                                        <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">
                                             {item.options?.map((opt, i) => (
                                                 <NavLink key={i}
                                                     className={({ isActive }) =>
 
                                                         `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
-                                    ${isActive ? 'bg-gray-400 text-foreground' : ''}`}
+                                    ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
                                                     to={opt.href!}
                                                 >
                                                     {opt.label}
@@ -94,7 +96,7 @@ export function SideBar({ navigationItems }: SideBarProps) {
                                 className={({ isActive }) =>
 
                                     `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
-                                    ${isActive ? 'bg-gray-400 text-foreground' : ''}`
+                                    ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300'}`
 
                                 }
                             >
@@ -105,14 +107,21 @@ export function SideBar({ navigationItems }: SideBarProps) {
                 </nav>
 
                 <div className="border-t p-4">
-                    <div className="rounded-lg bg-muted p-3">
-                        <p className="text-sm font-medium">Organização atual</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Aticurando TOP 1 Atibaia
-                        </p>
-                    </div>
-
-
+                    <a
+                        href="https://wa.me/5511962865972"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="
+            flex items-center justify-center gap-2
+            rounded-lg bg-green-500 px-3 py-3
+            text-sm font-semibold text-white
+            transition
+            hover:bg-green-600 hover:shadow-lg
+            active:scale-95
+        "
+                    >
+                        Suporte via WhatsApp
+                    </a>
                 </div>
             </aside >
         </>

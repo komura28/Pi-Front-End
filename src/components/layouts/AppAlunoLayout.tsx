@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import { Header } from "./Header";
-import { SideBar } from "./SideBar";
+import { SideBar } from "../SideBar";
+import { Header } from "../Header";
 
 
 const alunoNavItems = [
@@ -12,7 +12,7 @@ export function AppAlunoLayout() {
     return (
         <>
             <div className="min-h-screen bg-muted/40">
-                <SideBar navigationItems={alunoNavItems} />
+                <SideBar navigationItems={alunoNavItems} link="/api/home" />
                 <div className="flex min-h-screen flex-col pl-64">
                     <Header />
                     <main className="flex-1 p-6">

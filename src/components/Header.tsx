@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import perfilImage from "../../assets/perfil.png"
-import { useAuth } from "../../hooks/useAuth";
+import perfilImage from "../assets/perfil.png"
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+
+
 
 
 export function Header() {
@@ -36,10 +38,10 @@ export function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-blue-800 px-6">
+        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-[#0F172A] px-6">
             <div>
-                <p className="text-sm text-muted-foreground">Bem-vindo a </p>
-                <h1 className="text-lg font-semibold">Aticurando</h1>
+                <p className="text-sm text-white">Bem-vindo a </p>
+                <h1 className="text-lg font-semibold text-white">Aticurando!</h1>
             </div>
 
             <div

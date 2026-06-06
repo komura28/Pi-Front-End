@@ -78,7 +78,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                             <th className="text-left text-slate-800 font-medium p-2 border-b">Nome</th>
                             <th className="text-left text-slate-800 font-medium p-2 border-b">CPF</th>
                             <th className="text-left text-slate-800 font-medium p-2 border-b">Curso</th>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">Turma</th>
+                            <th className="text-left text-slate-800 font-medium p-2 border-b">Turno</th>
                             <th className="text-left text-slate-800 font-medium p-2 border-b">Status</th>
                             <th className="text-slate-800 font-medium p-2 border-b">Ações</th>
                         </tr>

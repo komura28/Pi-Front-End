@@ -1,16 +1,17 @@
 
 import { solicitarMatricula } from "../services/matriculaService";
 import type { authTurma } from "../types/auth/auth-types";
+import { formatDate } from "../utils/formatters";
 
 
 type CardProps = {
     turma: authTurma;
 }
 
-export function Card({ turma }: CardProps) {
+export function CardTurma({ turma }: CardProps) {
 
-    const dataInicio = new Date(turma.dataInicio).toLocaleDateString("pt-BR");
-    const dataFim = new Date(turma.dataFim).toLocaleDateString("pt-BR");
+    const dataInicio = formatDate(turma.dataInicio);
+    const dataFim = formatDate(turma.dataFim);
     const handleCandidatar = async () => {
         try {
             await solicitarMatricula({ turma: turma._id });
@@ -23,9 +24,9 @@ export function Card({ turma }: CardProps) {
 
     return (
         <div className="max-w-md">
-            <div className="rounded-xl bg-white p-6 shadow-md transition hover:shadow-lg">
+            <div className="rounded-xl bg-white p-6 shadow-md transition">
                 <h2 className="mb-2 text-2xl font-semibold text-gray-800">
-                    Turma {new Date(turma.dataInicio).getMonth()}/{new Date(turma.dataInicio).getFullYear()}
+                    Turma {formatDate(turma.dataInicio)}
                 </h2>
 
                 <div className="mb-4 space-y-2 text-gray-600">

@@ -35,7 +35,9 @@ export function PerfilPage() {
 
     return (
         <div>
-            <h1>Meu Perfil</h1>
+            <h1 className="text-3xl font-bold text-slate-800 mb-8">
+                Meu Perfil
+            </h1>
             <section className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8 border border-slate-200">
                 <div className="flex flex-col gap-2">
                         <label
