@@ -17,21 +17,9 @@ interface SideBarProps {
 
 
 export function SideBar({ navigationItems }: SideBarProps) {
-    const navigate = useNavigate();
-    const { logout } = useAuth();
-    const [serverError, setServerError] = useState("");
-    const [select, setSelect] = useState("");
+const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
+    
 
-    async function handleLogout() {
-        try {
-            setServerError("");
-            await logout();
-            navigate("/login");
-        } catch (error) {
-            console.log(error);
-            setServerError(error instanceof Error ? error.message : "Erro ao realizar logout.");
-        }
-    }
 
     return (
         <>
@@ -53,25 +41,31 @@ export function SideBar({ navigationItems }: SideBarProps) {
                             return (
                                 <div
                                     key={index}
-                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                    className="flex flex-col items-start gap-1 w-full rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 >
-                                    <select
-                                    value = {select}
-                                        onChange={(e) => {
-                                            if (e.target.value) {
-                                                navigate(e.target.value);
-                                            } setSelect("");
-                                        }}
-                                        className="w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"
-                                    >
-                                        <option value="" disabled hidden>{item.label}</option>
+                                    <button
+                                    onClick={() => setOpenMenus((prev) => ({ ...prev, [index]: !prev[index] }))}
+                                    className="text-left w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"
+                                    >{item.label}</button>
 
-                                        {item.options?.map((opt, i) => (
-                                            <option key={i} value={opt.href} className="bg-background text-foreground">
-                                                {opt.label}
-                                            </option>
+                                    {openMenus[index] && (
+                                        <div>
+                                            {item.options?.map((opt, i) => (
+                                            <NavLink key={i}
+                                                     className={({ isActive }) =>
+
+                                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
+                                    ${isActive ? 'bg-gray-400 text-foreground' : ''}`}
+                                                     to={opt.href!}
+                                                     >
+                                                    {opt.label}
+                                                    
+                                            </NavLink>
                                         ))}
-                                    </select>
+                                        </div>
+                                    )}
+                                        
+                                    
                                 </div>
                             );
                         }
@@ -100,18 +94,8 @@ export function SideBar({ navigationItems }: SideBarProps) {
                             Aticurando TOP 1 Atibaia
                         </p>
                     </div>
-                    {serverError && (
-                        <span className="text-xs font-medium text-red-500 block px-1">
-                            {serverError}
-                        </span>
-                    )}
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="cursor-pointer w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    >
-                        Sair da conta
-                    </button>
+                    
+                    
                 </div>
             </aside >
         </>
