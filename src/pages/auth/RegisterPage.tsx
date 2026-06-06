@@ -25,7 +25,7 @@ export function RegistroPage() {
         try {
             setServerError("");
             await cadastrar(data);
-            navigate("/app/home");
+            navigate("/api/home");
             alert("Cadastro realizado com sucesso!");
             console.log("Dados do cadastro:", data);
         } catch (error) {

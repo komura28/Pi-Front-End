@@ -47,7 +47,7 @@ export function CursoAlunoPage() {
                         className="rounded-xl bg-white p-6 shadow-md"
                     >
                         <h2 className="mb-3 text-xl font-semibold text-gray-800">
-                             Curso: {candidatura.turma.curso.name}
+                             Curso: {candidatura.turma.curso?.name}
                         </h2>
 
                         <p className="mb-2 text-gray-600">

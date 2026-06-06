@@ -31,7 +31,7 @@ export function Card({ turma }: CardProps) {
                 <div className="mb-4 space-y-2 text-gray-600">
                     <p>
                         <span className="font-medium">Curso:</span>{" "}
-                        {turma.curso.name}
+                        {turma.curso?.name}
                     </p>
 
                     <p>

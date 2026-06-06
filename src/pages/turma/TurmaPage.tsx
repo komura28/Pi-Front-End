@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authTurma } from "../../types/auth/auth-types";
-import {  deletarTurmaAPI, getTurma } from "../../services/authService";
+import { deletarTurmaAPI, getTurma } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 
 
@@ -14,17 +14,43 @@ export function TurmaPage() {
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [idSelecionado, setIdSelecionado] = useState<string | null>(null);
+    const [paginaAtual, setPaginaAtual] = useState(1);
+    const itensPorPagina = 5;
+    const indiceUltimoItem = paginaAtual * itensPorPagina;
+    const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
 
-    async function handleExclusao() {   
-            try {
-                await deletarTurmaAPI(idSelecionado!);
-                alert("Cadastro excluído com sucesso!");
-                setTurmas(turmas.filter((turma) => turma._id !== idSelecionado));
-            } catch (error) {
-                console.log(error);
-                alert("Erro ao excluir a turma.");
-            }
+    const turmasPaginadas = turmas.slice(
+        indicePrimeiroItem,
+        indiceUltimoItem
+    );
+
+    const totalPaginas = Math.ceil(turmas.length / itensPorPagina);
+
+    async function handleExclusao() {
+        try {
+            await deletarTurmaAPI(idSelecionado!);
+            alert("Cadastro excluído com sucesso!");
+            setTurmas(turmas.filter((turma) => turma._id !== idSelecionado));
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao excluir a turma.");
         }
+        setTurmas(turmas.filter((turma) => turma._id !== idSelecionado));
+
+        const novaLista = turmas.filter(
+            (turma) => turma._id !== idSelecionado
+        );
+
+        setTurmas(novaLista);
+
+        const novasPaginas = Math.ceil(
+            novaLista.length / itensPorPagina
+        );
+
+        if (paginaAtual > novasPaginas && novasPaginas > 0) {
+            setPaginaAtual(novasPaginas);
+        }
+    }
 
     useEffect(() => {
         async function carregarTurmas() {
@@ -58,7 +84,7 @@ export function TurmaPage() {
 
         carregarTurmas();
     }, [])
-    
+
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
     }
@@ -72,7 +98,7 @@ export function TurmaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white flex items-center justify-center p-6">
+        <div className="min-h-screen bg-white flex items-center justify-center p-6 relative">
             <section className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 border border-slate-300">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">
                     Lista de Turmas
@@ -101,57 +127,87 @@ export function TurmaPage() {
                                 Data de Fim
                             </th>
 
-                            <th className=" text-slate-800 font-medium p-2 border-b justify-center">
+                            <th className=" text-slate-800 font-medium p-2 border-b">
                                 Ações
                             </th>
                         </tr>
                     </thead>
 
                     <tbody className="border-b">
-                        {turmas.map((turma) => (
-                            <tr key={turma._id}>
-                                <td className="text-slate-600 p-2 border-b">
+                        {turmasPaginadas.map((turma) => (
+                            <tr key={turma._id} className="border-b">
+                                <td className="text-slate-600 p-2">
                                     {turma.turno}
                                 </td>
-                                <td className="text-slate-600 p-2 border-b">
+                                <td className="text-slate-600 p-2">
                                     {turma.curso?.name || "Curso não definido"}
                                 </td>
-                                <td className="text-slate-600 p-2 border-b">
+                                <td className="text-slate-600 p-2">
                                     {turma.capacidade}
                                 </td>
-                                <td className="text-slate-600 p-2 border-b">
-                                    {turma.dataInicio}
+                                <td className="text-slate-600 p-2">
+                                    {turma.dataInicio.split("T")[0]}
                                 </td>
-                                <td className="text-slate-600 p-2 border-b">
-                                    {turma.dataFim}
+                                <td className="text-slate-600 p-2">
+                                    {turma.dataFim.split("T")[0]}
                                 </td>
-                                <td className="p-2 flex gap-2 justify-center">
-                                    <Button isSubmitting={isSubmitting}
-                                        label={<FaPencilAlt />}
-                                        loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
-                                    <Button isSubmitting={isSubmitting}
-                                        label={<FaTrash />}
-                                        onClick={() => {
-                                        setIsModalOpen(true);
-                                        setIdSelecionado(turma._id)}}
-                                        loadingLabel = "excluindo"
-                                        className = "bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1" 
+                                <td className="p-2 gap-2">
+                                    <div className="flex justify-center items-center gap-2">
+                                        <Button isSubmitting={isSubmitting}
+                                            label={<FaPencilAlt />}
+                                            loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
+                                        <Button isSubmitting={isSubmitting}
+                                            label={<FaTrash />}
+                                            onClick={() => {
+                                                setIsModalOpen(true);
+                                                setIdSelecionado(turma._id)
+                                            }}
+                                            loadingLabel="excluindo"
+                                            className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
                                         />
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                <div className="flex justify-center items-center gap-2 mt-4">
+                    <button
+                        onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
+                        disabled={paginaAtual === 1}
+                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                    >
+                        Anterior
+                    </button>
+
+                    <span className="text-slate-600">
+                        Página {paginaAtual} de {totalPaginas}
+                    </span>
+
+                    <button
+                        onClick={() =>
+                            setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
+                        }
+                        disabled={paginaAtual === totalPaginas}
+                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                    >
+                        Próxima
+                    </button>
+                </div>
             </section>
             {isModalOpen && (
-                            <Modal
-                            decisao = {null}
-                            titulo = {`Tem certeza que deseja excluir esta matrícula?`}
-                            opSim = {() => {setIsModalOpen(false);
-                                            handleExclusao()}}
-                            opNao = {() => {setIsModalOpen(false);
-                                           setIdSelecionado(null)}}
-                                         /> )}
+                <Modal
+                    decisao={null}
+                    titulo={`Tem certeza que deseja excluir esta matrícula?`}
+                    opSim={() => {
+                        setIsModalOpen(false);
+                        handleExclusao()
+                    }}
+                    opNao={() => {
+                        setIsModalOpen(false);
+                        setIdSelecionado(null)
+                    }}
+                />)}
         </div>
     );
 }

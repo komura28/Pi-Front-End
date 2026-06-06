@@ -21,6 +21,18 @@ export function CursoPage() {
     const [editName, setEditName] = useState("");
     const [editDescription, setEditDescription] = useState("");
 
+    const [paginaAtual, setPaginaAtual] = useState(1);
+    const itensPorPagina = 5;
+    const indiceUltimoItem = paginaAtual * itensPorPagina;
+    const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
+
+    const cursosPaginados = cursos.slice(
+        indicePrimeiroItem,
+        indiceUltimoItem
+    );
+
+    const totalPaginas = Math.ceil(cursos.length / itensPorPagina);
+
     useEffect(() => {
         async function carregarCursos() {
             try {
@@ -58,7 +70,19 @@ export function CursoPage() {
         try {
             await deletarCursoAPI(cursoToDelete);
             alert("Cadastro excluído com sucesso!");
-            setCursos(cursos.filter((curso) => curso._id !== cursoToDelete));
+            const novaLista = cursos.filter(
+                (curso) => curso._id !== cursoToDelete
+            );
+
+            setCursos(novaLista);
+
+            const novasPaginas = Math.ceil(
+                novaLista.length / itensPorPagina
+            );
+
+            if (paginaAtual > novasPaginas && novasPaginas > 0) {
+                setPaginaAtual(novasPaginas);
+            }
         } catch (error) {
             console.log(error);
             alert("Erro ao excluir o curso.");
@@ -93,16 +117,16 @@ export function CursoPage() {
             // Chama a API passando o ID e os novos dados. 
             // Ajuste os parâmetros de acordo com o que sua API espera receber.
             await editarCursoAPI(cursoToEditId, { name: editName, description: editDescription });
-            
+
             alert("Curso atualizado com sucesso!");
-            
+
             // Atualiza a lista na tela (procura o curso pelo ID e altera apenas ele)
-            setCursos(cursos.map((curso) => 
-                curso._id === cursoToEditId 
-                    ? { ...curso, name: editName, description: editDescription } 
+            setCursos(cursos.map((curso) =>
+                curso._id === cursoToEditId
+                    ? { ...curso, name: editName, description: editDescription }
                     : curso
             ));
-            
+
         } catch (error) {
             console.log(error);
             alert("Erro ao atualizar o curso.");
@@ -136,36 +160,61 @@ export function CursoPage() {
                         <tr>
                             <th className="text-left text-slate-800 font-medium p-2 border-b">Curso</th>
                             <th className="text-left text-slate-800 font-medium p-2 border-b">Descrição</th>
-                            <th className="text-slate-800 font-medium p-2 border-b justify-center">Ações</th>
+                            <th className="text-slate-800 font-medium p-2 border-b ">Ações</th>
                         </tr>
                     </thead>
 
                     <tbody className="border-b">
-                        {cursos.map((curso) => (
-                            <tr key={curso._id}>
-                                <td className="text-slate-600 p-2 border-b">{curso.name}</td>
-                                <td className="text-slate-600 p-2 border-b">{curso.description}</td>
-                                <td className="p-2 flex gap-2 justify-center">
-                                    <Button 
-                                        isSubmitting={isSubmitting}
-                                        label={<FaPencilAlt />}
-                                        loadingLabel="salvando" 
-                                        className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" 
-                                        // AQUI: Adicionei o evento de clique para abrir a edição passando o curso atual
-                                        onClick={() => abrirModalEdicao(curso)}
-                                    />
-                                    <Button 
-                                        isSubmitting={isSubmitting}
-                                        label={<FaTrash />}
-                                        loadingLabel="recusando" 
-                                        className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" 
-                                        onClick={() => confirmarExclusao(curso._id)} 
-                                    />
+                        {cursosPaginados.map((curso) => (
+                            <tr key={curso._id} className="border-b">
+                                <td className="text-slate-600 p-2 ">{curso.name}</td>
+                                <td className="text-slate-600 p-2 ">{curso.description}</td>
+                                <td className="p-2  gap-2">
+                                    <div className="flex justify-center items-center gap-2">
+                                        <Button
+                                            isSubmitting={isSubmitting}
+                                            label={<FaPencilAlt />}
+                                            loadingLabel="salvando"
+                                            className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
+                                            // AQUI: Adicionei o evento de clique para abrir a edição passando o curso atual
+                                            onClick={() => abrirModalEdicao(curso)}
+                                        />
+                                        <Button
+                                            isSubmitting={isSubmitting}
+                                            label={<FaTrash />}
+                                            loadingLabel="recusando"
+                                            className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
+                                            onClick={() => confirmarExclusao(curso._id)}
+                                        />
+                                    </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                <div className="flex justify-center items-center gap-2 mt-4">
+                    <button
+                        onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
+                        disabled={paginaAtual === 1}
+                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                    >
+                        Anterior
+                    </button>
+
+                    <span className="text-slate-600">
+                        Página {paginaAtual} de {totalPaginas}
+                    </span>
+
+                    <button
+                        onClick={() =>
+                            setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
+                        }
+                        disabled={paginaAtual === totalPaginas}
+                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                    >
+                        Próxima
+                    </button>
+                </div>
             </section>
 
             {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
@@ -176,15 +225,15 @@ export function CursoPage() {
                         <p className="text-slate-600 mb-6">
                             Tem certeza que deseja excluir este curso? Esta ação não poderá ser desfeita.
                         </p>
-                        
+
                         <div className="flex justify-end gap-3">
-                            <button 
+                            <button
                                 onClick={fecharModal}
                                 className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
                             >
                                 Cancelar
                             </button>
-                            <button 
+                            <button
                                 onClick={handleConfirmarExclusao}
                                 className="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors"
                             >
@@ -200,14 +249,14 @@ export function CursoPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                         <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Curso</h3>
-                        
+
                         <div className="flex flex-col gap-4 mb-6">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">
                                     Nome do Curso
                                 </label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={editName}
                                     onChange={(e) => setEditName(e.target.value)}
                                     className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -218,22 +267,22 @@ export function CursoPage() {
                                 <label className="block text-sm font-medium text-slate-700 mb-1">
                                     Descrição
                                 </label>
-                                <textarea 
+                                <textarea
                                     value={editDescription}
                                     onChange={(e) => setEditDescription(e.target.value)}
                                     className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="flex justify-end gap-3">
-                            <button 
+                            <button
                                 onClick={fecharModalEdicao}
                                 className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
                             >
                                 Cancelar
                             </button>
-                            <button 
+                            <button
                                 onClick={handleSalvarEdicao}
                                 className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
                             >
