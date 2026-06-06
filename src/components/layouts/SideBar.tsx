@@ -1,24 +1,25 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { FaChevronDown } from "react-icons/fa6";
 
 
 interface NavigationItem {
-  label: string;
-  href?: string;
-  isSelect?: boolean;
-  options?: { label: string; href: string }[];
+    label: string;
+    href?: string;
+    isSelect?: boolean;
+    options?: { label: string; href: string }[];
 }
 
 interface SideBarProps {
-  navigationItems: NavigationItem[];
+    navigationItems: NavigationItem[];
 }
 
 
 
 export function SideBar({ navigationItems }: SideBarProps) {
-const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
-    
+    const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
+
 
 
     return (
@@ -41,31 +42,47 @@ const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
                             return (
                                 <div
                                     key={index}
-                                    className="flex flex-col items-start gap-1 w-full rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                    className="w-full"
                                 >
                                     <button
-                                    onClick={() => setOpenMenus((prev) => ({ ...prev, [index]: !prev[index] }))}
-                                    className="text-left w-full bg-transparent outline-none cursor-pointer pr-4 appearance-none text-muted-foreground"
-                                    >{item.label}</button>
+                                        onClick={() =>
+                                            setOpenMenus((prev) => ({
+                                                ...prev,
+                                                [index]: !prev[index],
+                                            }))
+                                        }
+                                        className="flex w-full items-center justify-between
+    rounded-lg px-3 py-2
+    text-sm font-medium text-muted-foreground
+    transition-colors hover:bg-muted hover:text-foreground
+                                                "
+                                    >
+                                        <span>{item.label}</span>
 
+                                        <FaChevronDown
+                                            size={15}
+                                            className={`transition-transform duration-300 ${openMenus[index] ? "rotate-180" : ""
+                                                }`}
+                                        />
+                                    </button>
                                     {openMenus[index] && (
-                                        <div>
+                                        <div className="ml-2 mt-1 border-l border-slate-200 pl-3">
                                             {item.options?.map((opt, i) => (
-                                            <NavLink key={i}
-                                                     className={({ isActive }) =>
+                                                <NavLink key={i}
+                                                    className={({ isActive }) =>
 
-                                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
+                                                        `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
                                     ${isActive ? 'bg-gray-400 text-foreground' : ''}`}
-                                                     to={opt.href!}
-                                                     >
+                                                    to={opt.href!}
+                                                >
                                                     {opt.label}
-                                                    
-                                            </NavLink>
-                                        ))}
+
+                                                </NavLink>
+                                            ))}
                                         </div>
                                     )}
-                                        
-                                    
+
+
                                 </div>
                             );
                         }
@@ -94,8 +111,8 @@ const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
                             Aticurando TOP 1 Atibaia
                         </p>
                     </div>
-                    
-                    
+
+
                 </div>
             </aside >
         </>

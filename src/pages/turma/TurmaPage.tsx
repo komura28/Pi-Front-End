@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
-import type { authTurma } from "../../types/auth/auth-types";
-import { deletarTurmaAPI, getTurma } from "../../services/authService";
+import type { authCurso, authTurma } from "../../types/auth/auth-types";
+import { deletarTurmaAPI, editarTurmaAPI, getCurso, getTurma } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 
 
@@ -18,6 +18,18 @@ export function TurmaPage() {
     const itensPorPagina = 5;
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [turmaToEditId, setTurmaToEditId] = useState<string | null>(null);
+    const [editCurso, setEditCurso] = useState("");
+    const [editCapacidade, setEditCapacidade] = useState("");
+    const [editTurno, setEditTurno] = useState("");
+    const [editDataInicio, setEditDataInicio] = useState("");
+    const [editDataFim, setEditDataFim] = useState("");
+    const [cursos, setCursos] = useState<authCurso[]>([]);
+    const cursoSelecionado = cursos.find(
+        (curso) => curso._id === editCurso
+    );
+
 
     const turmasPaginadas = turmas.slice(
         indicePrimeiroItem,
@@ -80,7 +92,15 @@ export function TurmaPage() {
             } finally {
                 setLoading(false);
             }
+
+            async function carregarCursos() {
+                const data = await getCurso();
+                setCursos(data);
+            }
+
+            carregarCursos();
         }
+
 
         carregarTurmas();
     }, [])
@@ -97,6 +117,63 @@ export function TurmaPage() {
         return <div className="p-8"><p>Nenhuma turma encontrada</p></div>;
     }
 
+
+
+    function abrirModalEdicao(turma: authTurma) {
+        setTurmaToEditId(turma._id);
+        setEditCurso(turma.curso?._id || "");
+        setEditCapacidade(turma.capacidade.toString());
+        setEditTurno(turma.turno);
+        setEditDataInicio(turma.dataInicio.split("T")[0]);
+        setEditDataFim(turma.dataFim.split("T")[0]);
+        setIsEditModalOpen(true);
+    }
+
+    // 2. Limpa os campos e fecha o modal
+    function fecharModalEdicao() {
+        setIsEditModalOpen(false);
+        setTurmaToEditId(null);
+        setEditCurso("");
+        setEditCapacidade("");
+        setEditTurno("");
+        setEditDataInicio("");
+        setEditDataFim("");
+    }
+
+    async function handleSalvarEdicao() {
+        if (!turmaToEditId) return;
+
+        try {
+            // Chama a API passando o ID e os novos dados. 
+            // Ajuste os parâmetros de acordo com o que sua API espera receber.
+            await editarTurmaAPI(turmaToEditId, { curso: editCurso, capacidade: parseInt(editCapacidade), turno: editTurno, dataInicio: editDataInicio, dataFim: editDataFim });
+
+            alert("Turma atualizada com sucesso!");
+
+            // Atualiza a lista na tela (procura a turma pelo ID e altera apenas ela)
+            setTurmas(
+                turmas.map((turma) =>
+                    turma._id === turmaToEditId
+                        ? {
+                            ...turma,
+                            curso: cursoSelecionado || turma.curso,
+                            capacidade: parseInt(editCapacidade),
+                            turno: editTurno,
+                            dataInicio: editDataInicio,
+                            dataFim: editDataFim,
+                        }
+                        : turma
+                )
+            );
+
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao atualizar a turma.");
+        } finally {
+            fecharModalEdicao();
+        }
+    }
+
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-6 relative">
             <section className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 border border-slate-300">
@@ -108,7 +185,7 @@ export function TurmaPage() {
                     <thead>
                         <tr>
                             <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Período
+                                Turno
                             </th>
 
                             <th className="text-left text-slate-800 font-medium p-2 border-b">
@@ -155,7 +232,8 @@ export function TurmaPage() {
                                     <div className="flex justify-center items-center gap-2">
                                         <Button isSubmitting={isSubmitting}
                                             label={<FaPencilAlt />}
-                                            loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1" />
+                                            loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
+                                            onClick={() => abrirModalEdicao(turma)} />
                                         <Button isSubmitting={isSubmitting}
                                             label={<FaTrash />}
                                             onClick={() => {
@@ -209,6 +287,101 @@ export function TurmaPage() {
                         setIdSelecionado(null)
                     }}
                 />)}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Turma</h3>
+
+                        <div className="flex flex-col gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Curso
+                                </label>
+                                <select
+                                    value={editCurso}
+                                    onChange={(e) => setEditCurso(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2"
+                                >
+                                    <option value="">Selecione um curso</option>
+
+                                    {cursos.map((curso) => (
+                                        <option key={curso._id} value={curso._id}>
+                                            {curso.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Capacidade
+                                </label>
+                                <input
+                                    type="number"
+                                    value={editCapacidade}
+                                    onChange={(e) => setEditCapacidade(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Turno
+                                </label>
+                                <select
+                                    value={editTurno}
+                                    onChange={(e) => setEditTurno(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">Selecione um turno</option>
+                                    <option value="MANHA">Manhã</option>
+                                    <option value="TARDE">Tarde</option>
+                                    <option value="NOITE">Noite</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Data de Início
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editDataInicio}
+                                    onChange={(e) => setEditDataInicio(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Data de Fim
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editDataFim}
+                                    onChange={(e) => setEditDataFim(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={fecharModalEdicao}
+                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSalvarEdicao}
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
