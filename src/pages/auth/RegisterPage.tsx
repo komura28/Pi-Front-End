@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import logo from "../../assets/logo2.png";
 
 interface CadastroFormData {
     name: string;
@@ -39,11 +40,13 @@ export function RegistroPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-            <section className="w-full max-w-md rounded-2x1 bg-white p-8 shadow-lg">
+        <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
+            <section className="w-full max-w-md rounded-2x1 bg-white p-8 shadow-lg rounded-lg">
+                
                 <a href="/login" className="text-blue-500 hover:underline">
                     ← Voltar
                 </a>
+                <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
                 <h1 className="mb-2 text-center text-2x1 font-bold text-gray-800">
                     Aticurando
                 </h1>
