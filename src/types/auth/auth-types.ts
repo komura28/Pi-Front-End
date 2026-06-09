@@ -4,7 +4,7 @@ export type papelUsuario = "ALUNO" | "ADM";
 export interface authUser{
     _id: string;
     name: string;
-    cpf: string;
+    cpf: number;
     email: string;
     papelUsuario: papelUsuario;
 }
@@ -21,9 +21,10 @@ export interface LoginResponse{
 
 export interface RegisterRequest{
     name: string;
-    cpf: string;
+    cpf: number;
     email: string;
     senha: string;
+    confirmarSenha: string;
 }
 
 export interface authMateria{
