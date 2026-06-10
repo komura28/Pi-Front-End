@@ -49,6 +49,7 @@ export function TurmaCadastroPage() {
 
     async function handleCadastro(data: CadastroTurmaFormData) {
         try {
+            
             console.log("Dados do formulário:", data);
             setServerError("");
             const dados: RegisterTurmaRequest = {
@@ -65,11 +66,14 @@ export function TurmaCadastroPage() {
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
         }
         console.log("objeto:", data);
+
     }
 
     const onError = (errors: any) => {
         console.log("Erros de validação do formulário:", errors);
     }
+
+
 
 
     
@@ -79,6 +83,8 @@ export function TurmaCadastroPage() {
                 <h1 className="mb-2 text-center text-3xl font-bold text-gray-800">
                     Cadastro de Turma
                 </h1>
+
+                
 
                 <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
 
@@ -196,7 +202,12 @@ export function TurmaCadastroPage() {
                             </p>
                         )}
                     </div>
-
+                    
+                    {serverError && (
+                        <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-700 text-center font-semibold border border-red-200">
+                    {serverError}
+                </div>
+                )}
 
                     <button
                         type="submit"
@@ -207,6 +218,7 @@ export function TurmaCadastroPage() {
                     </button>
                     
                 </form>
+                
             </section>
         </main>
     );
