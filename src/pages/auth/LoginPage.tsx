@@ -31,7 +31,7 @@ export function LoginPage() {
             console.log("data: ", data);
         } catch (error) {
             console.log(error);
-            setServerError(error instanceof Error ? error.message: "Erro ao realisar login. Verifique os dados informados");
+            setServerError(error instanceof Error ? error.message : "Erro ao realisar login. Verifique os dados informados");
             console.log("data: ", data);
         } 
     }
@@ -63,11 +63,11 @@ export function LoginPage() {
                                 required: "O e-mail é obrigatório",
                             })}
                         />
-                        {errors.email && (
+                        {/* {errors.email && (
                             <p className="mt-1 text-sm text-red-600">
                                 {errors.email.message}
                             </p>
-                        )}
+                        )} */}
                     </div>
 
                     <div>
@@ -83,17 +83,17 @@ export function LoginPage() {
                             })}
                         />
 
-                        {errors.senha && (
+                        {/* {errors.senha && (
                             <p className="mt-1 text-sm text-red-600">
                                 {errors.senha.message}
                             </p>
-                        )}
+                        )} */}
                     </div>
 
                     {
                         serverError && (
                             <p className="rounded-lg bg-red-50 px-3 py-2 text-red-600">
-                                {serverError}
+                                Usuario ou senha inválidos. Verifique os dados informados e tente novamente.
                             </p>
                         )
                     }
