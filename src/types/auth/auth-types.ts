@@ -55,6 +55,11 @@ export interface authTurma{
     dataFim: string
 }
 
+export interface TurmaMatricula{
+    turma: authTurma;
+    vagasDisponiveis: number;
+}
+
 export interface RegisterTurmaRequest{
     curso: string;
     turno: string;

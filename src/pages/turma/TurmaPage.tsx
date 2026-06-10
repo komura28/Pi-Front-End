@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
-import type { authCurso, authTurma } from "../../types/auth/auth-types";
+import type { authCurso, authTurma, TurmaMatricula } from "../../types/auth/auth-types";
 import { deletarTurmaAPI, editarTurmaAPI, getCurso, getTurma } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 import { formatDate } from "../../utils/formatters";
@@ -10,7 +10,7 @@ import { formatDate } from "../../utils/formatters";
 const isSubmitting = false;
 
 export function TurmaPage() {
-    const [turmas, setTurmas] = useState<authTurma[]>([]);
+    const [turmas, setTurmas] = useState<TurmaMatricula[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,15 +43,15 @@ export function TurmaPage() {
         try {
             await deletarTurmaAPI(idSelecionado!);
             alert("Cadastro excluído com sucesso!");
-            setTurmas(turmas.filter((turma) => turma._id !== idSelecionado));
+            setTurmas(turmas.filter((turma) => turma.turma._id !== idSelecionado));
         } catch (error) {
             console.log(error);
             alert("Erro ao excluir a turma.");
         }
-        setTurmas(turmas.filter((turma) => turma._id !== idSelecionado));
+        setTurmas(turmas.filter((turma) => turma.turma._id !== idSelecionado));
 
         const novaLista = turmas.filter(
-            (turma) => turma._id !== idSelecionado
+            (turma) => turma.turma._id !== idSelecionado
         );
 
         setTurmas(novaLista);
@@ -154,10 +154,10 @@ export function TurmaPage() {
             // Atualiza a lista na tela (procura a turma pelo ID e altera apenas ela)
             setTurmas(
                 turmas.map((turma) =>
-                    turma._id === turmaToEditId
+                    turma.turma._id === turmaToEditId
                         ? {
                             ...turma,
-                            curso: cursoSelecionado || turma.curso,
+                            curso: cursoSelecionado || turma.turma.curso,
                             capacidade: parseInt(editCapacidade),
                             turno: editTurno,
                             dataInicio: editDataInicio,
@@ -213,33 +213,33 @@ export function TurmaPage() {
 
                     <tbody className="border-b">
                         {turmasPaginadas.map((turma) => (
-                            <tr key={turma._id} className="border-b">
+                            <tr key={turma.turma._id} className="border-b">
                                 <td className="text-slate-600 p-2">
-                                    {turma.turno}
+                                    {turma.turma.turno}
                                 </td>
                                 <td className="text-slate-600 p-2">
-                                    {turma.curso?.name || "Curso não definido"}
+                                    {turma.turma.curso?.name || "Curso não definido"}
                                 </td>
                                 <td className="text-slate-600 p-2">
-                                    {turma.capacidade}
+                                    {turma.turma.capacidade}
                                 </td>
                                 <td className="text-slate-600 p-2">
-                                    {formatDate(turma.dataInicio)}
+                                    {formatDate(turma.turma.dataInicio)}
                                 </td>
                                 <td className="text-slate-600 p-2">
-                                    {formatDate(turma.dataFim)}
+                                    {formatDate(turma.turma.dataFim)}
                                 </td>
                                 <td className="p-2 gap-2">
                                     <div className="flex justify-center items-center gap-2">
                                         <Button isSubmitting={isSubmitting}
                                             label={<FaPencilAlt />}
                                             loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => abrirModalEdicao(turma)} />
+                                            onClick={() => abrirModalEdicao(turma.turma)} />
                                         <Button isSubmitting={isSubmitting}
                                             label={<FaTrash />}
                                             onClick={() => {
                                                 setIsModalOpen(true);
-                                                setIdSelecionado(turma._id)
+                                                setIdSelecionado(turma.turma._id)
                                             }}
                                             loadingLabel="excluindo"
                                             className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"

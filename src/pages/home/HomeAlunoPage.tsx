@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getCurso, getTurma } from "../../services/authService";
-import type { authCurso, authTurma } from "../../types/auth/auth-types";
+import type { authCurso, authTurma, TurmaMatricula } from "../../types/auth/auth-types";
 import { CardTurma } from "../../components/CardTurma";
 import { Carousel } from "../../components/Carousel";
 
@@ -8,7 +8,7 @@ import { Carousel } from "../../components/Carousel";
 export function HomeAlunoPage() {
 
     const [cursos, setCursos] = useState<authCurso[]>([]);
-    const [turmas, setTurmas] = useState<authTurma[]>([]);
+    const [turmas, setTurmas] = useState<TurmaMatricula[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -90,9 +90,8 @@ export function HomeAlunoPage() {
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {turmas.map((turma) => (
                             <CardTurma
-                                key={turma._id}
+                                key={turma.turma._id}
                                 turma={turma}
-
                             />
                         ))}
                     </div>
