@@ -210,17 +210,6 @@ export function RegistroPage() {
                                 )
                                 }</button>
                         </div>
-                        <input
-                            type="password"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Confirme sua Senha"
-                            {...register("confirmarSenha", {
-                                required: "Confirmação é obrigatório",
-                                validate: (senhaValida) => {if(senhaUser !== senhaValida) { 
-                                    return "Senhas não coincidem"
-                                }},
-                            })}
-                        />
 
                         {errors.confirmarSenha && (
                             <p className="mt-1 text-sm text-red-600">
