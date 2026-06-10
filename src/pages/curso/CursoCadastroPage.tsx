@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import type { RegisterCursoRequest } from "../../types/auth/auth-types";
 import { cadastrarCurso } from "../../services/admService";
+import { Modal } from "../../components/Modal";
 
 interface Materia {
     name: string;
@@ -20,6 +21,7 @@ export function CursoCadastroPage() {
     const [serverError, setServerError] = useState("");
     const [materia, setMateria] = useState("");
     const [materiaDesc, setMateriaDesc] = useState("");
+    const [modal, setModal] = useState(false);
 
     const {
         register,
@@ -45,10 +47,10 @@ export function CursoCadastroPage() {
             const dados: RegisterCursoRequest = {
                 name: data.name,
                 description: data.description,
-                materias: data.materias.map(materia => ({name: materia.name, description: materia.description }))
+                materias: data.materias.map(materia => ({ name: materia.name, description: materia.description }))
             };
             await cadastrarCurso(dados);
-            navigate("/app/curso");
+            setModal(true);
         } catch (error) {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
@@ -72,7 +74,7 @@ export function CursoCadastroPage() {
         setMateria("");
     };
 
-    
+
     return (
         <main className="flex min-h-screen items-center justify-center bg-white px-4">
             <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
@@ -139,32 +141,32 @@ export function CursoCadastroPage() {
                                         handleMateria();
                                     }
                                 }} />
-                            </div>
+                        </div>
 
-                            <label className="mb-1 block text-gray-700 font-bold text-sm">
+                        <label className="mb-1 block text-gray-700 font-bold text-sm">
                             Nome da Descrição (Matéria)
-                            </label>
+                        </label>
 
-                            <div className="flex flex-wrap gap-2">
-                                <input
-                                    type="text"
-                                    value={materiaDesc}
-                                    onChange={(e) => setMateriaDesc(e.target.value)}
-                                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                    placeholder="Digite a descrição da matéria"
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            handleMateria();
-                                        }
-                                    }} />
-                                <button
-                                    type="button"
-                                    onClick={handleMateria}
-                                    className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
-                                >
-                                    +
-                                </button>
+                        <div className="flex flex-wrap gap-2">
+                            <input
+                                type="text"
+                                value={materiaDesc}
+                                onChange={(e) => setMateriaDesc(e.target.value)}
+                                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                placeholder="Digite a descrição da matéria"
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        handleMateria();
+                                    }
+                                }} />
+                            <button
+                                type="button"
+                                onClick={handleMateria}
+                                className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
+                            >
+                                +
+                            </button>
                         </div>
                     </div>
 
@@ -175,32 +177,32 @@ export function CursoCadastroPage() {
                                 <span className="col-span-6">Descrição</span>
                                 <span className="col-span-2">Ação</span>
                             </div>
-                            
+
                         )}
                         {fields.map((field, index) => (
-                            <div key={field.id} 
-                                 className="grid grid-cols-12 gap-2 items-center rounded-lg bg-gray-50 px-3 py-2 border border-gray-200 text-sm">
+                            <div key={field.id}
+                                className="grid grid-cols-12 gap-2 items-center rounded-lg bg-gray-50 px-3 py-2 border border-gray-200 text-sm">
                                 <div className="col-span-4 font-medium text-gray-900 break-words whitespace-normal">
-                                <input
-                                    type="hidden"
-                                    
-                                    {...register(`materias.${index}.name` as const, {
-                                        required: "O nome da matéria é obrigatório"
-                                    })}
-                                />
-                                {field.name}
+                                    <input
+                                        type="hidden"
+
+                                        {...register(`materias.${index}.name` as const, {
+                                            required: "O nome da matéria é obrigatório"
+                                        })}
+                                    />
+                                    {field.name}
                                 </div>
 
                                 <div className="col-span-6 text-gray-600 break-words whitespace-normal">
-                                <input
+                                    <input
 
-                                    type="hidden"
-                                    
-                                    {...register(`materias.${index}.description` as const, {
-                                        required: "A descrição da matéria é obrigatório"
-                                    })}
-                                />
-                                {field.description}
+                                        type="hidden"
+
+                                        {...register(`materias.${index}.description` as const, {
+                                            required: "A descrição da matéria é obrigatório"
+                                        })}
+                                    />
+                                    {field.description}
                                 </div>
 
 
@@ -212,14 +214,14 @@ export function CursoCadastroPage() {
                                 )}
 
                                 <div className="col-span-2 text-right">
-                                <button
-                                    type="button"
-                                    onClick={() => remove(index)}
-                                    disabled={isSubmitting}
-                                    className="w-auto rounded-lg bg-red-100 px-3 py-2 font-medium text-red-600 transition hover:bg-red-200 cursor-pointer disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-                                >
-                                    {isSubmitting ? "Removendo..." : "Remover"}
-                                </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => remove(index)}
+                                        disabled={isSubmitting}
+                                        className="w-auto rounded-lg bg-red-100 px-3 py-2 font-medium text-red-600 transition hover:bg-red-200 cursor-pointer disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                    >
+                                        {isSubmitting ? "Removendo..." : "Remover"}
+                                    </button>
                                 </div>
 
                                 {errors.materias?.[index]?.name && (
@@ -227,8 +229,8 @@ export function CursoCadastroPage() {
                                         {errors.materias[index]?.name.message}
                                     </p>
                                 )}
-                                </div>    
-                            
+                            </div>
+
                         ))}
                     </div>
 
@@ -240,6 +242,19 @@ export function CursoCadastroPage() {
                         {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>
                 </form>
+                {modal && (
+                    <Modal
+                        titulo="Cadastro"
+                        message="Curso Cadastrado com Sucesso"
+                        decisao={null}
+                        texto="Ok"
+                        opSim={() => {
+                            setModal(false);
+                            navigate("/app/curso");
+
+                        }}
+                    />)}
+
             </section>
         </main>
     );
