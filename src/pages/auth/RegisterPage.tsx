@@ -190,7 +190,7 @@ export function RegistroPage() {
                                     required: "Confirmação é obrigatório",
                                     validate: (senhaValida) => {
                                         if (senhaUser !== senhaValida) {
-                                            return "Senhas não coicidem"
+                                            return "Senhas não coincidem"
                                         }
                                     },
                                 })}
