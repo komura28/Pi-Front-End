@@ -151,6 +151,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                     titulo = {`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
                     message={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
                     decisao={decisao}
+                    texto="Sim"
                     opSim={() => {
                         handleDecisao(idSelecionado!, decisao!);
                         setIsModalOpen(false)

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
+import { Modal } from "../../components/Modal";
 
 interface CadastroFormData {
     name: string;
@@ -17,6 +18,7 @@ export function RegistroPage() {
     const navigate = useNavigate();
     const { cadastrar } = useAuth()
     const [serverError, setServerError] = useState("");
+    const [modal, setModal] = useState(false);
 
     const formatarCPF = (valor: string) => {
         return valor
@@ -40,9 +42,8 @@ export function RegistroPage() {
         try {
             setServerError("");
             await cadastrar(data);
-            navigate("/login");
-            alert("Cadastro realizado com sucesso!");
             console.log("Dados do cadastro:", data);
+            setModal(true);
         } catch (error) {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
@@ -197,6 +198,20 @@ export function RegistroPage() {
                         {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>
                 </form>
+
+                {modal && (
+                    <Modal
+                    titulo = "Cadastro"
+                    message= "Usuário Cadastrado com Sucesso"
+                    decisao = {null}
+                    texto="Ok"
+                    opSim = {() => {
+                        setModal(false);
+                        navigate("/login");
+
+                    }}
+                            />
+                )}
             </section>
         </main>
     );
