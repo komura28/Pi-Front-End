@@ -61,9 +61,14 @@ export function TurmaCadastroPage() {
             };
             await cadastrarTurma(dados);
             navigate("/app/turma");
-        } catch (error) {
-            console.log(error);
-            setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
+        } catch (error: any) {
+            console.error("Erro pego no front-end:", error);
+
+            const mensagemDoBackend = 
+                error?.response?.data?.message || 
+                (error instanceof Error ? error.message : "Erro na hora de realizar o cadastro");
+                
+            setServerError(mensagemDoBackend);
         }
         console.log("objeto:", data);
 
@@ -193,7 +198,13 @@ export function TurmaCadastroPage() {
                             className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                             placeholder="Digite a data de fim"
                             {...register("dataFim", {
-                                required: "A data de fim é obrigatória"
+                                required: "A data de fim é obrigatória",
+                                validate: (value, formValues) => {
+                                    if (!formValues.dataInicio) return true;
+                                    const inicio = new Date(formValues.dataInicio);
+                                    const fim = new Date(value);
+                                    return fim > inicio || "A data de fim deve ser posterior à data de início";
+                                }
                             })}
                         />
                         {errors.dataFim && (
@@ -204,10 +215,10 @@ export function TurmaCadastroPage() {
                     </div>
                     
                     {serverError && (
-                        <div className="mb-4 rounded-lg bg-red-100 p-3 text-sm text-red-700 text-center font-semibold border border-red-200">
-                    {serverError}
-                </div>
-                )}
+                        <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700 text-center font-semibold border border-red-200">
+                            {serverError}
+                        </div>
+                    )}
 
                     <button
                         type="submit"
