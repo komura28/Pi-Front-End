@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import type { authCurso, RegisterTurmaRequest } from "../../types/auth/auth-types";
 import { getCurso } from "../../services/authService";
 import { cadastrarTurma } from "../../services/admService";
+import { Modal } from "../../components/Modal";
 
 interface CadastroTurmaFormData {
     curso: string;
@@ -19,10 +20,11 @@ export function TurmaCadastroPage() {
     const [cursos, setCursos] = useState<authCurso[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [modal, setModal] = useState(false);
 
     useEffect(() => {
         async function carregarTurmas() {
-            try{
+            try {
                 setLoading(true);
                 const data = await getCurso();
                 setCursos(data);
@@ -49,7 +51,7 @@ export function TurmaCadastroPage() {
 
     async function handleCadastro(data: CadastroTurmaFormData) {
         try {
-            
+
             console.log("Dados do formulário:", data);
             setServerError("");
             const dados: RegisterTurmaRequest = {
@@ -60,14 +62,14 @@ export function TurmaCadastroPage() {
                 dataFim: data.dataFim,
             };
             await cadastrarTurma(dados);
-            navigate("/app/turma");
+            setModal(true);
         } catch (error: any) {
             console.error("Erro pego no front-end:", error);
 
-            const mensagemDoBackend = 
-                error?.response?.data?.message || 
+            const mensagemDoBackend =
+                error?.response?.data?.message ||
                 (error instanceof Error ? error.message : "Erro na hora de realizar o cadastro");
-                
+
             setServerError(mensagemDoBackend);
         }
         console.log("objeto:", data);
@@ -81,7 +83,7 @@ export function TurmaCadastroPage() {
 
 
 
-    
+
     return (
         <main className="flex min-h-screen items-center justify-center bg-white px-4">
             <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
@@ -89,7 +91,7 @@ export function TurmaCadastroPage() {
                     Cadastro de Turma
                 </h1>
 
-                
+
 
                 <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
 
@@ -99,25 +101,25 @@ export function TurmaCadastroPage() {
                             Curso
                         </label>
 
-                            <select
-                                className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
+                        <select
+                            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
 
-                                {...register("curso", {
-                                    required: "O curso é obrigatório",
-                                })}
-                            >
-                                <option value="" disabled>Selecione o curso</option>
-                                {cursos.map((curso) => (
-                                    <option key={curso._id} value={curso._id}>
-                                        {curso.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.curso && (
-                                <p className="mt-1 text-sm text-red-600">
-                                    {errors.curso.message}
-                                </p>
-                            )}
+                            {...register("curso", {
+                                required: "O curso é obrigatório",
+                            })}
+                        >
+                            <option value="" disabled>Selecione o curso</option>
+                            {cursos.map((curso) => (
+                                <option key={curso._id} value={curso._id}>
+                                    {curso.name}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.curso && (
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.curso.message}
+                            </p>
+                        )}
                     </div>
 
 
@@ -188,7 +190,7 @@ export function TurmaCadastroPage() {
                         )}
                     </div>
 
-                     <div>
+                    <div>
                         <label className="mb-1 block text-gray-700 font-bold text-sm">
                             Data de Fim
                         </label>
@@ -213,7 +215,7 @@ export function TurmaCadastroPage() {
                             </p>
                         )}
                     </div>
-                    
+
                     {serverError && (
                         <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700 text-center font-semibold border border-red-200">
                             {serverError}
@@ -227,8 +229,20 @@ export function TurmaCadastroPage() {
                     >
                         {isSubmitting ? "Cadastando..." : "Cadastrar"}
                     </button>
-                    
+
                 </form>
+                {modal && (
+                    <Modal
+                        titulo="Cadastro"
+                        message="Turma Cadastrada com Sucesso"
+                        decisao={null}
+                        texto="Ok"
+                        opSim={() => {
+                            setModal(false);
+                            navigate("/app/turma");
+
+                        }}
+                    />)}
                 
             </section>
         </main>
