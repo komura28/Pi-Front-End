@@ -6,6 +6,7 @@ import { LoginApi, Register } from "../services/authService";
 
 interface AuthContextData {
     user: authUser | null;
+    setUser: React.Dispatch<React.SetStateAction<authUser | null>>;
     isAuthenticated: boolean;
     isAdmin: boolean;
     control: boolean;
@@ -65,6 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         <AuthContext.Provider
             value={{
                 user,
+                setUser,
                 isAuthenticated,
                 isAdmin,
                 cadastrar,
