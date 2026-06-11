@@ -5,11 +5,13 @@ import type { authCurso, authTurma, TurmaMatricula } from "../../types/auth/auth
 import { deletarTurmaAPI, editarTurmaAPI, getCurso, getTurma } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 import { formatDate } from "../../utils/formatters";
+import { useNavigate } from "react-router-dom";
 
 
 const isSubmitting = false;
 
 export function TurmaPage() {
+    const navigate = useNavigate();
     const [turmas, setTurmas] = useState<TurmaMatricula[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -38,31 +40,28 @@ export function TurmaPage() {
     );
 
     const totalPaginas = Math.ceil(turmas.length / itensPorPagina);
+    const [mostrarModal, setMostrarModal] = useState(false);
 
     async function handleExclusao() {
         try {
             await deletarTurmaAPI(idSelecionado!);
-            alert("Cadastro excluído com sucesso!");
-            setTurmas(turmas.filter((turma) => turma.turma._id !== idSelecionado));
+            const novaLista = turmas.filter(
+                (turma) => turma.turma._id !== idSelecionado
+            );
+            setMostrarModal(true);
+            setTurmas(novaLista);
+            const novasPaginas = Math.ceil(
+                novaLista.length / itensPorPagina
+            );
+
+            if (paginaAtual > novasPaginas && novasPaginas > 0) {
+                setPaginaAtual(novasPaginas);
+            }
         } catch (error) {
             console.log(error);
             alert("Erro ao excluir a turma.");
         }
-        setTurmas(turmas.filter((turma) => turma.turma._id !== idSelecionado));
 
-        const novaLista = turmas.filter(
-            (turma) => turma.turma._id !== idSelecionado
-        );
-
-        setTurmas(novaLista);
-
-        const novasPaginas = Math.ceil(
-            novaLista.length / itensPorPagina
-        );
-
-        if (paginaAtual > novasPaginas && novasPaginas > 0) {
-            setPaginaAtual(novasPaginas);
-        }
     }
 
     useEffect(() => {
@@ -115,7 +114,22 @@ export function TurmaPage() {
     }
 
     if (turmas.length === 0) {
-        return <div className="p-8"><p>Nenhuma turma encontrada</p></div>;
+        return (
+            <div className="p-8"><p>Nenhuma turma encontrada</p>
+            {mostrarModal && (
+                <Modal
+                    titulo="Exclusão"
+                    decisao={null}
+                    message="Turma Excluída com Sucesso"
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModal(false);
+                        navigate("/app/turma");
+                    }}
+                    
+                />)}
+            </div>
+                    );
     }
 
 
@@ -279,6 +293,7 @@ export function TurmaPage() {
                     titulo={`Confirmar Exclusão de Turma`}
                     decisao={null}
                     message={`Tem certeza que deseja excluir esta turma?`}
+                    texto="Sim"
                     opSim={() => {
                         setIsModalOpen(false);
                         handleExclusao()
@@ -286,6 +301,17 @@ export function TurmaPage() {
                     opNao={() => {
                         setIsModalOpen(false);
                         setIdSelecionado(null)
+                    }}
+                />)}
+            {mostrarModal && (
+                <Modal
+                    titulo="Exclusão"
+                    decisao={null}
+                    message="Turma Excluída com Sucesso"
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModal(false);
+                        navigate("/app/turma");
                     }}
                 />)}
             {isEditModalOpen && (
