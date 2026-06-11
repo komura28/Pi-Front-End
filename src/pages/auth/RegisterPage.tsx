@@ -239,7 +239,7 @@ export function RegistroPage() {
                 {modal && (
                     <Modal
                         titulo="Cadastro"
-                        message="Usuário Cadastrado com Sucesso"
+                        message="Usuário Cadastrado com Sucesso!"
                         decisao={null}
                         texto="Ok"
                         opSim={() => {

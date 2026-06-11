@@ -32,6 +32,8 @@ export function TurmaPage() {
     const cursoSelecionado = cursos.find(
         (curso) => curso._id === editCurso
     );
+    const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
+    const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
 
 
     const turmasPaginadas = turmas.slice(
@@ -40,7 +42,7 @@ export function TurmaPage() {
     );
 
     const totalPaginas = Math.ceil(turmas.length / itensPorPagina);
-    const [mostrarModal, setMostrarModal] = useState(false);
+    // const [mostrarModal, setMostrarModal] = useState(false);
 
     async function handleExclusao() {
         try {
@@ -48,7 +50,7 @@ export function TurmaPage() {
             const novaLista = turmas.filter(
                 (turma) => turma.turma._id !== idSelecionado
             );
-            setMostrarModal(true);
+            setMostrarModalExclusao(true);
             setTurmas(novaLista);
             const novasPaginas = Math.ceil(
                 novaLista.length / itensPorPagina
@@ -116,20 +118,20 @@ export function TurmaPage() {
     if (turmas.length === 0) {
         return (
             <div className="p-8"><p>Nenhuma turma encontrada</p>
-            {mostrarModal && (
-                <Modal
-                    titulo="Exclusão"
-                    decisao={null}
-                    message="Turma Excluída com Sucesso"
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModal(false);
-                        navigate("/app/turma");
-                    }}
-                    
-                />)}
+                {/*  {mostrarModal && (
+                    <Modal
+                        titulo="Exclusão"
+                        decisao={null}
+                        message="Turma Excluída com Sucesso"
+                        texto="Ok"
+                        opSim={() => {
+                            setMostrarModal(false);
+                            navigate("/app/turma");
+                        }}
+
+                    />)} */}
             </div>
-                    );
+        );
     }
 
 
@@ -163,23 +165,28 @@ export function TurmaPage() {
             // Ajuste os parâmetros de acordo com o que sua API espera receber.
             await editarTurmaAPI(turmaToEditId, { curso: editCurso, capacidade: parseInt(editCapacidade), turno: editTurno, dataInicio: editDataInicio, dataFim: editDataFim });
 
-            alert("Turma atualizada com sucesso!");
+            setMostrarModalEdicao(true);
 
             // Atualiza a lista na tela (procura a turma pelo ID e altera apenas ela)
             setTurmas(
-                turmas.map((turma) =>
-                    turma.turma._id === turmaToEditId
+                turmas.map((item) =>
+                    item.turma._id === turmaToEditId
                         ? {
-                            ...turma,
-                            curso: cursoSelecionado || turma.turma.curso,
-                            capacidade: parseInt(editCapacidade),
-                            turno: editTurno,
-                            dataInicio: editDataInicio,
-                            dataFim: editDataFim,
+                            ...item,
+                            turma: {
+                                ...item.turma,
+                                curso: cursoSelecionado || item.turma.curso,
+                                capacidade: parseInt(editCapacidade),
+                                turno: editTurno,
+                                dataInicio: editDataInicio,
+                                dataFim: editDataFim,
+                            }
                         }
-                        : turma
+                        : item
                 )
             );
+            fecharModalEdicao();
+            setMostrarModalEdicao(true);
 
         } catch (error) {
             console.log(error);
@@ -303,17 +310,30 @@ export function TurmaPage() {
                         setIdSelecionado(null)
                     }}
                 />)}
-            {mostrarModal && (
+            {mostrarModalExclusao && (
                 <Modal
                     titulo="Exclusão"
                     decisao={null}
-                    message="Turma Excluída com Sucesso"
+                    message="Turma Excluída com Sucesso!"
                     texto="Ok"
                     opSim={() => {
-                        setMostrarModal(false);
+                        setMostrarModalExclusao(false);
                         navigate("/app/turma");
                     }}
                 />)}
+
+            {mostrarModalEdicao && (
+                <Modal
+                    titulo="Atualização"
+                    decisao={null}
+                    message="Turma Atualizada com Sucesso!"
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModalEdicao(false);
+                        navigate("/app/turma");
+                    }}
+                />
+            )}
             {isEditModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">

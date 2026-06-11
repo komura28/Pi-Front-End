@@ -4,6 +4,7 @@ import { meusCursos, solicitarMatricula } from "../services/matriculaService";
 import type { TurmaMatricula } from "../types/auth/auth-types";
 import { formatDate } from "../utils/formatters";
 import type { authMatricula } from "../types/matricula/matricula-types";
+import { Modal } from "./Modal";
 
 
 type CardProps = {
@@ -20,6 +21,8 @@ export function CardTurma({ turma }: CardProps) {
     const jaCandidatado = candidaturas.some(
         solicitacao => solicitacao.turma._id === turma.turma._id
     );
+    const [mostrarModalSucesso, setMostrarModalSucesso] = useState(false);
+
 
     const handleCandidatar = async () => {
         try {
@@ -28,7 +31,7 @@ export function CardTurma({ turma }: CardProps) {
             });
 
             setCandidaturas(prev => [...prev, novaCandidatura]);
-            alert("Candidatura enviada com sucesso!");
+            setMostrarModalSucesso(true);
         } catch (error) {
             console.error("Erro ao candidatar-se à turma:", error);
             alert("Erro ao enviar candidatura. Por favor, tente novamente.");
@@ -73,6 +76,11 @@ export function CardTurma({ turma }: CardProps) {
                     </p>
 
                     <p>
+                        <span className="font-medium">Turno:</span>{" "}
+                        {turma.turma.turno}
+                    </p>
+
+                    <p>
                         <span className="font-medium">Vagas:</span>{" "}
                         {turma.vagasDisponiveis} vagas disponíveis
                     </p>
@@ -89,6 +97,15 @@ export function CardTurma({ turma }: CardProps) {
                 >
                     {jaCandidatado ? "Já Candidatado" : "Candidatar-se"}
                 </button>
+                {mostrarModalSucesso && (
+                    <Modal
+                        titulo="Candidatura"
+                        message={"Candidatura enviada com sucesso!\nVerifique a candidatura em Meus Cursos"}
+                        decisao={null}
+                        texto="Ok"
+                        opSim={() => setMostrarModalSucesso(false)}
+                    />
+                )}
             </div>
         </div>
     )

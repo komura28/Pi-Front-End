@@ -41,33 +41,42 @@ export function CursoAlunoPage() {
             </h1>
 
             <div className="space-y-4">
-                {candidaturas.map((candidatura) => (
-                    <div
-                        key={candidatura._id}
-                        className="rounded-xl bg-white p-6 shadow-md"
-                    >
-                        <h2 className="mb-3 text-xl font-semibold text-gray-800">
-                             Curso: {candidatura.turma?.curso?.name}
-                        </h2>
 
-                        <p className="mb-2 text-gray-600">
-                            <span className="font-medium">
-                                Data da candidatura:
-                            </span>{" "}
-                            {new Date(
-                                candidatura.createdAt
-                            ).toLocaleDateString("pt-BR")}
+                {candidaturas.length === 0 ? (
+                    <div className="p-8">
+                        <p>
+                            Você ainda não possui nenhuma candidatura em cursos.
                         </p>
-
-                        <span
-                            className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${getStatusStyle(
-                                candidatura.status
-                            )}`}
-                        >
-                            {candidatura.status}
-                        </span>
                     </div>
-                ))}
+                ) : (
+                    candidaturas.map((candidatura) => (
+                        <div
+                            key={candidatura._id}
+                            className="rounded-xl bg-white p-6 shadow-md"
+                        >
+                            <h2 className="mb-3 text-xl font-semibold text-gray-800">
+                                Curso: {candidatura.turma?.curso?.name}
+                            </h2>
+
+                            <p className="mb-2 text-gray-600">
+                                <span className="font-medium">
+                                    Data da candidatura:
+                                </span>{" "}
+                                {new Date(
+                                    candidatura.createdAt
+                                ).toLocaleDateString("pt-BR")}
+                            </p>
+
+                            <span
+                                className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${getStatusStyle(
+                                    candidatura.status
+                                )}`}
+                            >
+                                {candidatura.status}
+                            </span>
+                        </div>
+                    ))
+                )}
             </div>
         </main>
     );

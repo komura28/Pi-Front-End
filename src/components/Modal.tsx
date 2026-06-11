@@ -16,7 +16,7 @@ export function Modal({titulo, message, texto, decisao, opSim, opNao}: IModal) {
             <h1 className="text-xl font-semibold text-slate-900 mb-4 text-center">
                 {titulo}
             </h1>
-            <p className="mb-6">
+            <p className="mb-6 whitespace-pre-line">
                 {message}
             </p>
             <div className="flex gap-3 justify-center w-full">

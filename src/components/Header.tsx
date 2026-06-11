@@ -57,7 +57,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                             <div className="flex items-center gap-2 p-12">
                                 <div>
                                     <Link to={link ?? "/"}>
-                                        <img src={logo} alt="Logo" className="h-12 w-auto object-contain" />
+                                        <img src={logo} alt="Logo" className="h-28 w-auto object-contain" />
                                     </Link>
                                 </div>
                             </div>

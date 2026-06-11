@@ -13,6 +13,8 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const [idSelecionado, setIdSelecionado] = useState<string | null>(null); //Aqui onde ele controla o ID que selecionamos, e o que fazer com ele
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 5;
+    const [mostrarModalAprovacao, setMostrarModalAprovacao] = useState(false);
+    const [mostrarModalRecusa, setMostrarModalRecusa] = useState(false);
 
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
@@ -33,6 +35,11 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                     matricula._id === _id ? { ...matricula, status: status } : matricula
 
                 ));
+            if (status === "APROVADA") {
+                setMostrarModalAprovacao(true);
+            } else {
+                setMostrarModalRecusa(true);
+            }
         } catch (error) { //Trata Erros
             setError("Erro ao atualizar o status da matrícula");
         }
@@ -148,7 +155,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
             {/*Aqui onde ele abre o Modal (Componente) para o ADM fazer a validação do usuário */}
             {isModalOpen && (
                 <Modal
-                    titulo = {`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
+                    titulo={`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
                     message={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
                     decisao={decisao}
                     texto="Sim"
@@ -164,6 +171,30 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
 
 
                 />)}
+
+            {mostrarModalAprovacao && (
+                <Modal
+                    titulo="Matrícula Aprovada"
+                    message="A matrícula foi aprovada com sucesso!"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModalAprovacao(false);
+                    }}
+                />
+            )}
+
+            {mostrarModalRecusa && (
+                <Modal
+                    titulo="Matrícula Recusada"
+                    message="A matrícula foi recusada com sucesso!"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModalRecusa(false);
+                    }}
+                />
+            )}
         </div>
     )
 }

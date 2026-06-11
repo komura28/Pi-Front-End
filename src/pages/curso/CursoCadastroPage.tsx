@@ -245,7 +245,7 @@ export function CursoCadastroPage() {
                 {modal && (
                     <Modal
                         titulo="Cadastro"
-                        message="Curso Cadastrado com Sucesso"
+                        message="Curso Cadastrado com Sucesso!"
                         decisao={null}
                         texto="Ok"
                         opSim={() => {

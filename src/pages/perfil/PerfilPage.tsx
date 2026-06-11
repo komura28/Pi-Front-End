@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import { useAuth } from "../../contexts/AuthContext";
-import { Button } from "../../components/Button";
 import { FaPencilAlt } from "react-icons/fa";
 import type { authUser } from "../../types/auth/auth-types";
 import { editarUser } from "../../services/userService";
+import { Modal } from "../../components/Modal";
 
 export function PerfilPage() {
 
@@ -11,8 +11,8 @@ export function PerfilPage() {
     const [error, setError] = useState("");
     const { user, setUser } = useAuth();
     const [editName, setEditName] = useState("");
-    const [editEmail, setEditEmail] = useState("");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
 
 
     useEffect(() => {
@@ -44,7 +44,6 @@ export function PerfilPage() {
 
     function abrirModalEdicao(user: authUser) {
         setEditName(user.name || "");
-        setEditEmail(user.email || "");
         setIsEditModalOpen(true);
     }
 
@@ -52,7 +51,6 @@ export function PerfilPage() {
     function fecharModalEdicao() {
         setIsEditModalOpen(false);
         setEditName("");
-        setEditEmail("");
     }
 
     async function handleSalvarEdicao() {
@@ -60,14 +58,14 @@ export function PerfilPage() {
         try {
 
             const updatedUser = await editarUser({
-                name: editName,
-                email: editEmail,
+                name: editName
             });
 
             setUser(updatedUser);
             localStorage.setItem("user", JSON.stringify(updatedUser));
 
-            alert("Usuário atualizado com sucesso!");
+            fecharModalEdicao();
+            setMostrarModalEdicao(true);
 
 
         } catch (error) {
@@ -165,18 +163,6 @@ export function PerfilPage() {
                                     className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    E-mail
-                                </label>
-                                <input
-                                    type="email"
-                                    value={editEmail}
-                                    onChange={(e) => setEditEmail(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
                         </div>
 
                         <div className="flex justify-end gap-3">
@@ -195,6 +181,16 @@ export function PerfilPage() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {mostrarModalEdicao && (
+                <Modal
+                    titulo="Atualização"
+                    message="Perfil atualizado com sucesso!"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => setMostrarModalEdicao(false)}
+                />
             )}
         </div>
     )

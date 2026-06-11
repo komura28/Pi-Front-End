@@ -234,7 +234,7 @@ export function TurmaCadastroPage() {
                 {modal && (
                     <Modal
                         titulo="Cadastro"
-                        message="Turma Cadastrada com Sucesso"
+                        message="Turma Cadastrada com Sucesso!"
                         decisao={null}
                         texto="Ok"
                         opSim={() => {

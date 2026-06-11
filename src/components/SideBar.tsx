@@ -26,14 +26,14 @@ export function SideBar({ navigationItems, link }: SideBarProps) {
     return (
         <>
             <aside className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background bg-[#0F172A]">
-                <div className="flex h-16 items-center border-b px-6">
-                    <div className="flex items-center gap-2 p-12">
-                        <div>
-                            <Link to={link}>
-                                <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
-                            </Link>
-                        </div>
-                    </div>
+                <div className="flex h-24 items-center justify-center border-b">
+                    <Link to={link}>
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            className="h-28 w-auto object-contain"
+                        />
+                    </Link>
                 </div>
 
                 <nav className="flex-1 space-y-1 p-3">

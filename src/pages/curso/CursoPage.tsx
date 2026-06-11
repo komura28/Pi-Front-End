@@ -19,14 +19,14 @@ export function CursoPage() {
     // Estados do Modal de Exclusão
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cursoToDelete, setCursoToDelete] = useState<string | null>(null);
-
-    const [mostrarModal, setMostrarModal] = useState(false);
-
+    
     // --- NOVOS ESTADOS PARA O MODAL DE EDIÇÃO ---
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [cursoToEditId, setCursoToEditId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editDescription, setEditDescription] = useState("");
+    const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
+    const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
 
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 5;
@@ -96,7 +96,7 @@ export function CursoPage() {
                 return novaLista;
             });
 
-            setMostrarModal(true);
+            setMostrarModalExclusao(true);
         } catch (error) {
             console.log(error);
             alert("Erro ao excluir o curso.");
@@ -153,8 +153,8 @@ export function CursoPage() {
                 )
             );
 
-            alert("Curso atualizado com sucesso!");
             fecharModalEdicao();
+            setMostrarModalEdicao(true);
         } catch (error) {
             console.log(error);
             alert("Erro ao atualizar o curso.");
@@ -176,7 +176,7 @@ export function CursoPage() {
             <div className="p-8">
                 <p>Nenhum curso encontrado</p>
 
-                {mostrarModal && (
+        {/*         {mostrarModal && (
                     <Modal
                         titulo="Exclusão"
                         message="Curso Excluído com Sucesso"
@@ -187,7 +187,7 @@ export function CursoPage() {
                             navigate("/app/curso");
                         }}
                     />
-                )}
+                )} */}
             </div>
         );
     }
@@ -352,17 +352,30 @@ export function CursoPage() {
                 </div>
             )}
 
-            {mostrarModal && (
+            {mostrarModalExclusao && (
                 <Modal
                     titulo="Exclusão"
-                    message="Curso Excluído com Sucesso"
+                    message="Curso Excluído com Sucesso!"
                     decisao={null}
                     texto="Ok"
                     opSim={() => {
-                        setMostrarModal(false);
+                        setMostrarModalExclusao(false);
                         navigate("/app/curso");
                     }}
                 />)}
+
+            {mostrarModalEdicao && (
+                <Modal
+                    titulo="Atualização"
+                    message="Curso atualizado com sucesso!"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModalEdicao(false);
+                        navigate("/app/curso");
+                    }}
+                />
+            )}
         </div>
     )
 }
