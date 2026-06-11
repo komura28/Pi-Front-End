@@ -3,10 +3,15 @@ import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso } from "../../types/auth/auth-types";
 import { deletarCursoAPI, getCurso, editarCursoAPI } from "../../services/authService"; // Adicionei o editarCursoAPI aqui
-
-const isSubmitting = false;
+import { Modal } from "../../components/Modal";
+import { useNavigate } from "react-router-dom";
 
 export function CursoPage() {
+    const navigate = useNavigate();
+
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
+
     const [cursos, setCursos] = useState<authCurso[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -14,6 +19,8 @@ export function CursoPage() {
     // Estados do Modal de Exclusão
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cursoToDelete, setCursoToDelete] = useState<string | null>(null);
+
+    const [mostrarModal, setMostrarModal] = useState(false);
 
     // --- NOVOS ESTADOS PARA O MODAL DE EDIÇÃO ---
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -31,7 +38,7 @@ export function CursoPage() {
         indiceUltimoItem
     );
 
-    const totalPaginas = Math.ceil(cursos.length / itensPorPagina);
+    const totalPaginas = Math.max(1, Math.ceil(cursos.length / itensPorPagina));
 
     useEffect(() => {
         async function carregarCursos() {
@@ -68,25 +75,33 @@ export function CursoPage() {
         if (!cursoToDelete) return;
 
         try {
+            setIsDeleting(true);
+
             await deletarCursoAPI(cursoToDelete);
-            alert("Cadastro excluído com sucesso!");
-            const novaLista = cursos.filter(
-                (curso) => curso._id !== cursoToDelete
-            );
 
-            setCursos(novaLista);
+            setCursos((prevCursos) => {
+                const novaLista = prevCursos.filter(
+                    (curso) => curso._id !== cursoToDelete
+                );
 
-            const novasPaginas = Math.ceil(
-                novaLista.length / itensPorPagina
-            );
+                const novasPaginas = Math.max(
+                    1,
+                    Math.ceil(novaLista.length / itensPorPagina)
+                );
 
-            if (paginaAtual > novasPaginas && novasPaginas > 0) {
-                setPaginaAtual(novasPaginas);
-            }
+                setPaginaAtual((pagina) =>
+                    pagina > novasPaginas ? novasPaginas : pagina
+                );
+
+                return novaLista;
+            });
+
+            setMostrarModal(true);
         } catch (error) {
             console.log(error);
             alert("Erro ao excluir o curso.");
         } finally {
+            setIsDeleting(false);
             fecharModal();
         }
     }
@@ -96,8 +111,8 @@ export function CursoPage() {
     // 1. Abre o modal e preenche os inputs com os dados atuais do curso
     function abrirModalEdicao(curso: authCurso) {
         setCursoToEditId(curso._id);
-        setEditName(curso.name);
-        setEditDescription(curso.description);
+        setEditName(curso.name ?? "");
+        setEditDescription(curso.description ?? "");
         setIsEditModalOpen(true);
     }
 
@@ -113,28 +128,40 @@ export function CursoPage() {
     async function handleSalvarEdicao() {
         if (!cursoToEditId) return;
 
+        if (!editName.trim()) {
+            alert("O nome do curso é obrigatório.");
+            return;
+        }
+
         try {
-            // Chama a API passando o ID e os novos dados. 
-            // Ajuste os parâmetros de acordo com o que sua API espera receber.
-            await editarCursoAPI(cursoToEditId, { name: editName, description: editDescription });
+            setIsSavingEdit(true);
+
+            await editarCursoAPI(cursoToEditId, {
+                name: editName.trim(),
+                description: editDescription.trim(),
+            });
+
+            setCursos((prevCursos) =>
+                prevCursos.map((curso) =>
+                    curso._id === cursoToEditId
+                        ? {
+                            ...curso,
+                            name: editName.trim(),
+                            description: editDescription.trim(),
+                        }
+                        : curso
+                )
+            );
 
             alert("Curso atualizado com sucesso!");
-
-            // Atualiza a lista na tela (procura o curso pelo ID e altera apenas ele)
-            setCursos(cursos.map((curso) =>
-                curso._id === cursoToEditId
-                    ? { ...curso, name: editName, description: editDescription }
-                    : curso
-            ));
-
+            fecharModalEdicao();
         } catch (error) {
             console.log(error);
             alert("Erro ao atualizar o curso.");
         } finally {
-            fecharModalEdicao();
+            setIsSavingEdit(false);
         }
     }
-
 
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
@@ -145,7 +172,24 @@ export function CursoPage() {
     }
 
     if (cursos.length === 0) {
-        return <div className="p-8"><p>Nenhum curso encontrado</p></div>;
+        return (
+            <div className="p-8">
+                <p>Nenhum curso encontrado</p>
+
+                {mostrarModal && (
+                    <Modal
+                        titulo="Exclusão"
+                        message="Curso Excluído com Sucesso"
+                        decisao={null}
+                        texto="Ok"
+                        opSim={() => {
+                            setMostrarModal(false);
+                            navigate("/app/curso");
+                        }}
+                    />
+                )}
+            </div>
+        );
     }
 
     return (
@@ -154,35 +198,46 @@ export function CursoPage() {
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">
                     Lista de Cursos
                 </h1>
-
                 <table className="w-full">
                     <thead>
                         <tr>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">Curso</th>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">Descrição</th>
-                            <th className="text-slate-800 font-medium p-2 border-b ">Ações</th>
+                            <th className="text-left text-slate-800 font-medium p-2 border-b">
+                                Curso
+                            </th>
+                            <th className="text-left text-slate-800 font-medium p-2 border-b">
+                                Descrição
+                            </th>
+                            <th className="text-slate-800 font-medium p-2 border-b">
+                                Ações
+                            </th>
                         </tr>
                     </thead>
 
                     <tbody className="border-b">
                         {cursosPaginados.map((curso) => (
                             <tr key={curso._id} className="border-b">
-                                <td className="text-slate-600 p-2 ">{curso.name}</td>
-                                <td className="text-slate-600 p-2 ">{curso.description}</td>
-                                <td className="p-2  gap-2">
+                                <td className="text-slate-600 p-2">
+                                    {curso.name}
+                                </td>
+
+                                <td className="text-slate-600 p-2">
+                                    {curso.description}
+                                </td>
+
+                                <td className="p-2">
                                     <div className="flex justify-center items-center gap-2">
                                         <Button
-                                            isSubmitting={isSubmitting}
+                                            isSubmitting={false}
                                             label={<FaPencilAlt />}
                                             loadingLabel="salvando"
                                             className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
-                                            // AQUI: Adicionei o evento de clique para abrir a edição passando o curso atual
                                             onClick={() => abrirModalEdicao(curso)}
                                         />
+
                                         <Button
-                                            isSubmitting={isSubmitting}
+                                            isSubmitting={isDeleting}
                                             label={<FaTrash />}
-                                            loadingLabel="recusando"
+                                            loadingLabel="Excluindo..."
                                             className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
                                             onClick={() => confirmarExclusao(curso._id)}
                                         />
@@ -192,6 +247,7 @@ export function CursoPage() {
                         ))}
                     </tbody>
                 </table>
+
                 <div className="flex justify-center items-center gap-2 mt-4">
                     <button
                         onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
@@ -286,14 +342,27 @@ export function CursoPage() {
                             </button>
                             <button
                                 onClick={handleSalvarEdicao}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                                disabled={isSavingEdit}
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
-                                Salvar Alterações
+                                {isSavingEdit ? "Salvando..." : "Salvar Alterações"}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {mostrarModal && (
+                <Modal
+                    titulo="Exclusão"
+                    message="Curso Excluído com Sucesso"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModal(false);
+                        navigate("/app/curso");
+                    }}
+                />)}
         </div>
-    );
+    )
 }
