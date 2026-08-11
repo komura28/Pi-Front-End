@@ -1,4 +1,4 @@
-import { FaInstagram, FaEnvelope, FaPhone } from "react-icons/fa";
+import { FaInstagram, FaEnvelope, FaPhone, FaYoutube } from "react-icons/fa";
 
 export function Footer() {
     return (
@@ -43,6 +43,15 @@ export function Footer() {
                             className="flex items-center gap-2 hover:text-white transition"
                         >
                             <FaInstagram />
+                            @aticurando
+                        </a>
+                        <a
+                            href="https://www.youtube.com/@Aticurando"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 hover:text-white transition"
+                        >
+                            <FaYoutube />
                             @aticurando
                         </a>
                     </div>

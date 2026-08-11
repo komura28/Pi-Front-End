@@ -57,7 +57,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                             <div className="flex items-center gap-2 p-12">
                                 <div>
                                     <Link to={link ?? "/"}>
-                                        <img src={logo} alt="Logo" className="h-28 w-auto object-contain" />
+                                        <img src={logo} alt="Logo" className="h-15  w-auto object-contain" />
                                     </Link>
                                 </div>
                             </div>
@@ -101,7 +101,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                 >
                     <button
                         onClick={() => setOpenMenus((prev) => !prev)}
-                        className="w-10 h-10 rounded-full overflow-hidden">
+                        className="w-auto h-15 rounded-full overflow-hidden cursor-pointer object-contain">
                         <img src={perfilImage} alt="Foto de Perfil"
                             className="w-full h-full object-cover" />
                     </button>

@@ -31,7 +31,7 @@ export function SideBar({ navigationItems, link }: SideBarProps) {
                         <img
                             src={logo}
                             alt="Logo"
-                            className="h-28 w-auto object-contain"
+                            className="h-20 w-auto object-contain"
                         />
                     </Link>
                 </div>
