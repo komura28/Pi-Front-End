@@ -32,6 +32,9 @@ export function TurmaPage() {
     const cursoSelecionado = cursos.find(
         (curso) => curso._id === editCurso
     );
+    const dataFimInvalida = Boolean(
+    editDataInicio && editDataFim && new Date(editDataFim) <= new Date(editDataInicio)
+    );
     const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
     const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
 
@@ -407,9 +410,16 @@ export function TurmaPage() {
                                     type="date"
                                     value={editDataFim}
                                     onChange={(e) => setEditDataFim(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
+                                     className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    dataFimInvalida ? "border-red-500" : "border-slate-300"
+                                    }`}
+                                    />
+                                    {dataFimInvalida && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                    A data de fim deve ser posterior à data de início
+                                    </p>
+                                    )}
+                                </div>
                         </div>
 
                         <div className="flex justify-end gap-3">
@@ -421,6 +431,7 @@ export function TurmaPage() {
                             </button>
                             <button
                                 onClick={handleSalvarEdicao}
+                                disabled={dataFimInvalida}
                                 className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 Salvar Alterações
