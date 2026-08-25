@@ -118,27 +118,6 @@ export function TurmaPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
-    if (turmas.length === 0) {
-        return (
-            <div className="p-8"><p>Nenhuma turma encontrada</p>
-                {/*  {mostrarModal && (
-                    <Modal
-                        titulo="Exclusão"
-                        decisao={null}
-                        message="Turma Excluída com Sucesso"
-                        texto="Ok"
-                        opSim={() => {
-                            setMostrarModal(false);
-                            navigate("/app/turma");
-                        }}
-
-                    />)} */}
-            </div>
-        );
-    }
-
-
-
     function abrirModalEdicao(turma: authTurma) {
         setTurmaToEditId(turma._id);
         setEditCurso(turma.curso?._id || "");
@@ -197,6 +176,24 @@ export function TurmaPage() {
         } finally {
             fecharModalEdicao();
         }
+    }
+
+    if (turmas.length === 0) {
+        return (
+            <div className="p-8"><p>Nenhuma turma encontrada</p>
+                {mostrarModalExclusao && (
+                <Modal
+                    titulo="Exclusão"
+                    decisao={null}
+                    message="Turma Excluída com Sucesso!"
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModalExclusao(false);
+                        navigate("/app/turma");
+                    }}
+                />)}
+            </div>
+        );
     }
 
     return (

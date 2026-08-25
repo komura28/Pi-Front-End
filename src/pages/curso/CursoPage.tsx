@@ -176,18 +176,17 @@ export function CursoPage() {
             <div className="p-8">
                 <p>Nenhum curso encontrado</p>
 
-        {/*         {mostrarModal && (
-                    <Modal
-                        titulo="Exclusão"
-                        message="Curso Excluído com Sucesso"
-                        decisao={null}
-                        texto="Ok"
-                        opSim={() => {
-                            setMostrarModal(false);
-                            navigate("/app/curso");
-                        }}
-                    />
-                )} */}
+        {mostrarModalExclusao && (
+                <Modal
+                    titulo="Exclusão"
+                    message="Curso Excluído com Sucesso!"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => {
+                        setMostrarModalExclusao(false);
+                        navigate("/app/curso");
+                    }}
+                />)}
             </div>
         );
     }

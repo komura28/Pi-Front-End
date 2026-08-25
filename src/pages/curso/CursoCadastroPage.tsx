@@ -144,7 +144,7 @@ export function CursoCadastroPage() {
                         </div>
 
                         <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Nome da Descrição (Matéria)
+                         Descrição (Matéria)
                         </label>
 
                         <div className="flex flex-wrap gap-2">
@@ -165,7 +165,7 @@ export function CursoCadastroPage() {
                                 onClick={handleMateria}
                                 className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
                             >
-                                +
+                                Adicionar
                             </button>
                         </div>
                     </div>

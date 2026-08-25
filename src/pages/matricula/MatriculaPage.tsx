@@ -69,7 +69,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     }
 
     if (matriculas.length === 0) {
-        return <div className="p-8"><p>NenhumA Matrícula Encontrado</p></div>;
+        return <div className="p-8"><p>Nenhuma Matrícula Encontrada</p></div>;
     }
 
     return (
