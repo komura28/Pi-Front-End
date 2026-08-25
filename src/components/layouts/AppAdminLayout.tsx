@@ -32,6 +32,10 @@ const adminNavItems = [
         href: "/app/matricula",
 
     },
+    {
+        label: "Lista de Usuários",
+        href: "/app/user"
+    },
 
 ]
 

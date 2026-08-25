@@ -23,6 +23,11 @@ export async function getMe() {
     return response.data;
 }
 
+export async function deletarUserAPI(_id: string) {    
+    const response = await api.delete(`/user/${_id}`)
+    return response.data;
+}
+
 export async function deletarCursoAPI(_id: string) {    
     const response = await api.delete(`/curso/${_id}`)
     return response.data;
@@ -50,6 +55,12 @@ export async function LoginApi(data: LoginRequest): Promise<LoginResponse> {
 
 export async function getCurso() {
     const response = await api.get("/curso")
+
+    return response.data;
+}
+
+export async function getUser() {
+    const response = await api.get("/user")
 
     return response.data;
 }

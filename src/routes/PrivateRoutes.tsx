@@ -7,6 +7,7 @@ import { MatriculaPage } from "../pages/matricula/MatriculaPage";
 import { CursoCadastroPage } from "../pages/curso/CursoCadastroPage";
 import { TurmaCadastroPage } from "../pages/turma/TurmaCadastroPage";
 import { TurmaPage } from "../pages/turma/TurmaPage";
+import { UserPage } from "../pages/user/UserPage";
 
 export function PrivateRoutes() {
     return (
@@ -18,6 +19,10 @@ export function PrivateRoutes() {
 
             <Route path="/curso" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <CursoPage />
+            </ProtectedRoutes>} />
+
+            <Route path="/user" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+                <UserPage />
             </ProtectedRoutes>} />
 
             <Route path="/turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
