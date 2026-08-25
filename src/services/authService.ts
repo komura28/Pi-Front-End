@@ -48,6 +48,11 @@ export async function adicionarMateriaCursoAPI(cursoId: string, data: { name: st
     return response.data;
 }
 
+export async function removerMateriaCursoAPI(cursoId: string, materiaId: string) {
+    const response = await api.delete(`/curso/${cursoId}/materias/${materiaId}`);
+    return response.data;
+}
+
 export async function editarTurmaAPI(_id: string, data: { curso: string; turno: string; capacidade: number; dataInicio: string; dataFim: string }) {
     const response = await api.put(`/turma/${_id}`, data);
     return response.data;
