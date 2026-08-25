@@ -38,6 +38,16 @@ export async function editarCursoAPI(_id: string, data: { name: string; descript
     return response.data;
 }
 
+export async function editarMateriaAPI(_id: string, data: { name: string; description: string }) {
+    const response = await api.put(`/materia/${_id}`, data);
+    return response.data;
+}
+
+export async function adicionarMateriaCursoAPI(cursoId: string, data: { name: string; description: string }) {
+    const response = await api.post(`/curso/${cursoId}/materias`, data);
+    return response.data;
+}
+
 export async function editarTurmaAPI(_id: string, data: { curso: string; turno: string; capacidade: number; dataInicio: string; dataFim: string }) {
     const response = await api.put(`/turma/${_id}`, data);
     return response.data;

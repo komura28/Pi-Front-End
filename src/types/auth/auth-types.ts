@@ -1,4 +1,3 @@
-
 export type papelUsuario = "ALUNO" | "ADM";
 
 export interface authUser{
@@ -27,23 +26,31 @@ export interface RegisterRequest{
     confirmarSenha: string;
 }
 
-export interface authMateria{
+export interface authMateriaInput{
     name: string;
     description: string;
+}
 
+export interface authMateria extends authMateriaInput{
+    _id: string;
+
+}
+
+export interface authCursoMateria{
+    materia: authMateria;
 }
 
 export interface authCurso{
     _id: string,
     name: string,
     description: string,
-    materias: authMateria[]
+    materias: authCursoMateria[]
 }
 
 export interface RegisterCursoRequest{
     name: string;
     description: string;
-    materias: authMateria[];
+    materias: authMateriaInput[];
 }
 
 export interface authTurma{
@@ -67,4 +74,3 @@ export interface RegisterTurmaRequest{
     dataInicio: Date;
     dataFim: Date;
 }
-
