@@ -15,11 +15,18 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const itensPorPagina = 5;
     const [mostrarModalAprovacao, setMostrarModalAprovacao] = useState(false);
     const [mostrarModalRecusa, setMostrarModalRecusa] = useState(false);
+    const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS"); //Estrado para filtro
+
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
 
-    const matriculasPaginaAtual = matriculas.slice(
+    const matriculasFiltro = matriculas.filter(
+        (matricula) => filtro === "TODOS" || matricula.status === filtro
+    );
+
+    const totalPaginas = Math.max(Math.ceil(matriculasFiltro.length / itensPorPagina ), 1);
+    const matriculasPaginaAtual = matriculasFiltro.slice(
         indicePrimeiroItem,
         indiceUltimoItem
     );
@@ -131,6 +138,20 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                     Lista de Matrículas
                 </h1>
 
+                <select
+                value={filtro}
+                onChange={(e) => {
+                    setFiltro(e.target.value as "TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE");
+                    setPaginaAtual(1);
+                }}
+                className="p-2 border border-slate-300 rounded-md bg-white text-slate-700"
+                >
+                    <option value="TODOS">Todas Matrículas</option>
+                    <option value="APROVADA">Aprovadas</option>
+                    <option value="RECUSADA">Recusadas</option>
+                    <option value="PENDENTE">Pendentes</option>
+                </select>
+
                 <table className="w-full table-fixed ">
                     <thead>
                         <tr>
@@ -142,6 +163,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                             <th className="text-center text-slate-800 font-medium p-2 border-b">Ações</th>
                         </tr>
                     </thead>
+
                     {/*Aqui onde lista as matrículas solicitadas */}
                     <tbody className="border-b">
                         {matriculasPaginaAtual.map((matricula) => (
