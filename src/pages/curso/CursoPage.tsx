@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
-import type { authCurso } from "../../types/auth/auth-types";
-import { deletarCursoAPI, getCurso, editarCursoAPI } from "../../services/authService"; // Adicionei o editarCursoAPI aqui
+import type { authCurso, authMateria } from "../../types/auth/auth-types";
+import { deletarCursoAPI, getCurso, editarCursoAPI, editarMateriaAPI, adicionarMateriaCursoAPI, removerMateriaCursoAPI } from "../../services/authService"; // Adicionei o editarCursoAPI aqui
 import { Modal } from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -16,17 +16,33 @@ export function CursoPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Estados do Modal de Exclusão
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cursoToDelete, setCursoToDelete] = useState<string | null>(null);
     
-    // --- NOVOS ESTADOS PARA O MODAL DE EDIÇÃO ---
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [cursoToEditId, setCursoToEditId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editDescription, setEditDescription] = useState("");
     const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
     const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
+
+    const [isMateriasModalOpen, setIsMateriasModalOpen] = useState(false);
+    const [cursoMateriasSelecionado, setCursoMateriasSelecionado] = useState<authCurso | null>(null);
+
+    const [isEditMateriaModalOpen, setIsEditMateriaModalOpen] = useState(false);
+    const [materiaToEditId, setMateriaToEditId] = useState<string | null>(null);
+    const [editMateriaName, setEditMateriaName] = useState("");
+    const [editMateriaDescription, setEditMateriaDescription] = useState("");
+    const [isSavingMateriaEdit, setIsSavingMateriaEdit] = useState(false);
+    const [mostrarModalEdicaoMateria, setMostrarModalEdicaoMateria] = useState(false);
+
+    const [novaMateriaNome, setNovaMateriaNome] = useState("");
+    const [novaMateriaDescricao, setNovaMateriaDescricao] = useState("");
+    const [isAddingMateria, setIsAddingMateria] = useState(false);
+
+    const [isDeleteMateriaModalOpen, setIsDeleteMateriaModalOpen] = useState(false);
+    const [materiaToDeleteId, setMateriaToDeleteId] = useState<string | null>(null);
+    const [isDeletingMateria, setIsDeletingMateria] = useState(false);
 
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 5;
@@ -60,7 +76,6 @@ export function CursoPage() {
         carregarCursos();
     }, []);
 
-    // --- FUNÇÕES DE EXCLUSÃO ---
     function confirmarExclusao(id: string) {
         setCursoToDelete(id);
         setIsModalOpen(true);
@@ -106,9 +121,6 @@ export function CursoPage() {
         }
     }
 
-    // --- NOVAS FUNÇÕES DE EDIÇÃO ---
-
-    // 1. Abre o modal e preenche os inputs com os dados atuais do curso
     function abrirModalEdicao(curso: authCurso) {
         setCursoToEditId(curso._id);
         setEditName(curso.name ?? "");
@@ -116,7 +128,6 @@ export function CursoPage() {
         setIsEditModalOpen(true);
     }
 
-    // 2. Limpa os campos e fecha o modal
     function fecharModalEdicao() {
         setIsEditModalOpen(false);
         setCursoToEditId(null);
@@ -124,7 +135,6 @@ export function CursoPage() {
         setEditDescription("");
     }
 
-    // 3. Envia os dados para a API e atualiza a lista na tela
     async function handleSalvarEdicao() {
         if (!cursoToEditId) return;
 
@@ -160,6 +170,167 @@ export function CursoPage() {
             alert("Erro ao atualizar o curso.");
         } finally {
             setIsSavingEdit(false);
+        }
+    }
+
+    function abrirModalMaterias(curso: authCurso) {
+        setCursoMateriasSelecionado(curso);
+        setIsMateriasModalOpen(true);
+    }
+
+    function fecharModalMaterias() {
+        setIsMateriasModalOpen(false);
+        setCursoMateriasSelecionado(null);
+    }
+
+    function abrirModalEdicaoMateria(materia: authMateria) {
+        setMateriaToEditId(materia._id);
+        setEditMateriaName(materia.name ?? "");
+        setEditMateriaDescription(materia.description ?? "");
+        setIsMateriasModalOpen(false);
+        setIsEditMateriaModalOpen(true);
+    }
+
+    function fecharModalEdicaoMateria() {
+        setIsEditMateriaModalOpen(false);
+        setMateriaToEditId(null);
+        setEditMateriaName("");
+        setEditMateriaDescription("");
+        setIsMateriasModalOpen(true);
+    }
+
+    async function handleSalvarEdicaoMateria() {
+        if (!materiaToEditId) return;
+
+        if (!editMateriaName.trim()) {
+            alert("O nome da matéria é obrigatório.");
+            return;
+        }
+
+        try {
+            setIsSavingMateriaEdit(true);
+
+            await editarMateriaAPI(materiaToEditId, {
+                name: editMateriaName.trim(),
+                description: editMateriaDescription.trim(),
+            });
+
+            const atualizarMateria = (materia: authMateria) =>
+                materia._id === materiaToEditId
+                    ? {
+                        ...materia,
+                        name: editMateriaName.trim(),
+                        description: editMateriaDescription.trim(),
+                    }
+                    : materia;
+
+            setCursos((prevCursos) =>
+                prevCursos.map((curso) => ({
+                    ...curso,
+                    materias: curso.materias.map((item) => ({
+                        materia: atualizarMateria(item.materia),
+                    })),
+                }))
+            );
+
+            setCursoMateriasSelecionado((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        materias: prev.materias.map((item) => ({
+                            materia: atualizarMateria(item.materia),
+                        })),
+                    }
+                    : prev
+            );
+
+            setIsEditMateriaModalOpen(false);
+            setMateriaToEditId(null);
+            setEditMateriaName("");
+            setEditMateriaDescription("");
+            setIsMateriasModalOpen(true);
+            setMostrarModalEdicaoMateria(true);
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao atualizar a matéria.");
+        } finally {
+            setIsSavingMateriaEdit(false);
+        }
+    }
+
+    // --- ADICIONAR NOVA MATÉRIA DIRETO NO CURSO JÁ EXISTENTE ---
+    async function handleAdicionarMateria() {
+        if (!cursoMateriasSelecionado) return;
+
+        if (!novaMateriaNome.trim()) {
+            alert("O nome da matéria é obrigatório.");
+            return;
+        }
+
+        try {
+            setIsAddingMateria(true);
+
+            const cursoAtualizado: authCurso = await adicionarMateriaCursoAPI(
+                cursoMateriasSelecionado._id,
+                {
+                    name: novaMateriaNome.trim(),
+                    description: novaMateriaDescricao.trim(),
+                }
+            );
+
+            setCursos((prevCursos) =>
+                prevCursos.map((curso) =>
+                    curso._id === cursoAtualizado._id ? cursoAtualizado : curso
+                )
+            );
+
+            setCursoMateriasSelecionado(cursoAtualizado);
+
+            setNovaMateriaNome("");
+            setNovaMateriaDescricao("");
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao adicionar a matéria.");
+        } finally {
+            setIsAddingMateria(false);
+        }
+    }
+
+    // --- EXCLUSÃO DE MATÉRIA ---
+    function confirmarExclusaoMateria(materiaId: string) {
+        setMateriaToDeleteId(materiaId);
+        setIsDeleteMateriaModalOpen(true);
+    }
+
+    function fecharModalExclusaoMateria() {
+        setIsDeleteMateriaModalOpen(false);
+        setMateriaToDeleteId(null);
+    }
+
+    async function handleConfirmarExclusaoMateria() {
+        if (!materiaToDeleteId || !cursoMateriasSelecionado) return;
+
+        try {
+            setIsDeletingMateria(true);
+
+            const cursoAtualizado: authCurso = await removerMateriaCursoAPI(
+                cursoMateriasSelecionado._id,
+                materiaToDeleteId
+            );
+
+            setCursos((prevCursos) =>
+                prevCursos.map((curso) =>
+                    curso._id === cursoAtualizado._id ? cursoAtualizado : curso
+                )
+            );
+
+            setCursoMateriasSelecionado(cursoAtualizado);
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao excluir a matéria.");
+        } finally {
+            setIsDeletingMateria(false);
+            fecharModalExclusaoMateria();
         }
     }
 
@@ -225,6 +396,14 @@ export function CursoPage() {
 
                                 <td className="p-2">
                                     <div className="flex justify-center items-center gap-2">
+                                        <Button
+                                            isSubmitting={false}
+                                            label="Matérias"
+                                            loadingLabel="salvando"
+                                            className="bg-blue-500 hover:bg-blue-600 rounded-md text-white text-sm py-1 px-2"
+                                            onClick={() => abrirModalMaterias(curso)}
+                                        />
+
                                         <Button
                                             isSubmitting={false}
                                             label={<FaPencilAlt />}
@@ -349,6 +528,182 @@ export function CursoPage() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {isMateriasModalOpen && cursoMateriasSelecionado && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-4">
+                            Matérias de {cursoMateriasSelecionado.name}
+                        </h3>
+
+                        <div className="max-h-80 overflow-y-auto space-y-2 mb-6">
+                            {cursoMateriasSelecionado.materias.length === 0 ? (
+                                <p className="text-slate-500 text-sm">
+                                    Este curso ainda não possui matérias cadastradas.
+                                </p>
+                            ) : (
+                                cursoMateriasSelecionado.materias.map((item) => (
+                                    <div
+                                        key={item.materia._id}
+                                        className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2 border border-gray-200"
+                                    >
+                                        <div className="min-w-0">
+                                            <p className="font-medium text-slate-800 truncate">{item.materia.name}</p>
+                                            <p className="text-sm text-slate-500 truncate">{item.materia.description}</p>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <Button
+                                                isSubmitting={false}
+                                                label={<FaPencilAlt />}
+                                                className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-2"
+                                                onClick={() => abrirModalEdicaoMateria(item.materia)}
+                                            />
+
+                                            <Button
+                                                isSubmitting={false}
+                                                label={<FaTrash />}
+                                                className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-2"
+                                                onClick={() => confirmarExclusaoMateria(item.materia._id)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <div className="border-t border-gray-200 pt-4 mt-2">
+                            <p className="text-sm font-medium text-slate-700 mb-2">
+                                Adicionar nova matéria
+                            </p>
+
+                            <div className="flex flex-col gap-2 mb-3">
+                                <input
+                                    type="text"
+                                    value={novaMateriaNome}
+                                    onChange={(e) => setNovaMateriaNome(e.target.value)}
+                                    placeholder="Nome da matéria"
+                                    className="w-full border border-slate-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <input
+                                    type="text"
+                                    value={novaMateriaDescricao}
+                                    onChange={(e) => setNovaMateriaDescricao(e.target.value)}
+                                    placeholder="Descrição"
+                                    className="w-full border border-slate-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <button
+                                onClick={handleAdicionarMateria}
+                                disabled={isAddingMateria}
+                                className="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                            >
+                                {isAddingMateria ? "Adicionando..." : "+ Adicionar Matéria"}
+                            </button>
+                        </div>
+
+                        <div className="flex justify-end mt-4">
+                            <button
+                                onClick={fecharModalMaterias}
+                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isDeleteMateriaModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                        <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">
+                            Confirmar Exclusão de Matéria
+                        </h3>
+                        <p className="text-slate-600 mb-6 justify-center text-center">
+                            Tem certeza que deseja excluir esta matéria do curso? Esta ação não poderá ser desfeita.
+                        </p>
+
+                        <div className="flex justify-center gap-3">
+                            <button
+                                onClick={handleConfirmarExclusaoMateria}
+                                disabled={isDeletingMateria}
+                                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                            >
+                                {isDeletingMateria ? "Excluindo..." : "Sim"}
+                            </button>
+
+                            <button
+                                onClick={fecharModalExclusaoMateria}
+                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                            >
+                                Não
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            
+            {isEditMateriaModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Matéria</h3>
+
+                        <div className="flex flex-col gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Nome da Matéria
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editMateriaName}
+                                    onChange={(e) => setEditMateriaName(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Descrição
+                                </label>
+                                <textarea
+                                    value={editMateriaDescription}
+                                    onChange={(e) => setEditMateriaDescription(e.target.value)}
+                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={fecharModalEdicaoMateria}
+                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSalvarEdicaoMateria}
+                                disabled={isSavingMateriaEdit}
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            >
+                                {isSavingMateriaEdit ? "Salvando..." : "Salvar Alterações"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {mostrarModalEdicaoMateria && (
+                <Modal
+                    titulo="Atualização"
+                    message="Matéria atualizada com sucesso!"
+                    decisao={null}
+                    texto="Ok"
+                    opSim={() => setMostrarModalEdicaoMateria(false)}
+                />
             )}
 
             {mostrarModalExclusao && (
