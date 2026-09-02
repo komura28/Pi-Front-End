@@ -18,13 +18,17 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
+    const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS"); //Estado para filtro
 
-    const matriculasPaginaAtual = matriculas.slice(
+    const matriculasFiltro = matriculas.filter(
+        (matricula) => filtro === "TODOS" || matricula.status === filtro
+    );
+
+    const totalPaginas = Math.max(Math.ceil(matriculasFiltro.length / itensPorPagina ), 1);
+    const matriculasPaginaAtual = matriculasFiltro.slice(
         indicePrimeiroItem,
         indiceUltimoItem
     );
-
-    const totalPaginas = Math.ceil(matriculas.length / itensPorPagina);
 
     const [isModalEdicaoOpen, setIsModalEdicaoOpen] = useState(false);
     const [formEdicao, setFormEdicao] = useState<{ name: string; status: "APROVADA" | "RECUSADA" }>({
@@ -130,6 +134,20 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                 <h1 className="text-2xl font-bold text-slate-800 mb-6">
                     Lista de Matrículas
                 </h1>
+
+                <select
+                value={filtro}
+                onChange={(e) => {
+                    setFiltro(e.target.value as "TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE");
+                    setPaginaAtual(1);
+                }}
+                className="p-2 border border-slate-300 rounded-md bg-white text-slate-700"
+                >
+                    <option value="TODOS">Todas Matrículas</option>
+                    <option value="APROVADA">Aprovadas</option>
+                    <option value="RECUSADA">Recusadas</option>
+                    <option value="PENDENTE">Pendentes</option>
+                </select>
 
                 <table className="w-full table-fixed ">
                     <thead>
