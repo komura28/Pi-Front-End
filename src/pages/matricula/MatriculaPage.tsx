@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { AtualizarMatricula, getMatricula } from "../../services/matriculaService";
 import type { authMatricula } from "../../types/matricula/matricula-types";
 import { Modal } from "../../components/Modal";
+import { Search } from "lucide-react";
+
 
 export function MatriculaPage() { //Aqui onde criamos a página de matrículas, começando pelos estados
     const [matriculas, setMatriculas] = useState<authMatricula[]>([]); //EStado para armazenar as matrículas
@@ -19,12 +21,25 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
     const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS"); //Estado para filtro
+    const [pesquisar, setPesquisar] = useState("");
 
-    const matriculasFiltro = matriculas.filter(
-        (matricula) => filtro === "TODOS" || matricula.status === filtro
+    const matriculasFiltro = matriculas.filter((matriculas) => {
+        
+        const digitado = pesquisar.toLowerCase();
+
+        const name = matriculas.user.name.toLowerCase().includes(digitado);
+        const cpf = matriculas.user.cpf.toString().toLowerCase().includes(digitado);
+        const pesquisarTudo = name || cpf;
+
+        const addStatus = filtro === "TODOS" || matriculas.status === filtro;
+
+        return pesquisarTudo && addStatus;
+        
+        }
     );
 
-    const totalPaginas = Math.max(Math.ceil(matriculasFiltro.length / itensPorPagina ), 1);
+    const totalPaginas = Math.max(Math.ceil(matriculasFiltro.length / itensPorPagina), 1);
+
     const matriculasPaginaAtual = matriculasFiltro.slice(
         indicePrimeiroItem,
         indiceUltimoItem
@@ -132,22 +147,42 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
         <div>
             <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
                 <h1 className="text-2xl font-bold text-slate-800 mb-6">
-                    Lista de Matrículas
+                    Lista de Matrículas Aprovadas ou Recusadas
                 </h1>
 
-                <select
-                value={filtro}
-                onChange={(e) => {
-                    setFiltro(e.target.value as "TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE");
-                    setPaginaAtual(1);
-                }}
-                className="p-2 border border-slate-300 rounded-md bg-white text-slate-700"
-                >
-                    <option value="TODOS">Todas Matrículas</option>
-                    <option value="APROVADA">Aprovadas</option>
-                    <option value="RECUSADA">Recusadas</option>
-                    <option value="PENDENTE">Pendentes</option>
-                </select>
+                <div className="flex w-full items-center justify-between gap-4">
+                    <div className="relative w-64">
+                        <input
+                            type="text"
+                            placeholder="Pesquisar..."
+                            value={pesquisar}
+                            onChange={(e) => {setPesquisar(e.target.value)
+                                              setPaginaAtual(1);}
+                            }
+                            
+                            className="relative w-250px rounded-lg border border-gray-300 bg-white px-4 py-2 pl-10 text-sm text-gray-900 shadow-sm transition-colors duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <Search className="h-4 w-4" />
+                        </div>
+                    </div>
+
+                    <select
+                        value={filtro}
+                        onChange={(e) => {
+                            setFiltro(e.target.value as "TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE");
+                            setPaginaAtual(1);
+                        }}
+                        className="p-2 border border-slate-300 rounded-md bg-white text-slate-700"
+                    >
+                        <option value="TODOS">Todas Matrículas</option>
+                        <option value="APROVADA">Aprovadas</option>
+                        <option value="RECUSADA">Recusadas</option>
+                        <option value="PENDENTE">Pendentes</option>
+                    </select>
+                </div>
+
+
 
                 <table className="w-full table-fixed ">
                     <thead>
@@ -210,7 +245,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                                                         onClick={() => handleAbrirEdicao(matricula)}
                                                         className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 flex items-center gap-2 cursor-pointer transition-colors"
                                                     >
-                                                         Editar
+                                                        Editar
                                                     </button>
                                                 </div>
                                             )}
@@ -246,6 +281,8 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
                 </div>
 
             </section>
+
+            
 
             {isModalEdicaoOpen && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
