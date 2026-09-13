@@ -12,6 +12,15 @@ interface CadastroFormData {
     email: string;
     senha: string;
     confirmarSenha: string;
+    dt_nascimento: string;
+    participacao_anterior: boolean;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario: string;
+    profissao: string;
+    profissao_custom?: string;
+    problemas_saude: string;
+    problemas_saude_custom?: string;
 }
 
 export function RegistroPage() {
@@ -22,6 +31,7 @@ export function RegistroPage() {
     const [mostrConfirmSenha, setMostrConfirmSenha] = useState(false);
     const [mostrarSenha, setMostrarSenha] = useState(false);
 
+    
     const formatarCPF = (valor: string) => {
         return valor
             .replace(/\D/g, "")
@@ -29,6 +39,14 @@ export function RegistroPage() {
             .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
             .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, "$1.$2.$3-$4")
             .substring(0, 14);
+    };
+
+    const formatarTelefone = (valor: string) => {
+       const digitos = valor.replace(/\D/g, "").substring(0, 11);
+       if (digitos.length <= 10) {
+           return digitos.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim();
+       }
+       return digitos.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
     };
 
     const {
@@ -58,7 +76,7 @@ export function RegistroPage() {
 
     return (
         <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
-            <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg rounded-lg">
+            <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg py-8">
 
                 <a href="/login" className="text-blue-500 hover:underline">
                     ← Voltar
@@ -93,34 +111,34 @@ export function RegistroPage() {
                         )}
                     </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            CPF
-                        </label>
-                        <input
-                            type="text"
-                            maxLength={14}
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite o CPF"
-                            {...register("cpf", {
-                                required: "O CPF é obrigatório",
-                                onChange: (e) => {
-                                    e.target.value = formatarCPF(e.target.value);
-                                },
-                                setValueAs: (valorFormatado) => Number(valorFormatado.replace(/\D/g, "")),
+                    {/* CPF e Data de Nascimento */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">CPF</label>
+                            <input
+                                type="text"
+                                maxLength={14}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                placeholder="000.000.000-00"
+                                {...register("cpf", {
+                                    required: "O CPF é obrigatório",
+                                    onChange: (e) => { e.target.value = formatarCPF(e.target.value); },
+                                    setValueAs: (v) => Number(String(v).replace(/\D/g, "")),
+                                    validate: (v) => cpf.isValid(String(v)) || "CPF Inválido"
+                                })}
+                            />
+                            {errors.cpf && <p className="mt-1 text-sm text-red-600">{errors.cpf.message}</p>}
+                        </div>
 
-                                validate: async (CPFValido) => {
-                                    if (!cpf.isValid(String(CPFValido))) {
-                                        return "CPF Inválido"
-                                    }
-                                }
-                            })}
-                        />
-                        {errors.cpf && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.cpf.message}
-                            </p>
-                        )}
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Data de Nascimento</label>
+                            <input
+                                type="date"
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                {...register("dt_nascimento", { required: "Data de nascimento é obrigatória" })}
+                            />
+                            {errors.dt_nascimento && <p className="mt-1 text-sm text-red-600">{errors.dt_nascimento.message}</p>}
+                        </div>
                     </div>
 
                     <div>
@@ -141,6 +159,111 @@ export function RegistroPage() {
                             </p>
                         )}
                     </div>
+                    
+                    {/* Telefones */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Telefone Principal</label>
+                            <input
+                                type="text"
+                                maxLength={15}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                placeholder="(00) 00000-0000"
+                                {...register("telefone_principal", {
+                                    required: "Telefone principal é obrigatório",
+                                    onChange: (e) => { e.target.value = formatarTelefone(e.target.value); }
+                                })}
+                            />
+                            {errors.telefone_principal && <p className="mt-1 text-sm text-red-600">{errors.telefone_principal.message}</p>}
+                        </div>
+
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Telefone Secundário/Reserva</label>
+                            <input
+                                type="text"
+                                maxLength={15}
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                placeholder="(00) 00000-0000"
+                                {...register("telefone_secundario", {
+                                    required: "Telefone secundário é obrigatório",
+                                    onChange: (e) => { e.target.value = formatarTelefone(e.target.value); }
+                                })}
+                            />
+                            {errors.telefone_secundario && <p className="mt-1 text-sm text-red-600">{errors.telefone_secundario.message}</p>}
+                        </div>
+                    </div>
+
+                    {/* Estado Civil e Profissão */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Estado Civil</label>
+                            <select
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
+                                {...register("estado_civil", { required: "Selecione o estado civil" })}
+                            >
+                                <option value="">Selecione...</option>
+                                <option value="Solteiro(a)">Solteiro(a)</option>
+                                <option value="Casado(a)">Casado(a)</option>
+                                <option value="Divorciado(a)">Divorciado(a)</option>
+                                <option value="Viuvo(a)">Viúvo(a)</option>
+                                <option value="Uniao Estavel">União Estável</option>
+                            </select>
+                            {errors.estado_civil && <p className="mt-1 text-sm text-red-600">{errors.estado_civil.message}</p>}
+                        </div>
+
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Profissão</label>
+                            <select
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
+                                {...register("profissao", { required: "Selecione a profissão" })}
+                            >
+                                <option value="">Selecione...</option>
+                                <option value="Estudante">Estudante</option>
+                                <option value="Empregado">Empregado</option>
+                                <option value="Autônomo">Autônomo</option>
+                                <option value="Desempregado">Desempregado</option>
+                                <option value="Aposentado">Aposentado</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                            {errors.profissao && <p className="mt-1 text-sm text-red-600">{errors.profissao.message}</p>}
+                        </div>
+                    </div>
+
+                    {/* Problema de Saúde e Participação Anterior */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Possui problema de saúde?</label>
+                            <select
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
+                                {...register("problemas_saude", { required: "Selecione uma opção" })}
+                            >
+                                <option value="">Selecione...</option>
+                                <option value="Nenhum">Nenhum</option>
+                                <option value="Hipertensao">Hipertensão</option>
+                                <option value="Diabetes">Diabetes</option>
+                                <option value="Asma">Asma</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                            {errors.problemas_saude && <p className="mt-1 text-sm text-red-600">{errors.problemas_saude.message}</p>}
+                        </div>
+
+                        <div>
+                            <label className="mb-1 block text-sm font-medium text-gray-700">Você já foi ou é palhaço voluntário?</label>
+                            <select
+                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
+                                {...register("participacao_anterior", {
+                                setValueAs: (v) => (v === "" ? undefined : v === "true"),
+                                validate: (val) => val !== undefined || "Selecione se já participou"
+                                })}>
+                            
+                                <option value="">Selecione...</option>
+                                <option value="true">Sim</option>
+                                <option value="false">Não</option>
+                            </select>
+                            {errors.participacao_anterior && <p className="mt-1 text-sm text-red-600">{errors.participacao_anterior.message}</p>}
+                        </div>
+                    </div>
+
 
                     <div>
                         <label className="mb-1 block text-sm font-medium text-gray-700">
