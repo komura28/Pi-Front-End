@@ -75,7 +75,7 @@ export function RegistroPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
+        <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 py-8 sm:px-6 lg:px-8">
             <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg py-8">
 
                 <a href="/login" className="text-blue-500 hover:underline">
