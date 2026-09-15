@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { authUser, LoginRequest, RegisterRequest } from "../types/auth/auth-types";
-import { LoginApi, Register } from "../services/authService";
+import type { authUser, LoginRequest, RegisterRequest, EsqueciSenhaRequest } from "../types/auth/auth-types";
+import { EsqueciSenhaApi, LoginApi, Register } from "../services/authService";
 
 
 
@@ -14,6 +14,7 @@ interface AuthContextData {
     //cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; 
     login: (data: LoginRequest) => Promise<authUser>;
     logout: () => void;
+    esqueciSenha: (data: EsqueciSenhaRequest) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData | null>(null);
@@ -47,6 +48,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return response.user;
     }
 
+    async function esqueciSenha(data: EsqueciSenhaRequest) {
+        const response = await EsqueciSenhaApi(data)
+
+    }
+
     async function cadastrar(data: RegisterRequest) {
         await Register(data); //UsuarioService
     }
@@ -73,6 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 login,
                 control,
                 logout,
+                esqueciSenha,
             }}
         >
             {children}

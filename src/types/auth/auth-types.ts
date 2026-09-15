@@ -88,3 +88,11 @@ export interface RegisterTurmaRequest{
     dataInicio: Date;
     dataFim: Date;
 }
+
+export interface EsqueciSenhaRequest{
+    email: string;
+}
+
+export interface EsqueciSenhaResponse{
+    mensagem: string;
+}
