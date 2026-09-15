@@ -16,6 +16,7 @@
     "cpf-cnpj-validator": "^2.1.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "lucide-react": "^1.45.0",
     "mongodb": "^7.5.0",
     "mongoose": "^9.9.3",
     "react": "^19.2.6",

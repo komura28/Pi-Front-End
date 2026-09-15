@@ -6,6 +6,13 @@ export interface authUser{
     cpf: number;
     email: string;
     papelUsuario: papelUsuario;
+    dt_nascimento: string;
+    participacao_anterior: boolean;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario: string;
+    profissao: string;
+    problemas_saude: string;
 }
 
 export interface LoginRequest{
@@ -24,6 +31,13 @@ export interface RegisterRequest{
     email: string;
     senha: string;
     confirmarSenha: string;
+    dt_nascimento: string;
+    participacao_anterior: boolean;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario: string;
+    profissao: string;
+    problemas_saude: string;
 }
 
 export interface authMateriaInput{

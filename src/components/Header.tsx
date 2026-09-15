@@ -49,7 +49,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
     }
 
     return (
-        <header className="sticky top-0 z-10 flex h-20 items-center bg-[#0F172A] px-6 border-b border-slate-800">
+        <header className="sticky top-0 z-1000 flex h-20 items-center bg-[#0F172A] px-6 border-b border-slate-800">
             <div className="flex-1 flex items-center">
                 {mode === "ALUNO" &&
                     <>
