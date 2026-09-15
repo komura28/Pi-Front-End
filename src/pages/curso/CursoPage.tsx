@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "../../components/Button";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso, authMateria } from "../../types/auth/auth-types";
-import { deletarCursoAPI, getCurso, editarCursoAPI, editarMateriaAPI, adicionarMateriaCursoAPI, removerMateriaCursoAPI } from "../../services/authService"; // Adicionei o editarCursoAPI aqui
+import { deletarCursoAPI, getCurso, editarCursoAPI, editarMateriaAPI, adicionarMateriaCursoAPI, removerMateriaCursoAPI } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 
@@ -18,7 +18,7 @@ export function CursoPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cursoToDelete, setCursoToDelete] = useState<string | null>(null);
-    
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [cursoToEditId, setCursoToEditId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
@@ -258,7 +258,6 @@ export function CursoPage() {
         }
     }
 
-    // --- ADICIONAR NOVA MATÉRIA DIRETO NO CURSO JÁ EXISTENTE ---
     async function handleAdicionarMateria() {
         if (!cursoMateriasSelecionado) return;
 
@@ -296,7 +295,6 @@ export function CursoPage() {
         }
     }
 
-    // --- EXCLUSÃO DE MATÉRIA ---
     function confirmarExclusaoMateria(materiaId: string) {
         setMateriaToDeleteId(materiaId);
         setIsDeleteMateriaModalOpen(true);
@@ -346,7 +344,6 @@ export function CursoPage() {
         return (
             <div className="p-8">
                 <p>Nenhum curso encontrado</p>
-
         {mostrarModalExclusao && (
                 <Modal
                     titulo="Exclusão"
@@ -398,14 +395,6 @@ export function CursoPage() {
                                     <div className="flex justify-center items-center gap-2">
                                         <Button
                                             isSubmitting={false}
-                                            label="Matérias"
-                                            loadingLabel="salvando"
-                                            className="bg-blue-500 hover:bg-blue-600 rounded-md text-white text-sm py-1 px-2"
-                                            onClick={() => abrirModalMaterias(curso)}
-                                        />
-
-                                        <Button
-                                            isSubmitting={false}
                                             label={<FaPencilAlt />}
                                             loadingLabel="salvando"
                                             className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
@@ -451,7 +440,6 @@ export function CursoPage() {
                 </div>
             </section>
 
-            {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
@@ -464,7 +452,7 @@ export function CursoPage() {
 
                             <button
                                 onClick={handleConfirmarExclusao}
-                                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors"
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 Sim
                             </button>
@@ -480,7 +468,6 @@ export function CursoPage() {
                 </div>
             )}
 
-            {/* NOVO MODAL DE EDIÇÃO */}
             {isEditModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
@@ -513,17 +500,23 @@ export function CursoPage() {
 
                         <div className="flex justify-end gap-3">
                             <button
+                                onClick={() => {
+                                    const cursoAtual = cursos.find(c => c._id === cursoToEditId);
+                                    if (cursoAtual) {
+                                        setIsEditModalOpen(false);
+                                        abrirModalMaterias(cursoAtual);
+                                    }
+                                }}
+                                className="mr-auto px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors"
+                            >
+                                Gerenciar Matérias
+                            </button>
+
+                            <button
                                 onClick={fecharModalEdicao}
                                 className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
                             >
                                 Cancelar
-                            </button>
-                            <button
-                                onClick={handleSalvarEdicao}
-                                disabled={isSavingEdit}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                            >
-                                {isSavingEdit ? "Salvando..." : "Salvar Alterações"}
                             </button>
                         </div>
                     </div>
@@ -598,13 +591,24 @@ export function CursoPage() {
                             <button
                                 onClick={handleAdicionarMateria}
                                 disabled={isAddingMateria}
-                                className="w-full px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                                className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
                                 {isAddingMateria ? "Adicionando..." : "+ Adicionar Matéria"}
                             </button>
                         </div>
 
-                        <div className="flex justify-end mt-4">
+                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                            <button
+                                onClick={async () => {
+                                    await handleSalvarEdicao();
+                                    fecharModalMaterias();
+                                }}
+                                disabled={isSavingEdit}
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            >
+                                {isSavingEdit ? "Salvando..." : "Salvar Alterações"}
+                            </button>
+
                             <button
                                 onClick={fecharModalMaterias}
                                 className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
@@ -630,7 +634,7 @@ export function CursoPage() {
                             <button
                                 onClick={handleConfirmarExclusaoMateria}
                                 disabled={isDeletingMateria}
-                                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
                                 {isDeletingMateria ? "Excluindo..." : "Sim"}
                             </button>
@@ -646,7 +650,6 @@ export function CursoPage() {
                 </div>
             )}
 
-            
             {isEditMateriaModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
