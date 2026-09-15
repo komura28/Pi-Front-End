@@ -1,378 +1,434 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
 
 interface CadastroFormData {
-    name: string;
-    cpf: number;
-    email: string;
-    senha: string;
-    confirmarSenha: string;
-    dt_nascimento: string;
-    participacao_anterior: boolean;
-    estado_civil: string;
-    telefone_principal: string;
-    telefone_secundario: string;
-    profissao: string;
-    profissao_custom?: string;
-    problemas_saude: string;
-    problemas_saude_custom?: string;
+  name: string;
+  cpf: string;
+  email: string;
+  senha: string;
+  confirmarSenha: string;
+  dt_nascimento: string;
+  participacao_anterior: boolean;
+  estado_civil: string;
+  profissao: string;
+  profissao_custom?: string;
+  tem_problema_saude: string;
+  problemas_saude_custom?: string;
+  telefone_principal: string;
+  telefone_secundario: string;
 }
 
 export function RegistroPage() {
-    const navigate = useNavigate();
-    const { cadastrar } = useAuth()
-    const [serverError, setServerError] = useState("");
-    const [modal, setModal] = useState(false);
-    const [mostrConfirmSenha, setMostrConfirmSenha] = useState(false);
-    const [mostrarSenha, setMostrarSenha] = useState(false);
+  const navigate = useNavigate();
+  const { cadastrar } = useAuth();
+  const [serverError, setServerError] = useState("");
+  const [modal, setModal] = useState(false);
+  const [mostrConfirmSenha, setMostrConfirmSenha] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
-    
-    const formatarCPF = (valor: string) => {
-        return valor
-            .replace(/\D/g, "")
-            .replace(/(\d{3})(\d)/, "$1.$2")
-            .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-            .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, "$1.$2.$3-$4")
-            .substring(0, 14);
-    };
+  const formatarCPF = (valor: string) => {
+    return valor
+      .replace(/\D/g, "")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, "$1.$2.$3-$4")
+      .substring(0, 14);
+  };
 
-    const formatarTelefone = (valor: string) => {
-       const digitos = valor.replace(/\D/g, "").substring(0, 11);
-       if (digitos.length <= 10) {
-           return digitos.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim();
-       }
-       return digitos.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
-    };
-
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors, isSubmitting }
-    } = useForm<CadastroFormData>({ mode: "onBlur" });
-
-    const senhaUser = watch("senha");
-
-    async function handleCadastro(data: CadastroFormData) {
-        try {
-            setServerError("");
-            await cadastrar(data);
-            console.log("Dados do cadastro:", data);
-            setModal(true);
-        } catch (error) {
-            console.log(error);
-            setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
-        }
+  const formatarTelefone = (valor: string) => {
+    const digitos = valor.replace(/\D/g, "").substring(0, 11);
+    if (digitos.length <= 10) {
+      return digitos.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim();
     }
+    return digitos.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
+  };
 
-    const onError = (errors: any) => {
-        console.log("Erros de validação do formulário:", errors);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting }
+  } = useForm<CadastroFormData>({ mode: "onBlur" });
+
+  const senhaUser = watch("senha");
+  const profissaoSelecionada = watch("profissao");
+  const temProblemaSaude = watch("tem_problema_saude");
+
+  async function handleCadastro(data: CadastroFormData) {
+    try {
+      setServerError("");
+
+      // Tratamento dos dados para enviar ao backend conforme o tipo esperado
+      const payload = {
+        ...data,
+        cpf: Number(data.cpf.replace(/\D/g, "")),
+        profissao: data.profissao === "Outro" ? data.profissao_custom ?? "" : data.profissao,
+        problemas_saude:
+          data.tem_problema_saude === "Sim" ? data.problemas_saude_custom ?? "" : "Não"
+      };
+
+      await cadastrar(payload);
+      console.log("Dados do cadastro enviados:", payload);
+      setModal(true);
+    } catch (error) {
+      console.log(error);
+      setServerError(
+        error instanceof Error ? error.message : "Erro na hora de realizar o cadastro"
+      );
     }
+  }
 
-    return (
-        <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 py-8 sm:px-6 lg:px-8">
-            <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg py-8">
+  const onError = (errors: FieldErrors<CadastroFormData>) => {
+    console.log("Erros de validação do formulário:", errors);
+  };
 
-                <a href="/login" className="text-blue-500 hover:underline">
-                    ← Voltar
-                </a>
-                <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
-                <h1 className="mb-2 text-center text-2x1 font-bold text-gray-800">
-                    Aticurando
-                </h1>
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 py-8 sm:px-6 lg:px-8">
+      <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+        <Link to="/login" className="text-blue-500 hover:underline">
+          ← Voltar
+        </Link>
+        <img src={logo} alt="Logo" className="mx-auto h-16 w-auto object-contain" />
+        <h1 className="mb-2 text-center text-2xl font-bold text-gray-800">
+          Aticurando
+        </h1>
 
-                <p className="mb-b text-center text-sm text-gray-500">
-                    Faça seu cadastro
-                </p>
+        <p className="mb-6 text-center text-sm text-gray-500">
+          Faça seu cadastro
+        </p>
 
-                <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
+          {/* Nome */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Nome
+            </label>
+            <input
+              type="text"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+              placeholder="Digite o nome"
+              {...register("name", {
+                required: "O nome é obrigatório",
+              })}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Nome
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite o nome"
-                            {...register("name", {
-                                required: "O nome é obrigatório",
-                            })}
-                        />
-                        {errors.name && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.name.message}
-                            </p>
-                        )}
-                    </div>
+          {/* CPF e Data de Nascimento */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">CPF</label>
+              <input
+                type="text"
+                maxLength={14}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                placeholder="000.000.000-00"
+                {...register("cpf", {
+                  required: "O CPF é obrigatório",
+                  onChange: (e) => {
+                    setValue("cpf", formatarCPF(e.target.value));
+                  },
+                  validate: (v) => cpf.isValid(v.replace(/\D/g, "")) || "CPF Inválido"
+                })}
+              />
+              {errors.cpf && <p className="mt-1 text-sm text-red-600">{errors.cpf.message}</p>}
+            </div>
 
-                    {/* CPF e Data de Nascimento */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">CPF</label>
-                            <input
-                                type="text"
-                                maxLength={14}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                placeholder="000.000.000-00"
-                                {...register("cpf", {
-                                    required: "O CPF é obrigatório",
-                                    onChange: (e) => { e.target.value = formatarCPF(e.target.value); },
-                                    setValueAs: (v) => Number(String(v).replace(/\D/g, "")),
-                                    validate: (v) => cpf.isValid(String(v)) || "CPF Inválido"
-                                })}
-                            />
-                            {errors.cpf && <p className="mt-1 text-sm text-red-600">{errors.cpf.message}</p>}
-                        </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Data de Nascimento</label>
+              <input
+                type="date"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                {...register("dt_nascimento", { required: "Data de nascimento é obrigatória" })}
+              />
+              {errors.dt_nascimento && <p className="mt-1 text-sm text-red-600">{errors.dt_nascimento.message}</p>}
+            </div>
+          </div>
 
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Data de Nascimento</label>
-                            <input
-                                type="date"
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                {...register("dt_nascimento", { required: "Data de nascimento é obrigatória" })}
-                            />
-                            {errors.dt_nascimento && <p className="mt-1 text-sm text-red-600">{errors.dt_nascimento.message}</p>}
-                        </div>
-                    </div>
+          {/* E-mail */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              E-mail
+            </label>
+            <input
+              type="email"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+              placeholder="admin@gmail.com"
+              {...register("email", {
+                required: "O e-mail é obrigatório",
+              })}
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            E-mail
-                        </label>
-                        <input
-                            type="email"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="admin@gmail.com"
-                            {...register("email", {
-                                required: "O e-mail é obrigatório",
-                            })}
-                        />
-                        {errors.email && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.email.message}
-                            </p>
-                        )}
-                    </div>
-                    
-                    {/* Telefones */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Telefone Principal</label>
-                            <input
-                                type="text"
-                                maxLength={15}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                placeholder="(00) 00000-0000"
-                                {...register("telefone_principal", {
-                                    required: "Telefone principal é obrigatório",
-                                    onChange: (e) => { e.target.value = formatarTelefone(e.target.value); }
-                                })}
-                            />
-                            {errors.telefone_principal && <p className="mt-1 text-sm text-red-600">{errors.telefone_principal.message}</p>}
-                        </div>
+          {/* Telefones */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Telefone Principal</label>
+              <input
+                type="text"
+                maxLength={15}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                placeholder="(00) 00000-0000"
+                {...register("telefone_principal", {
+                  required: "Telefone principal é obrigatório",
+                  onChange: (e) => {
+                    setValue("telefone_principal", formatarTelefone(e.target.value));
+                  }
+                })}
+              />
+              {errors.telefone_principal && <p className="mt-1 text-sm text-red-600">{errors.telefone_principal.message}</p>}
+            </div>
 
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Telefone Secundário/Reserva</label>
-                            <input
-                                type="text"
-                                maxLength={15}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                placeholder="(00) 00000-0000"
-                                {...register("telefone_secundario", {
-                                    required: "Telefone secundário é obrigatório",
-                                    onChange: (e) => { e.target.value = formatarTelefone(e.target.value); }
-                                })}
-                            />
-                            {errors.telefone_secundario && <p className="mt-1 text-sm text-red-600">{errors.telefone_secundario.message}</p>}
-                        </div>
-                    </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Telefone Secundário/Reserva</label>
+              <input
+                type="text"
+                maxLength={15}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                placeholder="(00) 00000-0000"
+                {...register("telefone_secundario", {
+                  required: "Telefone secundário é obrigatório",
+                  onChange: (e) => {
+                    setValue("telefone_secundario", formatarTelefone(e.target.value));
+                  }
+                })}
+              />
+              {errors.telefone_secundario && <p className="mt-1 text-sm text-red-600">{errors.telefone_secundario.message}</p>}
+            </div>
+          </div>
 
-                    {/* Estado Civil e Profissão */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Estado Civil</label>
-                            <select
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
-                                {...register("estado_civil", { required: "Selecione o estado civil" })}
-                            >
-                                <option value="">Selecione...</option>
-                                <option value="Solteiro(a)">Solteiro(a)</option>
-                                <option value="Casado(a)">Casado(a)</option>
-                                <option value="Divorciado(a)">Divorciado(a)</option>
-                                <option value="Viuvo(a)">Viúvo(a)</option>
-                                <option value="Uniao Estavel">União Estável</option>
-                            </select>
-                            {errors.estado_civil && <p className="mt-1 text-sm text-red-600">{errors.estado_civil.message}</p>}
-                        </div>
+          {/* Estado Civil e Profissão */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Estado Civil</label>
+              <select
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                {...register("estado_civil", { required: "Selecione o estado civil" })}
+              >
+                <option value="">Selecione...</option>
+                <option value="Solteiro(a)">Solteiro(a)</option>
+                <option value="Casado(a)">Casado(a)</option>
+                <option value="Divorciado(a)">Divorciado(a)</option>
+                <option value="Viuvo(a)">Viúvo(a)</option>
+                <option value="Uniao Estavel">União Estável</option>
+              </select>
+              {errors.estado_civil && <p className="mt-1 text-sm text-red-600">{errors.estado_civil.message}</p>}
+            </div>
 
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Profissão</label>
-                            <select
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
-                                {...register("profissao", { required: "Selecione a profissão" })}
-                            >
-                                <option value="">Selecione...</option>
-                                <option value="Estudante">Estudante</option>
-                                <option value="Empregado">Empregado</option>
-                                <option value="Autônomo">Autônomo</option>
-                                <option value="Desempregado">Desempregado</option>
-                                <option value="Aposentado">Aposentado</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                            {errors.profissao && <p className="mt-1 text-sm text-red-600">{errors.profissao.message}</p>}
-                        </div>
-                    </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Profissão</label>
+              <select
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                {...register("profissao", { required: "Selecione a profissão" })}
+              >
+                <option value="">Selecione...</option>
+                <option value="Estudante">Estudante</option>
+                <option value="Empregado">Empregado</option>
+                <option value="Autônomo">Autônomo</option>
+                <option value="Desempregado">Desempregado</option>
+                <option value="Aposentado">Aposentado</option>
+                <option value="Outro">Outro</option>
+              </select>
+              {errors.profissao && <p className="mt-1 text-sm text-red-600">{errors.profissao.message}</p>}
+            </div>
+          </div>
 
-                    {/* Problema de Saúde e Participação Anterior */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Possui problema de saúde?</label>
-                            <select
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
-                                {...register("problemas_saude", { required: "Selecione uma opção" })}
-                            >
-                                <option value="">Selecione...</option>
-                                <option value="Nenhum">Nenhum</option>
-                                <option value="Hipertensao">Hipertensão</option>
-                                <option value="Diabetes">Diabetes</option>
-                                <option value="Asma">Asma</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                            {errors.problemas_saude && <p className="mt-1 text-sm text-red-600">{errors.problemas_saude.message}</p>}
-                        </div>
+          {/* Campo condicional para Profissão Customizada */}
+          {profissaoSelecionada === "Outro" && (
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Especifique a profissão
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                placeholder="Qual sua profissão?"
+                {...register("profissao_custom", { required: "Especifique sua profissão" })}
+              />
+              {errors.profissao_custom && (
+                <p className="mt-1 text-sm text-red-600">{errors.profissao_custom.message}</p>
+              )}
+            </div>
+          )}
 
-                        <div>
-                            <label className="mb-1 block text-sm font-medium text-gray-700">Você já foi ou é palhaço voluntário?</label>
-                            <select
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 bg-white"
-                                {...register("participacao_anterior", {
-                                setValueAs: (v) => (v === "" ? undefined : v === "true"),
-                                validate: (val) => val !== undefined || "Selecione se já participou"
-                                })}>
-                            
-                                <option value="">Selecione...</option>
-                                <option value="true">Sim</option>
-                                <option value="false">Não</option>
-                            </select>
-                            {errors.participacao_anterior && <p className="mt-1 text-sm text-red-600">{errors.participacao_anterior.message}</p>}
-                        </div>
-                    </div>
+          {/* Problema de Saúde e Participação Anterior */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Possui problema de saúde?</label>
+              <select
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                {...register("tem_problema_saude", { required: "Selecione uma opção" })}
+              >
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+              {errors.tem_problema_saude && <p className="mt-1 text-sm text-red-600">{errors.tem_problema_saude.message}</p>}
+            </div>
 
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Você já foi ou é palhaço voluntário?</label>
+              <select
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                {...register("participacao_anterior", {
+                  setValueAs: (v) => (v === "" ? undefined : v === "true"),
+                  validate: (val) => val !== undefined || "Selecione se já participou"
+                })}
+              >
+                <option value="">Selecione...</option>
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+              {errors.participacao_anterior && <p className="mt-1 text-sm text-red-600">{errors.participacao_anterior.message}</p>}
+            </div>
+          </div>
 
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Senha
-                        </label>
-                        <div className="gap-2 flex items-center w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
-                            <input
-                                type={mostrarSenha ? "text" : "password"}
-                                className="w-full bg-transparent outline-none"
-                                placeholder="Digite sua Senha"
-                                {...register("senha", {
-                                    required: "Senha é obrigatório",
-                                })}
-                            />
-                            <button className="cursor-pointer"
-                                type="button"
-                                onClick={() => setMostrarSenha(!mostrarSenha)}>
-                                {mostrarSenha ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                    </svg>
-                                ) : (
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                                    </svg>
-                                )}</button>
-                        </div>
+          {/* Campo condicional para detalhar a doença */}
+          {temProblemaSaude === "Sim" && (
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Qual problema de saúde/doença você possui?
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                placeholder="Digite a doença ou condição de saúde"
+                {...register("problemas_saude_custom", {
+                  required: "Descreva o problema de saúde"
+                })}
+              />
+              {errors.problemas_saude_custom && (
+                <p className="mt-1 text-sm text-red-600">{errors.problemas_saude_custom.message}</p>
+              )}
+            </div>
+          )}
 
-                        {errors.senha && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.senha.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Confirmar Senha
-                        </label>
-                        <div className="gap-2 flex items-center w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
-                            <input
-                                type={mostrConfirmSenha ? "text" : "password"}
-                                className="w-full bg-transparent outline-none"
-                                placeholder="Confirme sua Senha"
-                                {...register("confirmarSenha", {
-                                    required: "Confirmação é obrigatório",
-                                    validate: (senhaValida) => {
-                                        if (senhaUser !== senhaValida) {
-                                            return "Senhas não coincidem"
-                                        }
-                                    },
-                                })}
-                            />
-                            <button className="cursor-pointer"
-                                type="button"
-                                onClick={() => setMostrConfirmSenha(!mostrConfirmSenha)}>
-                                {mostrConfirmSenha ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                    </svg>
-                                ) : (
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                                    </svg>
-                                )
-                                }</button>
-                        </div>
-
-                        {errors.confirmarSenha && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.confirmarSenha.message}
-                            </p>
-                        )}
-
-
-                    </div>
-
-                    {
-                        serverError && (
-                            <p className="rounded-lg bg-red-50 px-3 py-2 text-red-600">
-                                {serverError}
-                            </p>
-                        )
-                    }
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 cursor-pointer disabled:bg-blue-300"
-                    >
-                        {isSubmitting ? "Cadastando..." : "Cadastrar"}
-                    </button>
-                </form>
-
-                {modal && (
-                    <Modal
-                        titulo="Cadastro"
-                        message="Usuário Cadastrado com Sucesso!"
-                        decisao={null}
-                        texto="Ok"
-                        opSim={() => {
-                            setModal(false);
-                            navigate("/login");
-
-                        }}
-                    />
+          {/* Senha */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Senha
+            </label>
+            <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
+              <input
+                type={mostrarSenha ? "text" : "password"}
+                className="w-full bg-transparent outline-none"
+                placeholder="Digite sua Senha"
+                {...register("senha", {
+                  required: "Senha é obrigatório",
+                })}
+              />
+              <button
+                className="cursor-pointer"
+                type="button"
+                onClick={() => setMostrarSenha(!mostrarSenha)}
+              >
+                {mostrarSenha ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
                 )}
-            </section>
-        </main>
-    );
+              </button>
+            </div>
+
+            {errors.senha && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.senha.message}
+              </p>
+            )}
+          </div>
+
+          {/* Confirmar Senha */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Confirmar Senha
+            </label>
+            <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
+              <input
+                type={mostrConfirmSenha ? "text" : "password"}
+                className="w-full bg-transparent outline-none"
+                placeholder="Confirme sua Senha"
+                {...register("confirmarSenha", {
+                  required: "Confirmação é obrigatório",
+                  validate: (senhaValida) => {
+                    if (senhaUser !== senhaValida) {
+                      return "Senhas não coincidem";
+                    }
+                  },
+                })}
+              />
+              <button
+                className="cursor-pointer"
+                type="button"
+                onClick={() => setMostrConfirmSenha(!mostrConfirmSenha)}
+              >
+                {mostrConfirmSenha ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {errors.confirmarSenha && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.confirmarSenha.message}
+              </p>
+            )}
+          </div>
+
+          {serverError && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-red-600">
+              {serverError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:bg-blue-300"
+          >
+            {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+          </button>
+        </form>
+
+        {modal && (
+          <Modal
+            titulo="Cadastro"
+            message="Usuário Cadastrado com Sucesso!"
+            decisao={null}
+            texto="Ok"
+            opSim={() => {
+              setModal(false);
+              navigate("/login");
+            }}
+          />
+        )}
+      </section>
+    </main>
+  );
 }
