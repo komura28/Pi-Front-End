@@ -13,3 +13,8 @@ export async function editarUser(data: IUpdateUserDTO) {
     const response = await api.put("/auth/edit-me", data)
     return response.data;
 }
+
+export async function findById(_id: string) {
+    const response = await api.get(`/user/${_id}`)
+    return response.data;
+}
