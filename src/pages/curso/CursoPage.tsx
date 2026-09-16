@@ -360,8 +360,8 @@ export function CursoPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white flex items-center justify-center p-6 relative">
-            <section className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 border border-slate-300">
+        <div>
+            <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
                 <h1 className="text-3xl font-bold text-slate-900 mb-2">
                     Lista de Cursos
                 </h1>
