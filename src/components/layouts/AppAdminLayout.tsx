@@ -1,26 +1,31 @@
 import { Outlet } from "react-router-dom";
 import { SideBar } from "../SideBar";
 import { Header } from "../Header";
-
+import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaUsers } from "react-icons/fa"
+import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 
 const adminNavItems = [
     {
         label: "Home",
         href: "/app/home",
+        icon: <FaHome/>
 
     },
     {
         label: "Cursos",
         isSelect: true,
+        icon: <FaGraduationCap/>,
         options: [
             { label: "Cadastrar Curso", href: "/app/register-curso" },
             { label: "Listar Cursos", href: "/app/curso" },
         ]
+        
 
     },
     {
         label: "Turmas",
         isSelect: true,
+        icon: <FaChalkboardTeacher/>,
         options: [
             {label: "Cadastrar Turma", href: "/app/register-turma"},
             {label: "Listar Turmas", href: "/app/turma"},
@@ -30,11 +35,13 @@ const adminNavItems = [
     {
         label: "Matrículas",
         href: "/app/matricula",
+        icon: <HiOutlineDocumentCheck/>
 
     },
     {
         label: "Lista de Usuários",
-        href: "/app/user"
+        href: "/app/user",
+        icon: <FaUsers/>
     },
 
 ]

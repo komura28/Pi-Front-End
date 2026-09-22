@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa6";
 import logo from "../assets/logo.png";
+import { FaWhatsapp } from "react-icons/fa";
+import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 
 
 interface NavigationItem {
     label: string;
     href?: string;
+    icon?: ReactNode;
     isSelect?: boolean;
     options?: { label: string; href: string }[];
 }
@@ -59,7 +62,10 @@ hover:bg-blue-500/20
 hover:text-white
                                                 "
                                     >
+                                        <div className="flex items-center gap-2">
+                                        {item.icon && <span className="text-base">{item.icon}</span>}
                                         <span>{item.label}</span>
+                                        </div>
 
                                         <FaChevronDown
                                             size={15}
@@ -67,17 +73,26 @@ hover:text-white
                                                 }`}
                                         />
                                     </button>
+                                                
+                                                
                                     {openMenus[index] && (
-                                        <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">
+                                        
+                                        <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">                                            
                                             {item.options?.map((opt, i) => (
+                                                
                                                 <NavLink key={i}
+                                                
+                                                    
                                                     className={({ isActive }) =>
+                                                        
 
                                                         `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
                                     ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
+                                    
+                                    
                                                     to={opt.href!}
                                                 >
-                                                    {opt.label}
+                                                    <span>{opt.label}</span>
 
                                                 </NavLink>
                                             ))}
@@ -100,7 +115,8 @@ hover:text-white
 
                                 }
                             >
-                                {item.label}
+                                {item.icon && <span className="text-base">{item.icon}</span>}
+                                <span>{item.label}</span>
                             </NavLink>
                         );
                     })}
@@ -120,6 +136,7 @@ hover:text-white
             active:scale-95
         "
                     >
+                        <FaWhatsapp className="h-[1em] w-[1em]" shrink-0 />
                         Suporte via WhatsApp
                     </a>
                 </div>
