@@ -4,6 +4,10 @@ import { AtualizarMatricula, getMatricula } from "../../services/matriculaServic
 import type { authMatricula } from "../../types/matricula/matricula-types";
 import { Modal } from "../../components/Modal";
 import { Search } from "lucide-react";
+import { ModalForms } from "../../components/ModalForms";
+import { getUser } from "../../services/authService";
+import { findById } from "../../services/userService";
+import type { IUserDTO } from "../../types/user/user-types";
 
 
 export function MatriculaPage() {
@@ -24,7 +28,7 @@ export function MatriculaPage() {
     const [pesquisar, setPesquisar] = useState("");
 
     const matriculasFiltro = matriculas.filter((matriculas) => {
-        
+
         const digitado = pesquisar.toLowerCase();
 
         const name = matriculas.user.name.toLowerCase().includes(digitado);
@@ -34,8 +38,8 @@ export function MatriculaPage() {
         const addStatus = filtro === "TODOS" || matriculas.status === filtro;
 
         return pesquisarTudo && addStatus;
-        
-        }
+
+    }
     );
 
     const totalPaginas = Math.max(Math.ceil(matriculasFiltro.length / itensPorPagina), 1);
@@ -50,6 +54,10 @@ export function MatriculaPage() {
         name: "",
         status: "APROVADA",
     });
+
+    const [matriculaSelecionada, setMatriculaSelecionada] = useState<authMatricula | null>(null);
+    const [isModalVisualizarOpen, setIsModalVisualizarOpen] = useState(false);
+    const [dadosMatricula, setDadosMatricula] = useState<IUserDTO | null>(null);
 
 
     async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") {
@@ -69,6 +77,13 @@ export function MatriculaPage() {
             setError("Erro ao atualizar o status da matrícula");
         }
     }
+
+    function handleAbrirVisualizar(matricula: authMatricula) {
+        setMatriculaSelecionada(matricula);
+        setIsModalVisualizarOpen(true);
+        setMenuAbertoId(null);
+    }
+
 
     function handleAbrirEdicao(matricula: authMatricula) {
         setIdSelecionado(matricula._id);
@@ -130,6 +145,19 @@ export function MatriculaPage() {
         buscarMatriculasPendentes();
     }, []);
 
+    async function buscarMatricula() {
+        if (!matriculaSelecionada) return;
+
+        try {
+            const formulario = await findById(matriculaSelecionada._id);
+            setDadosMatricula(formulario);
+            console.log(dadosMatricula);
+        } catch (error) {
+            console.log(error);
+            alert("Erro ao carregar os dados do formulário.");
+        }
+    }
+
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
     }
@@ -146,7 +174,7 @@ export function MatriculaPage() {
         <div>
             <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
                 <h1 className="text-2xl font-bold text-slate-800 mb-6">
-                    Lista de Matrículas Aprovadas ou Recusadas
+                    Lista de Matrículas Pendentes
                 </h1>
 
                 <div className="flex w-full items-center justify-between gap-4">
@@ -155,10 +183,12 @@ export function MatriculaPage() {
                             type="text"
                             placeholder="Pesquisar..."
                             value={pesquisar}
-                            onChange={(e) => {setPesquisar(e.target.value)
-                                              setPaginaAtual(1);}
+                            onChange={(e) => {
+                                setPesquisar(e.target.value)
+                                setPaginaAtual(1);
                             }
-                            
+                            }
+
                             className="relative w-250px rounded-lg border border-gray-300 bg-white px-4 py-2 pl-10 text-sm text-gray-900 shadow-sm transition-colors duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                         />
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -210,8 +240,10 @@ export function MatriculaPage() {
                                             <button className="cursor-pointer border-2 border-green-500 text-white bg-green-500 rounded-md px-3 py-1"
                                                 onClick={() => { //Atualiza os estados, para abrir o modal(true), receber a matrícula selecionada e a decisao selecionada
                                                     setIsModalOpen(true);
+                                                    setMatriculaSelecionada(matricula);
                                                     setIdSelecionado(matricula._id);
                                                     setDecisao("APROVADA");
+                                                    buscarMatricula();
                                                 }}
                                                 type="button">
                                                 Aceitar</button>
@@ -219,7 +251,9 @@ export function MatriculaPage() {
                                                 onClick={() => {
                                                     setIsModalOpen(true);
                                                     setIdSelecionado(matricula._id);
+                                                    setMatriculaSelecionada(matricula);
                                                     setDecisao("RECUSADA");
+                                                    buscarMatricula();
                                                 }}
                                                 type="button">
                                                 Recusar</button>
@@ -281,7 +315,7 @@ export function MatriculaPage() {
 
             </section>
 
-            
+
 
             {isModalEdicaoOpen && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
@@ -342,24 +376,67 @@ export function MatriculaPage() {
             )}
 
             {/*Aqui onde ele abre o Modal (Componente) para o ADM fazer a validação do usuário */}
-            {isModalOpen && (
-                <Modal
-                    titulo={`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
-                    message={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
-                    decisao={decisao}
-                    texto="Sim"
-                    opSim={() => {
-                        handleDecisao(idSelecionado!, decisao!);
-                        setIsModalOpen(false)
-                    }}
-                    opNao={() => {
-                        setIsModalOpen(false);
-                        setDecisao(null);
-                        setIdSelecionado(null)
-                    }}
+            {isModalOpen && matriculaSelecionada && (
+                <div>
+                    <ModalForms
+                        titulo={`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
+                        message={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
+                        decisao={decisao}
+                        texto="Sim"
+                        opSim={() => {
+                            handleDecisao(idSelecionado!, decisao!);
+                            setIsModalOpen(false);
+                            setMatriculaSelecionada(null);
+                        }}
+                        opNao={() => {
+                            setIsModalOpen(false);
+                            setDecisao(null);
+                            setIdSelecionado(null);
+                            setMatriculaSelecionada(null);
+                        }}
+
+                        dados_formulario={dadosMatricula}
+                    />
+                </div>
+            )}
 
 
-                />)}
+
+            {isModalVisualizarOpen && matriculaSelecionada && (
+                <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
+                        <h2 className="text-xl font-bold text-slate-800 mb-4">Detalhes da Matrícula</h2>
+                        <div className="flex flex-col gap-2 text-sm text-slate-700 mb-6">
+                            <p><strong>Nome:</strong> {matriculaSelecionada.user?.name}</p>
+                            <p><strong>CPF:</strong> {matriculaSelecionada.user?.cpf}</p>
+                            <p>
+                                <strong>Data de Nascimento:</strong>{" "}
+                                {matriculaSelecionada.user?.dt_nascimento
+                                    ? new Date(matriculaSelecionada.user.dt_nascimento).toLocaleDateString("pt-BR")
+                                    : "Não informada"}
+                            </p>
+                            <p><strong>Telefone Principal:</strong> {matriculaSelecionada?.user?.telefone_principal || "Não informado"}</p>
+                            <p><strong>Profissão:</strong> {matriculaSelecionada?.user?.profissao || "Não informada"}</p>
+                            <p><strong>Problemas de Saúde:</strong> {matriculaSelecionada?.user?.problemas_saude || "Nenhum informado"}</p>
+                            <p><strong>Curso:</strong> {matriculaSelecionada?.turma?.curso?.name}</p>
+                            <p><strong>Turno:</strong> {matriculaSelecionada?.turma?.turno}</p>
+                            <p><strong>Status:</strong> {matriculaSelecionada?.status}</p>
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsModalVisualizarOpen(false);
+                                    setMatriculaSelecionada(null);
+                                }}
+                                className="px-4 py-2 bg-slate-600 text-white rounded hover:bg-slate-700"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {mostrarModalAprovacao && (
                 <Modal

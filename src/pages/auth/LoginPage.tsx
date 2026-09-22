@@ -116,6 +116,11 @@ export function LoginPage() {
                     <Link to="/cadastro" className="text-blue-600 hover:underline">
                         Cadastre-se
                     </Link>
+
+                    <Link to="/esqueci-senha" className="text-blue-600 hover:underline">
+                        Esqueci Minha Senha
+                    </Link>
+
                     <button
                         type="submit"
                         disabled={isSubmitting}
