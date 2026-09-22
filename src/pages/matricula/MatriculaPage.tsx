@@ -5,9 +5,10 @@ import type { authMatricula } from "../../types/matricula/matricula-types";
 import { Modal } from "../../components/Modal";
 import { Search } from "lucide-react";
 import { ModalForms } from "../../components/ModalForms";
-import { getUser } from "../../services/authService";
 import { findById } from "../../services/userService";
 import type { IUserDTO } from "../../types/user/user-types";
+
+type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA";
 
 
 export function MatriculaPage() { //Aqui onde criamos a página de matrículas, começando pelos estados
@@ -26,8 +27,9 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
     const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS"); //Estado para filtro
     const [pesquisar, setPesquisar] = useState("");
+    const [abaAtiva, setAbaAtiva] = useState<StatusTab>("PENDENTE");
 
-    const matriculasFiltro = matriculas.filter((matriculas) => {
+    /*const matriculasFiltro = matriculas.filter((matriculas) => {
 
         const digitado = pesquisar.toLowerCase();
 
@@ -40,7 +42,17 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
         return pesquisarTudo && addStatus;
 
     }
-    );
+    );*/
+    const matriculasFiltro = matriculas.filter((matricula) => {
+        const digitado = pesquisar.toLowerCase();
+        const nameMatches = matricula.user?.name?.toLowerCase().includes(digitado);
+        const cpfMatches = matricula.user?.cpf?.toString().toLowerCase().includes(digitado);
+        const atendePesquisa = nameMatches || cpfMatches;
+
+        const atendeAba = matricula.status === abaAtiva;
+
+        return atendePesquisa && atendeAba;
+    });
 
     const totalPaginas = Math.max(Math.ceil(matriculasFiltro.length / itensPorPagina), 1);
 
@@ -58,6 +70,10 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const [matriculaSelecionada, setMatriculaSelecionada] = useState<authMatricula | null>(null);
     const [isModalVisualizarOpen, setIsModalVisualizarOpen] = useState(false);
     const [dadosMatricula, setDadosMatricula] = useState<IUserDTO | null>(null);
+
+    const totalPendentes = matriculas.filter((m) => m.status === "PENDENTE").length;
+    const totalAprovadas = matriculas.filter((m) => m.status === "APROVADA").length;
+    const totalRecusadas = matriculas.filter((m) => m.status === "RECUSADA").length;
 
 
     async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") { //Aqui onde ele atualiza o status da matricula e do BD
@@ -175,8 +191,70 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
         <div>
             <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
                 <h1 className="text-2xl font-bold text-slate-800 mb-6">
-                    Lista de Matrículas Pendentes
+                    Lista de Matrículas 
                 </h1>
+
+                <div className="flex border-b border-slate-200 mb-6">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setAbaAtiva("PENDENTE");
+                            setPaginaAtual(1);
+                        }}
+                        className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+                            abaAtiva === "PENDENTE"
+                                ? "border-amber-500 text-amber-600 bg-amber-50/50"
+                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                        }`}
+                    >
+                        Pendentes
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                            abaAtiva === "PENDENTE" ? "bg-amber-200 text-amber-800" : "bg-slate-100 text-slate-600"
+                        }`}>
+                            {totalPendentes}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setAbaAtiva("APROVADA");
+                            setPaginaAtual(1);
+                        }}
+                        className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+                            abaAtiva === "APROVADA"
+                                ? "border-green-500 text-green-600 bg-green-50/50"
+                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                        }`}
+                    >
+                        Aprovadas
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                            abaAtiva === "APROVADA" ? "bg-green-200 text-green-800" : "bg-slate-100 text-slate-600"
+                        }`}>
+                            {totalAprovadas}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setAbaAtiva("RECUSADA");
+                            setPaginaAtual(1);
+                        }}
+                        className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+                            abaAtiva === "RECUSADA"
+                                ? "border-red-500 text-red-600 bg-red-50/50"
+                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                        }`}
+                    >
+                        Recusadas
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${
+                            abaAtiva === "RECUSADA" ? "bg-red-200 text-red-800" : "bg-slate-100 text-slate-600"
+                        }`}>
+                            {totalRecusadas}
+                        </span>
+                    </button>
+                </div>
 
                 <div className="flex w-full items-center justify-between gap-4">
                     <div className="relative w-64">
