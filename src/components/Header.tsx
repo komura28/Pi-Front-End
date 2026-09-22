@@ -3,6 +3,7 @@ import perfilImage from "../assets/perfil.png"
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/logo.png";
+import { FaRightFromBracket, FaUser } from "react-icons/fa6";
 
 interface NavigationItem {
     label: string;
@@ -107,22 +108,33 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                     </button>
 
                     {openMenus && (
-                        <div className="absolute right-0 mt-2 bg-white rounded-md shadow w-48 p-1">
-                            <button
-                                className="w-full text-left px-3 py-2 hover:bg-slate-100"
-                                type="button"
-                                onClick={() => handlePerfil()}>
-                                Meu Perfil
+                        <>
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setOpenMenus(false)}
+                            />
+                            <div className="absolute right-0 mt-2 bg-white rounded-md shadow w-48 p-1 z-50">
+                                <button
+                                    className="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
+                                    type="button"
+                                    onClick={() => handlePerfil()}>
+                                    <FaUser className="shrink-0 text-xs text-gray-600" />
+                                    <span>Meu Perfil</span>
 
-                            </button>
-                            <button
-                                className="w-full text-left px-3 py-2 hover:bg-slate-100"
-                                type="button"
-                                onClick={() => handleLogout()}>
-                                Sair da Conta
-                            </button>
+                                </button>
 
-                        </div>
+
+                                <button
+
+                                    className="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
+                                    type="button"
+                                    onClick={() => handleLogout()}>
+                                    <FaRightFromBracket className="shrink-0 text-xs text-red-600" />
+                                    <span>Sair da Conta</span>
+                                </button>
+
+                            </div>
+                        </>
                     )}
 
                 </div>
