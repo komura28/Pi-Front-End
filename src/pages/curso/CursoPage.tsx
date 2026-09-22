@@ -658,7 +658,7 @@ export function CursoPage() {
                         <div className="flex flex-col gap-4 mb-6">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Nome da Matéria
+                                    Nome da Matéria:
                                 </label>
                                 <input
                                     type="text"

@@ -6,18 +6,13 @@ export interface authMatricula{
     _id: string;
     user: authUser;
     turma: authTurma;
-    status: "PENDENTE" | "APROVADA" | "RECUSADA";
+    status: "PENDENTE" | "APROVADA" | "RECUSADA" | "CANCELADA";
     papelUsuario: papelUsuario;
     createdAt: string;
 }
+
 export interface RegisterMatriculaRequest {
     turma: string;
-}
-
-export interface MatriculaForm{
-    nome: string;
-    dt_nascimento: string;
-    telefone_principal: string;
-    profissao: string;
-    problemas_saude: string;
+    interesseServicos: string[];
+    comoSoubeCurso: string;
 }

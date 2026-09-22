@@ -10,13 +10,13 @@ import { findById } from "../../services/userService";
 import type { IUserDTO } from "../../types/user/user-types";
 
 
-export function MatriculaPage() { //Aqui onde criamos a página de matrículas, começando pelos estados
-    const [matriculas, setMatriculas] = useState<authMatricula[]>([]); //EStado para armazenar as matrículas
-    const [loading, setLoading] = useState(true); //Estado para carregar os dados
-    const [error, setError] = useState(""); //Estado para erros
-    const [decisao, setDecisao] = useState<"APROVADA" | "RECUSADA" | null>(null); //Estado para decisão do ADM
-    const [isModalOpen, setIsModalOpen] = useState(false); //Estado do noss componente modal, para abrir e fechar ele
-    const [idSelecionado, setIdSelecionado] = useState<string | null>(null); //Aqui onde ele controla o ID que selecionamos, e o que fazer com ele
+export function MatriculaPage() {
+    const [matriculas, setMatriculas] = useState<authMatricula[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [decisao, setDecisao] = useState<"APROVADA" | "RECUSADA" | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [idSelecionado, setIdSelecionado] = useState<string | null>(null);
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 5;
     const [mostrarModalAprovacao, setMostrarModalAprovacao] = useState(false);
@@ -24,7 +24,7 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
-    const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS"); //Estado para filtro
+    const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS");
     const [pesquisar, setPesquisar] = useState("");
 
     const matriculasFiltro = matriculas.filter((matriculas) => {
@@ -60,10 +60,10 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
     const [dadosMatricula, setDadosMatricula] = useState<IUserDTO | null>(null);
 
 
-    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") { //Aqui onde ele atualiza o status da matricula e do BD
+    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") {
         try {
-            await AtualizarMatricula(_id, status); //Aguarda o BD autorizar os dados
-            setMatriculas((listaAtual) => //Atualiza o estado da lista para armazenar a nova lista, com o novo status
+            await AtualizarMatricula(_id, status);
+            setMatriculas((listaAtual) =>
                 listaAtual.map((matricula) =>
                     matricula._id === _id ? { ...matricula, status: status } : matricula
 
@@ -98,7 +98,6 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
         if (!idSelecionado) return;
 
         try {
-            // Chamada ao seu serviço backend enviando os dados novos
             await AtualizarMatricula(idSelecionado, formEdicao.status);
 
             setMatriculas((listaAtual) =>
@@ -130,8 +129,8 @@ export function MatriculaPage() { //Aqui onde criamos a página de matrículas, 
         return () => document.removeEventListener("mousedown", handleClickFora);
     }, []);
 
-    useEffect(() => { //useEffect é um hook
-        async function buscarMatriculasPendentes() { //Função para trazer as matrículas
+    useEffect(() => {
+        async function buscarMatriculasPendentes() { 
             try {
                 setError("");
                 const data = await getMatricula();
