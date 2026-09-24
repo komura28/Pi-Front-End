@@ -1,4 +1,4 @@
-import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest } from "../types/auth/auth-types";
+import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse } from "../types/auth/auth-types";
 import { api } from "./api";
 
 
@@ -69,7 +69,12 @@ export async function LoginApi(data: LoginRequest): Promise<LoginResponse> {
 }
 
 export async function EsqueciSenhaApi(data: EsqueciSenhaRequest): Promise<EsqueciSenhaResponse> {
-    const response = await api.post(`/esqueci-senha`, data)
+    const response = await api.post(`/auth/forgot-password`, data)
+    return response.data;
+}
+
+export async function ResetarSenhaApi(data: ResetarSenhaRequest): Promise<ResetarSenhaResponse> {
+    const response = await api.post("/auth/reset-password", data);
     return response.data;
 }
 

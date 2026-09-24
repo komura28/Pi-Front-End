@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { authUser, LoginRequest, RegisterRequest, EsqueciSenhaRequest } from "../types/auth/auth-types";
-import { EsqueciSenhaApi, LoginApi, Register } from "../services/authService";
+import type { authUser, LoginRequest, RegisterRequest, EsqueciSenhaRequest, ResetarSenhaRequest } from "../types/auth/auth-types";
+import { EsqueciSenhaApi, getMe, LoginApi, Register, ResetarSenhaApi } from "../services/authService";
 
 
 
@@ -15,6 +15,7 @@ interface AuthContextData {
     login: (data: LoginRequest) => Promise<authUser>;
     logout: () => void;
     esqueciSenha: (data: EsqueciSenhaRequest) => Promise<void>;
+    resetarSenha: (data: ResetarSenhaRequest) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData | null>(null);
@@ -28,14 +29,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [control, setControl] = useState(true);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem("user");
+    async function restoreSession() {
+        const token =
+            localStorage.getItem("token");
 
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
+        if (!token) {
+            setControl(false);
+            return;
         }
-       setControl(false);
 
-    }, []);
+        try {
+            const currentUser =
+                await getMe();
+
+            setUser(currentUser);
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(currentUser)
+            );
+
+        } catch {
+            localStorage.removeItem(
+                "token"
+            );
+
+            localStorage.removeItem(
+                "user"
+            );
+
+            setUser(null);
+
+        } finally {
+            setControl(false);
+        }
+    }
+
+    restoreSession();
+}, []);
 
     async function login(data: LoginRequest) {
         const response = await LoginApi(data);
@@ -50,7 +81,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function esqueciSenha(data: EsqueciSenhaRequest) {
         const response = await EsqueciSenhaApi(data)
-
+    }
+    
+    async function resetarSenha(data: ResetarSenhaRequest) {
+        const response = await ResetarSenhaApi(data)
     }
 
     async function cadastrar(data: RegisterRequest) {
@@ -80,6 +114,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 control,
                 logout,
                 esqueciSenha,
+                resetarSenha,
             }}
         >
             {children}

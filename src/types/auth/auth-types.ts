@@ -1,18 +1,18 @@
-export type papelUsuario = "ALUNO" | "ADM";
+export type papelUsuario = "ALUNO" | "ADM" | "PROFESSOR";
 
 export interface authUser{
-    _id: string;
+    id: string;
     name: string;
     cpf: number;
     email: string;
     papelUsuario: papelUsuario;
-    dt_nascimento: string;
-    participacao_anterior: boolean;
-    estado_civil: string;
-    telefone_principal: string;
-    telefone_secundario: string;
-    profissao: string;
-    problemas_saude: string;
+    dt_nascimento?: string;
+    participacao_anterior?: boolean;
+    estado_civil?: string;
+    telefone_principal?: string;
+    telefone_secundario?: string;
+    profissao?: string;
+    problemas_saude?: string;
 }
 
 export interface LoginRequest{
@@ -93,6 +93,16 @@ export interface EsqueciSenhaRequest{
     email: string;
 }
 
+export interface ResetarSenhaRequest{
+    token: string;
+    senha: string;
+    confirmarSenha: string;
+}
+
 export interface EsqueciSenhaResponse{
-    mensagem: string;
+    message: string;
+}
+
+export interface ResetarSenhaResponse{
+    message: string;
 }

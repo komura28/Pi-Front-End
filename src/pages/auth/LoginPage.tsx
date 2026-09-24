@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import logo from "../../assets/logo2.png";
- 
+
 interface LoginFormData {
     email: string;
     senha: string;
@@ -23,18 +23,18 @@ export function LoginPage() {
     async function handleLogin(data: LoginFormData) {
         try {
             setServerError("");
-             const loggedUser= await login(data);
-                if (loggedUser.papelUsuario === "ALUNO") {
-                    navigate("/api/home");
-                } else if (loggedUser.papelUsuario === "ADM") {
-                    navigate("/app/home");
-                }
+            const loggedUser = await login(data);
+            if (loggedUser.papelUsuario === "ALUNO") {
+                navigate("/api/home");
+            } else if (loggedUser.papelUsuario === "ADM") {
+                navigate("/app/home");
+            }
             console.log("data: ", data);
         } catch (error) {
             console.log(error);
             setServerError(error instanceof Error ? error.message : "Erro ao realisar login. Verifique os dados informados");
             console.log("data: ", data);
-        } 
+        }
     }
 
 
@@ -104,6 +104,16 @@ export function LoginPage() {
                                 {errors.senha.message}
                             </p>
                         )}
+
+                        <div className="flex w-full items-center justify-between text-sm pt-2">
+                            <Link to="/cadastro" className="text-blue-600 hover:underline">
+                                Cadastre-se
+                            </Link>
+
+                            <Link to="/forgot-password" className="text-blue-600 hover:underline">
+                                Esqueci Minha Senha
+                            </Link>
+                        </div>
                     </div>
 
                     {
@@ -113,14 +123,6 @@ export function LoginPage() {
                             </p>
                         )
                     }
-                    <Link to="/cadastro" className="text-blue-600 hover:underline">
-                        Cadastre-se
-                    </Link>
-
-                    <Link to="/esqueci-senha" className="text-blue-600 hover:underline">
-                        Esqueci Minha Senha
-                    </Link>
-
                     <button
                         type="submit"
                         disabled={isSubmitting}
@@ -131,5 +133,5 @@ export function LoginPage() {
                 </form>
             </section>
         </main>
-    ); 
+    );
 } 
