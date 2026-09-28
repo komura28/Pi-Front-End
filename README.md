@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# Aticurando
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação web para conectar alunos a oportunidades de formação artística. O sistema possui áreas para estudantes e administradores, com autenticação e acesso conforme o perfil do usuário.
 
-Currently, two official plugins are available:
+## Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Alunos:** consultar turmas disponíveis, realizar matrículas e acessar o perfil.
+- **Administradores:** acompanhar indicadores de cursos, turmas e matrículas, além de gerenciar cursos, turmas, matrículas e usuários.
+- **Autenticação:** login, cadastro e recuperação ou redefinição de senha.
 
-## React Compiler
+## Tecnologias
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 e TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- Axios
 
-## Expanding the ESLint configuration
+## Requisitos
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js e npm
+- API do Aticurando em execução
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Por padrão, o frontend faz requisições para `http://localhost:3002/aticurando/v1`. Essa URL está definida em `src/services/api.ts`; ajuste-a nesse arquivo caso sua API esteja em outro endereço.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Como executar
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Instale as dependências:
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Inicie o servidor de desenvolvimento:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm run dev
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+O Vite exibirá no terminal o endereço local para abrir no navegador.
+
+## Scripts disponíveis
+
+| Comando | Descrição |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento. |
+| `npm run build` | Verifica os tipos TypeScript e gera a versão de produção em `dist/`. |
+| `npm run preview` | Serve localmente a versão de produção gerada. |
+| `npm run lint` | Executa o ESLint. |
+
+## Estrutura do projeto
+
+```text
+src/
+  components/  Componentes reutilizáveis e layouts
+  contexts/    Contextos da aplicação, incluindo autenticação
+  pages/       Páginas agrupadas por funcionalidade
+  routes/      Rotas públicas e protegidas
+  services/    Comunicação com a API
+  types/       Tipos TypeScript
+  utils/       Funções utilitárias
 ```
