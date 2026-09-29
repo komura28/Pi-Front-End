@@ -1,11 +1,13 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../Header";
 import { Footer } from "../Footer";
+import { FaGraduationCap, FaHome } from "react-icons/fa";
 
 
 const alunoNavItems = [
-    { label: "Home", href: "/api/home" },
-    { label: "Meus Cursos", href: "/api/cursos" }
+    { label: "Home", href: "/api/home", icon: <FaHome/> },
+    { label: "Meus Cursos", href: "/api/cursos", icon: <FaGraduationCap/> },
+    
 ];
 
 export function AppAlunoLayout() {

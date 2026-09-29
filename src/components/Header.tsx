@@ -8,6 +8,7 @@ import { FaRightFromBracket, FaUser } from "react-icons/fa6";
 interface NavigationItem {
     label: string;
     href?: string;
+    icon?: React.ReactNode;
 }
 
 interface HeaderProps {
@@ -84,11 +85,12 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                         to={item.href!}
                         className={({ isActive }) =>
 
-                            `px-3 py-2 rounded-lg text-sm font-medium transition
+                            `flex flex-row items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition
                                     ${isActive ? 'bg-blue-600 text-white shadow' : 'text-slate-300 hover:text-white hover:bg-white/10'}`
 
                         }
                     >
+                        {item.icon}
                         {item.label}
                     </NavLink>
                 )
