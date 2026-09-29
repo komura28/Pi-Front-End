@@ -1,4 +1,4 @@
-import { FaInstagram, FaEnvelope, FaPhone, FaYoutube } from "react-icons/fa";
+import { FaInstagram, FaEnvelope, FaPhone, FaYoutube, FaWhatsapp } from "react-icons/fa";
 
 export function Footer() {
     return (
@@ -66,13 +66,14 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="
-                        flex items-center justify-center
+                        flex items-center justify-center gap-2.5
                         rounded-xl bg-green-500 px-4 py-3
                         text-sm font-semibold text-white
                         transition
                         hover:bg-green-600 hover:shadow-lg
                     "
                 >
+                    <FaWhatsapp className="text-lg shrink-0" />
                     Falar com suporte no WhatsApp
                 </a>
             </div>
