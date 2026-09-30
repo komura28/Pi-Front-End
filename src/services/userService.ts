@@ -15,6 +15,6 @@ export async function editarUser(data: IUpdateUserDTO) {
 }
 
 export async function findById(_id: string) {
-    const response = await api.get(`/user/${_id}`)
+    const response = await api.get(`/matricula/${_id}`)
     return response.data;
 }
