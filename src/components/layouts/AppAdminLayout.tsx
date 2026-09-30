@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { SideBar } from "../SideBar";
 import { Header } from "../Header";
-import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaUsers } from "react-icons/fa"
+import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
 import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 import { LucideBellRing } from "lucide-react";
 
@@ -17,8 +17,8 @@ const adminNavItems = [
         isSelect: true,
         icon: <FaGraduationCap/>,
         options: [
-            { label: "Cadastrar Curso", href: "/app/register-curso" },
-            { label: "Listar Cursos", href: "/app/curso" },
+            { label: "Cadastrar Curso", href: "/app/register-curso", iconF: <FaPlus/> },
+            { label: "Listar Cursos", href: "/app/curso", iconF: <FaList/> },
         ]
         
 
@@ -28,8 +28,8 @@ const adminNavItems = [
         isSelect: true,
         icon: <FaChalkboardTeacher/>,
         options: [
-            {label: "Cadastrar Turma", href: "/app/register-turma"},
-            {label: "Listar Turmas", href: "/app/turma"},
+            {label: "Cadastrar Turma", href: "/app/register-turma", iconF: <FaPlus/>},
+            {label: "Listar Turmas", href: "/app/turma", iconF: <FaList/>},
         ]
 
     },

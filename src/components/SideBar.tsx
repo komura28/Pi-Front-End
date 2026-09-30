@@ -3,7 +3,6 @@ import { Link, NavLink } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa6";
 import logo from "../assets/logo.png";
 import { FaWhatsapp } from "react-icons/fa";
-import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 import { getDashboardData } from "../services/dashboardService";
 import type { DashboardData } from "../types/dashboard/dashboard-types";
 
@@ -14,7 +13,7 @@ interface NavigationItem {
     icon?: ReactNode;
     iconContador?: ReactNode;
     isSelect?: boolean;
-    options?: { label: string; href: string }[];
+    options?: { label: string; href: string; iconF?: ReactNode }[];
 }
 
 interface SideBarProps {
@@ -116,6 +115,7 @@ hover:text-white
 
                                                     to={opt.href!}
                                                 >
+                                                    {opt.iconF && <span className="text-base">{opt.iconF}</span>}
                                                     <span>{opt.label}</span>
 
                                                 </NavLink>
