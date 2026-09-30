@@ -58,27 +58,27 @@ export function HomePage() {
                 {
                     tab === "geral" && (
                         <>
-                            <CardDashboard title="Total de Matrículas" value={dashboardData?.totalMatriculas ?? "Carregando..."} />
-                            <CardDashboard  title="Total de Cursos" value={dashboardData?.totalCursos ?? "Carregando..."} />
-                            <CardDashboard  title="Total de Turmas" value={dashboardData?.totalTurmas ?? "Carregando..."} />
+                            <CardDashboard title="Total de Matrículas" className="border-blue-600" value={dashboardData?.totalMatriculas ?? "Carregando..."} />
+                            <CardDashboard  title="Total de Cursos" className="border-blue-600" value={dashboardData?.totalCursos ?? "Carregando..."} />
+                            <CardDashboard  title="Total de Turmas" className="border-blue-600" value={dashboardData?.totalTurmas ?? "Carregando..."} />
                         </>
                     )
                 }
                 {
                     tab === "matriculas" && (
                         <>
-                            <CardDashboard  title="Matrículas Ativas" value={dashboardData?.matriculasAtivas ?? "Carregando..."} />
-                            <CardDashboard  title="Matrículas Recusadas" value={dashboardData?.matriculasRecusadas ?? "Carregando..."} />
-                            <CardDashboard  title="Matrículas Pendentes" value={dashboardData?.matriculasPendentes ?? "Carregando..."} />
+                            <CardDashboard  title="Matrículas Ativas" className="border-green-600" value={dashboardData?.matriculasAtivas ?? "Carregando..."} />
+                            <CardDashboard  title="Matrículas Recusadas" className="border-red-600" value={dashboardData?.matriculasRecusadas ?? "Carregando..."} />
+                            <CardDashboard  title="Matrículas Pendentes" className="border-yellow-600" value={dashboardData?.matriculasPendentes ?? "Carregando..."} />
                         </>
                     )
                 }
                 {
                     tab === "inativos" && (
                         <>
-                            <CardDashboard  title="Matrículas Inativas" value={dashboardData?.matriculasCanceladas ?? "Carregando..."} />
-                            <CardDashboard  title="Turmas Inativas" value={dashboardData?.turmasInativas ?? "Carregando..."} />
-                            <CardDashboard  title="Cursos Inativos" value={dashboardData?.cursosInativos ?? "Carregando..."} />
+                            <CardDashboard  title="Matrículas Inativas" className="border-gray-600" value={dashboardData?.matriculasCanceladas ?? "Carregando..."} />
+                            <CardDashboard  title="Turmas Inativas" className="border-gray-600" value={dashboardData?.turmasInativas ?? "Carregando..."} />
+                            <CardDashboard  title="Cursos Inativos" className="border-gray-600" value={dashboardData?.cursosInativos ?? "Carregando..."} />
                         </>
                     )
                 }
