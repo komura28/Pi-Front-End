@@ -1,15 +1,18 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa6";
 import logo from "../assets/logo.png";
 import { FaWhatsapp } from "react-icons/fa";
 import { HiOutlineDocumentCheck } from 'react-icons/hi2';
+import { getDashboardData } from "../services/dashboardService";
+import type { DashboardData } from "../types/dashboard/dashboard-types";
 
 
 interface NavigationItem {
     label: string;
     href?: string;
     icon?: ReactNode;
+    iconContador?: ReactNode;
     isSelect?: boolean;
     options?: { label: string; href: string }[];
 }
@@ -23,6 +26,27 @@ interface SideBarProps {
 
 export function SideBar({ navigationItems, link }: SideBarProps) {
     const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+
+    useEffect(() => {
+        async function carregarMatriculasPendentes() {
+            try {
+                const data = await getDashboardData();
+                setDashboardData(data);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setError(`Erro ao carregar os dados do curso: ${error.message}`);
+                } else {
+                    setError("Erro ao carregar os dados do curso");
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+        carregarMatriculasPendentes();
+    }, []);
 
 
 
@@ -63,8 +87,8 @@ hover:text-white
                                                 "
                                     >
                                         <div className="flex items-center gap-2">
-                                        {item.icon && <span className="text-base">{item.icon}</span>}
-                                        <span>{item.label}</span>
+                                            {item.icon && <span className="text-base">{item.icon}</span>}
+                                            <span>{item.label}</span>
                                         </div>
 
                                         <FaChevronDown
@@ -73,23 +97,23 @@ hover:text-white
                                                 }`}
                                         />
                                     </button>
-                                                
-                                                
+
+
                                     {openMenus[index] && (
-                                        
-                                        <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">                                            
+
+                                        <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">
                                             {item.options?.map((opt, i) => (
-                                                
+
                                                 <NavLink key={i}
-                                                
-                                                    
+
+
                                                     className={({ isActive }) =>
-                                                        
+
 
                                                         `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
                                     ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
-                                    
-                                    
+
+
                                                     to={opt.href!}
                                                 >
                                                     <span>{opt.label}</span>
@@ -117,6 +141,7 @@ hover:text-white
                             >
                                 {item.icon && <span className="text-base">{item.icon}</span>}
                                 <span>{item.label}</span>
+                                {(dashboardData?.matriculasPendentes ?? 0) > 0 && item.iconContador && (<span className="ml-auto text-yellow-500">{item.iconContador}</span>)}
                             </NavLink>
                         );
                     })}
