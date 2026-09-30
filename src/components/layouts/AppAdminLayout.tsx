@@ -3,6 +3,7 @@ import { SideBar } from "../SideBar";
 import { Header } from "../Header";
 import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaUsers } from "react-icons/fa"
 import { HiOutlineDocumentCheck } from 'react-icons/hi2';
+import { LucideBellRing } from "lucide-react";
 
 const adminNavItems = [
     {
@@ -35,7 +36,8 @@ const adminNavItems = [
     {
         label: "Matrículas",
         href: "/app/matricula",
-        icon: <HiOutlineDocumentCheck/>
+        icon: <HiOutlineDocumentCheck/>,
+        iconContador: <LucideBellRing/>
 
     },
     {
