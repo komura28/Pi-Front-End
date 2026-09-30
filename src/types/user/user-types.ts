@@ -7,6 +7,7 @@ export interface IUpdateUserDTO{
 }
 
 export interface IUserDTO{
+    _id: string;
     name: string;
     cpf: number;
     email: string;
