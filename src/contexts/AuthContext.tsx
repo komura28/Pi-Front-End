@@ -2,8 +2,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { authUser, LoginRequest, RegisterRequest, EsqueciSenhaRequest, ResetarSenhaRequest } from "../types/auth/auth-types";
 import { EsqueciSenhaApi, getMe, LoginApi, Register, ResetarSenhaApi } from "../services/authService";
 
-
-
 interface AuthContextData {
     user: authUser | null;
     setUser: React.Dispatch<React.SetStateAction<authUser | null>>;
@@ -11,7 +9,6 @@ interface AuthContextData {
     isAdmin: boolean;
     control: boolean;
     cadastrar: (data: RegisterRequest) => Promise<void>;
-    //cadastrarTurma: (data: RegisterTurmaRequest) => Promise<void>; 
     login: (data: LoginRequest) => Promise<authUser>;
     logout: () => void;
     esqueciSenha: (data: EsqueciSenhaRequest) => Promise<void>;
@@ -29,44 +26,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [control, setControl] = useState(true);
 
     useEffect(() => {
-    async function restoreSession() {
-        const token =
-            localStorage.getItem("token");
+        async function restoreSession() {
+            const token =
+                localStorage.getItem("token");
 
-        if (!token) {
-            setControl(false);
-            return;
+            if (!token) {
+                setControl(false);
+                return;
+            }
+
+            try {
+                const currentUser =
+                    await getMe();
+
+                setUser(currentUser);
+
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify(currentUser)
+                );
+
+            } catch {
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                setUser(null);
+
+            } finally {
+                setControl(false);
+            }
         }
 
-        try {
-            const currentUser =
-                await getMe();
-
-            setUser(currentUser);
-
-            localStorage.setItem(
-                "user",
-                JSON.stringify(currentUser)
-            );
-
-        } catch {
-            localStorage.removeItem(
-                "token"
-            );
-
-            localStorage.removeItem(
-                "user"
-            );
-
-            setUser(null);
-
-        } finally {
-            setControl(false);
-        }
-    }
-
-    restoreSession();
-}, []);
+        restoreSession();
+    }, []);
 
     async function login(data: LoginRequest) {
         const response = await LoginApi(data);
@@ -75,16 +72,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.setItem("user", JSON.stringify(response.user));
 
         setUser(response.user);
-        console.log("reponse contexto", response.user) 
+        console.log("reponse contexto", response.user)
         return response.user;
     }
 
     async function esqueciSenha(data: EsqueciSenhaRequest) {
-        const response = await EsqueciSenhaApi(data)
+        await EsqueciSenhaApi(data)
     }
-    
+
     async function resetarSenha(data: ResetarSenhaRequest) {
-        const response = await ResetarSenhaApi(data)
+        await ResetarSenhaApi(data)
     }
 
     async function cadastrar(data: RegisterRequest) {
@@ -121,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         </AuthContext.Provider>
     );
 
-    
+
 }
 
 export function useAuth() {

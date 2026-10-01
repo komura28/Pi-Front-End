@@ -1,14 +1,18 @@
 import { api } from "./api";
-import type { RegisterMatriculaRequest } from "../types/matricula/matricula-types";
 
+import type {
+    MatriculaDTO,
+    RegisterMatriculaRequest,
+    StatusMatricula
+} from "../types/matricula/matricula-types";
 
-export async function getMatricula(): Promise<[]> {
-    const response = await api.get("/matricula")
+export async function getMatriculas():Promise<MatriculaDTO[]> {
+    const response = await api.get<MatriculaDTO[]>("/matricula");
     return response.data;
 }
 
-export async function AtualizarMatricula(_id: string, status: "APROVADA" | "RECUSADA") {
-    const response = await api.put(`/matricula/${_id}`, { status })
+export async function atualizarStatusMatricula(id: string, status: Exclude<StatusMatricula, "PENDENTE" | "CANCELADA">) {
+    const response = await api.put(`/matricula/${id}`, { status });
     return response.data;
 }
 
@@ -17,7 +21,7 @@ export async function solicitarMatricula(data: RegisterMatriculaRequest) {
     return response.data;
 }
 
-export async function meusCursos() {
+export async function getMinhasMatriculas(): Promise<MatriculaDTO[]> {
     const response = await api.get("/matricula/candidaturas");
     return response.data;
 }

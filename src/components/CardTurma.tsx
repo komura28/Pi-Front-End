@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { meusCursos, solicitarMatricula } from "../services/matriculaService";
+import { getMinhasMatriculas, solicitarMatricula } from "../services/matriculaService";
 import type { TurmaMatricula } from "../types/auth/auth-types";
 import { formatDate } from "../utils/formatters";
-import type { authMatricula } from "../types/matricula/matricula-types";
 import { Modal } from "./Modal";
+import type { MatriculaDTO } from "../types/matricula/matricula-types";
 
 const OPCOES_INTERESSE_SERVICOS = [
     "Aulas de teatro/palhaçaria",
@@ -29,9 +29,8 @@ export function CardTurma({ turma }: CardProps) {
 
     const dataInicio = formatDate(turma.turma.dataInicio);
     const dataFim = formatDate(turma.turma.dataFim);
-    const [candidaturas, setCandidaturas] = useState<authMatricula[]>([]);
-    const [error, setError] = useState("");
-    const [candidatura, setCandidatura] = useState(false);
+    const [candidaturas, setCandidaturas] = useState<MatriculaDTO[]>([]);
+    const [, setError] = useState("");
     const jaCandidatado = candidaturas.some(
         solicitacao => solicitacao.turma._id === turma.turma._id
     );
@@ -99,7 +98,7 @@ export function CardTurma({ turma }: CardProps) {
         async function buscarCandidaturas() {
             try {
                 setError("");
-                const data = await meusCursos();
+                const data = await getMinhasMatriculas();
                 setCandidaturas(data);
             } catch (error) {
                 setError("Erro ao carregar os dados do Servidor");
@@ -107,11 +106,6 @@ export function CardTurma({ turma }: CardProps) {
         }
 
         buscarCandidaturas();
-        candidaturas.forEach(solicitacao => {
-            if (solicitacao.turma._id == turma.turma._id) {
-                setCandidatura(true);
-            }
-        });
     }, []);
 
     return (
