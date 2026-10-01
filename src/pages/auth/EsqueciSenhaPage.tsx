@@ -23,7 +23,7 @@ export function EsqueciSenhaPage() {
         try {
             setStatus(false)
             setServerError("");
-            const enviarSenha = await esqueciSenha(data);
+            await esqueciSenha(data);
             setStatus(true);
             console.log("data: ", data);
         } catch (error) {

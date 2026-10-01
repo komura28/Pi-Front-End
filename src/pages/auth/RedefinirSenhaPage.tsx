@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import logo from "../../assets/logo2.png";
 import { ResetarSenhaApi } from "../../services/authService";
 
@@ -15,7 +14,6 @@ export function ResetarSenhaPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const token = searchParams.get("token");
-    const { resetarSenha } = useAuth();
     const [serverError, setServerError] = useState("");
     const [status, setStatus] = useState(false)
     const [mostrarSenha, setMostrarSenha] = useState(false);

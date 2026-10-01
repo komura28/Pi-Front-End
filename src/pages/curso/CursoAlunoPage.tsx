@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
-import { meusCursos } from "../../services/matriculaService";
-import type { authMatricula } from "../../types/matricula/matricula-types";
-
-
+import type { MatriculaDTO } from "../../types/matricula/matricula-types";
+import { getMinhasMatriculas } from "../../services/matriculaService";
 
 export function CursoAlunoPage() {
 
-    const [candidaturas, setCandidaturas] = useState<authMatricula[]>([]);
+    const [candidaturas, setCandidaturas] = useState<MatriculaDTO[]>([]);
     const [error, setError] = useState("");
 
-    const getStatusStyle = (status: authMatricula["status"]) => {
+    const getStatusStyle = (status: MatriculaDTO["status"]) => {
         switch (status) {
             case "APROVADA":
                 return "bg-green-100 text-green-700";
@@ -24,7 +22,7 @@ export function CursoAlunoPage() {
         async function buscarCandidaturas() {
             try {
                 setError("");
-                const data = await meusCursos();
+                const data = await getMinhasMatriculas();
                 setCandidaturas(data);
             } catch (error) {
                 setError("Erro ao carregar os dados do Servidor");

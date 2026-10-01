@@ -1,21 +1,18 @@
-//import { useState } from "react";
 import { useEffect, useState } from "react";
-import { AtualizarMatricula, getMatricula } from "../../services/matriculaService";
-import type { authMatricula } from "../../types/matricula/matricula-types";
 import { Modal } from "../../components/Modal";
 import { Search } from "lucide-react";
 import { ModalForms } from "../../components/ModalForms";
-import { findById } from "../../services/userService";
+import { getUserById } from "../../services/userService";
 import type { IUserDTO } from "../../types/user/user-types";
 import { formatDate } from "../../utils/formatters";
+import type { MatriculaDTO } from "../../types/matricula/matricula-types";
+import { atualizarStatusMatricula, getMatriculas } from "../../services/matriculaService";
 
 type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA";
 
-
 export function MatriculaPage() {
-    const [matriculas, setMatriculas] = useState<authMatricula[]>([]);
+    const [matriculas, setMatriculas] = useState<MatriculaDTO[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
     const [decisao, setDecisao] = useState<"APROVADA" | "RECUSADA" | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [idSelecionado, setIdSelecionado] = useState<string | null>(null);
@@ -26,18 +23,19 @@ export function MatriculaPage() {
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
-    const [filtro, setFiltro] = useState<"TODOS" | "APROVADA" | "RECUSADA" | "PENDENTE">("TODOS");
     const [pesquisar, setPesquisar] = useState("");
     const [abaAtiva, setAbaAtiva] = useState<StatusTab>("PENDENTE");
 
+    const [loadError, setLoadError] = useState("");
+    const [actionError, setActionError] = useState("");
+
 
     const matriculasFiltro = matriculas.filter((matricula) => {
-        const digitado = pesquisar.toLowerCase();
-        const nameMatches = matricula.matricula?.user?.name?.toLowerCase().includes(digitado);
-        const cpfMatches = matricula.matricula?.user?.cpf?.toString().toLowerCase().includes(digitado);
+        const digitado = pesquisar.trim().toLowerCase();
+        const nameMatches = matricula.user.name.toLowerCase().includes(digitado);
+        const cpfMatches = matricula.user.cpf.toString().includes(digitado);
         const atendePesquisa = nameMatches || cpfMatches;
-
-        const atendeAba = matricula.matricula?.status === abaAtiva;
+        const atendeAba = matricula.status === abaAtiva;
 
         return atendePesquisa && atendeAba;
     });
@@ -50,51 +48,62 @@ export function MatriculaPage() {
     );
 
     const [isModalEdicaoOpen, setIsModalEdicaoOpen] = useState(false);
-    const [formEdicao, setFormEdicao] = useState<{ name: string; status: "APROVADA" | "RECUSADA" }>({
-        name: "",
-        status: "APROVADA",
-    });
+    const [formEdicao, setFormEdicao] =
+        useState<{
+            status: "APROVADA" | "RECUSADA";
+        }>({
+            status: "APROVADA",
+        });
 
-    const [matriculaSelecionada, setMatriculaSelecionada] = useState<authMatricula | null >(null);
+    const [matriculaSelecionada, setMatriculaSelecionada] = useState<MatriculaDTO | null>(null);
     const [isModalVisualizarOpen, setIsModalVisualizarOpen] = useState(false);
     const [dadosMatricula, setDadosMatricula] = useState<IUserDTO | null>(null);
 
-    const totalPendentes = matriculas.filter((m) => m.matricula?.status === "PENDENTE").length;
-    const totalAprovadas = matriculas.filter((m) => m.matricula?.status === "APROVADA").length;
-    const totalRecusadas = matriculas.filter((m) => m.matricula?.status === "RECUSADA").length;
+    const totalPendentes = matriculas.filter((m) => m.status === "PENDENTE").length;
+    const totalAprovadas = matriculas.filter((m) => m.status === "APROVADA").length;
+    const totalRecusadas = matriculas.filter((m) => m.status === "RECUSADA").length;
 
 
-    async function handleDecisao(_id: string, status: "APROVADA" | "RECUSADA") {
+    async function handleDecisao(
+        id: string,
+        status: "APROVADA" | "RECUSADA"
+    ) {
         try {
-            await AtualizarMatricula(_id, status);
+            setActionError("");
+
+            await atualizarStatusMatricula(id, status);
+
             setMatriculas((listaAtual) =>
                 listaAtual.map((matricula) =>
-                    matricula._id === _id ? { ...matricula, status: status } : matricula
+                    matricula._id === id
+                        ? { ...matricula, status }
+                        : matricula
+                )
+            );
 
-                ));
             if (status === "APROVADA") {
                 setMostrarModalAprovacao(true);
             } else {
                 setMostrarModalRecusa(true);
             }
-        } catch (error) { //Trata Erros
-            setError("Erro ao atualizar o status da matrícula");
+        } catch {
+            setActionError(
+                "Erro ao atualizar o status da matrícula"
+            );
         }
     }
 
-    function handleAbrirVisualizar(matricula: authMatricula) {
-        setMatriculaSelecionada(matricula);
-        setIsModalVisualizarOpen(true);
-        setMenuAbertoId(null);
-    }
-
-
-    function handleAbrirEdicao(matricula: authMatricula) {
+    function handleAbrirEdicao(matricula: MatriculaDTO) {
         setIdSelecionado(matricula._id);
+        setMatriculaSelecionada(matricula);
+
         setFormEdicao({
-            name: matricula.matricula?.user?.name || "",
-            status: matricula.matricula?.status === "RECUSADA" ? "RECUSADA" : "APROVADA",
+            status:
+                matricula.status === "RECUSADA"
+                    ? "RECUSADA"
+                    : "APROVADA",
         });
+
         setIsModalEdicaoOpen(true);
     }
 
@@ -102,7 +111,9 @@ export function MatriculaPage() {
         if (!idSelecionado) return;
 
         try {
-            await AtualizarMatricula(idSelecionado, formEdicao.status);
+            setActionError("");
+
+            await atualizarStatusMatricula(idSelecionado, formEdicao.status);
 
             setMatriculas((listaAtual) =>
                 listaAtual.map((item) =>
@@ -110,15 +121,17 @@ export function MatriculaPage() {
                         ? {
                             ...item,
                             status: formEdicao.status,
-                            user: { ...item.matricula?.user, name: formEdicao.name },
                         }
                         : item
                 )
             );
             setIsModalEdicaoOpen(false);
             setIdSelecionado(null);
-        } catch (error) {
-            setError("Erro ao editar matrícula");
+            setMatriculaSelecionada(null);
+        } catch {
+            setActionError(
+                "Erro ao atualizar o status da matrícula"
+            );
         }
     }
 
@@ -134,30 +147,33 @@ export function MatriculaPage() {
     }, []);
 
     useEffect(() => {
-        async function buscarMatriculasPendentes() {
+        async function buscarMatriculas() {
             try {
-                setError("");
-                const data = await getMatricula();
+                setLoadError("");
+
+                const data =
+                    await getMatriculas();
+
                 setMatriculas(data);
-            } catch (error) {
-                setError("Erro ao carregar os dados do Servidor");
+            } catch {
+                setLoadError(
+                    "Erro ao carregar os dados do servidor"
+                );
             } finally {
                 setLoading(false);
             }
         }
 
-        buscarMatriculasPendentes();
+        buscarMatriculas();
     }, []);
 
     async function buscarMatricula(userId: string) {
 
         try {
             setDadosMatricula(null);
-            const formulario = await findById(userId);
+            const formulario = await getUserById(userId);
             setDadosMatricula(formulario);
-            console.log(dadosMatricula);
         } catch (error) {
-            console.log(error);
             alert("Erro ao carregar os dados do formulário.");
         }
     }
@@ -166,8 +182,12 @@ export function MatriculaPage() {
         return <div className="p-8"><p>Carregando...</p></div>;
     }
 
-    if (error) {
-        return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
+    if (loadError) {
+        return (
+            <div className="p-8 text-red-600">
+                <p>Erro: {loadError}</p>
+            </div>
+        );
     }
 
     if (matriculas.length === 0) {
@@ -189,8 +209,8 @@ export function MatriculaPage() {
                             setPaginaAtual(1);
                         }}
                         className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${abaAtiva === "PENDENTE"
-                                ? "border-amber-500 text-amber-600 bg-amber-50/50"
-                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                            ? "border-amber-500 text-amber-600 bg-amber-50/50"
+                            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                             }`}
                     >
                         Pendentes
@@ -207,8 +227,8 @@ export function MatriculaPage() {
                             setPaginaAtual(1);
                         }}
                         className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${abaAtiva === "APROVADA"
-                                ? "border-green-500 text-green-600 bg-green-50/50"
-                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                            ? "border-green-500 text-green-600 bg-green-50/50"
+                            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                             }`}
                     >
                         Aprovadas
@@ -225,8 +245,8 @@ export function MatriculaPage() {
                             setPaginaAtual(1);
                         }}
                         className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${abaAtiva === "RECUSADA"
-                                ? "border-red-500 text-red-600 bg-red-50/50"
-                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                            ? "border-red-500 text-red-600 bg-red-50/50"
+                            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                             }`}
                     >
                         Recusadas
@@ -257,6 +277,11 @@ export function MatriculaPage() {
                     </div>
                 </div>
 
+                {actionError && (
+                    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        {actionError}
+                    </div>
+                )}
 
                 <table className="w-full table-fixed ">
                     <thead>
@@ -269,18 +294,18 @@ export function MatriculaPage() {
                             <th className="text-center text-slate-800 font-medium p-2 border-b">Ações</th>
                         </tr>
                     </thead>
-                    {/*Aqui onde lista as matrículas solicitadas */}
+
                     <tbody className="border-b">
                         {matriculasPaginaAtual.map((matricula) => (
                             <tr key={matricula._id} className="border-b">
-                                <td className="text-slate-600 p-2 ">{matricula.matricula?.user?.name || "Nome não definido"}</td>
-                                <td className="text-slate-600 p-2  ">{matricula.matricula?.user?.cpf || "CPF não definido"}</td>
-                                <td className="text-slate-600 p-2  ">{matricula.matricula?.turma?.curso?.name || "Curso não definido"}</td>
-                                <td className="text-slate-600 p-2  ">{matricula.matricula?.turma?.turno || "Turno não definido"}</td>
-                                <td>{matricula.matricula?.status}</td>
+                                <td>{matricula.user.name}</td>
+                                <td>{matricula.user.cpf}</td>
+                                <td>{matricula.turma.curso.name}</td>
+                                <td>{matricula.turma.turno}</td>
+                                <td>{matricula.status}</td>
                                 <td className="p-2 flex justify-center items-center gap-2">
 
-                                    {matricula.matricula.status === "PENDENTE" && ( //Aqui onde tem uma codição, se status for PENDENTE, ele cria 2 botões, aceitar ou recusar
+                                    {matricula.status === "PENDENTE" && (
                                         <div className="flex justify-center items-center gap-2">
                                             <button className="cursor-pointer border-2 border-green-500 text-white bg-green-500 rounded-md px-3 py-1"
                                                 onClick={() => { //Atualiza os estados, para abrir o modal(true), receber a matrícula selecionada e a decisao selecionada
@@ -288,28 +313,30 @@ export function MatriculaPage() {
                                                     setMatriculaSelecionada(matricula);
                                                     setIdSelecionado(matricula._id);
                                                     setDecisao("APROVADA");
-                                                    if (matricula.matricula?.user?._id) {
-                                                        buscarMatricula(matricula.matricula?.user?._id);
+                                                    if (matricula.user._id) {
+                                                        buscarMatricula(matricula.user._id);
                                                     }
                                                 }}
                                                 type="button">
-                                                Aceitar</button>
+                                                Aceitar
+                                            </button>
                                             <button className="cursor-pointer border-2 border-red-500 text-white bg-red-500 rounded-md px-3 py-1"
                                                 onClick={() => {
                                                     setIsModalOpen(true);
                                                     setIdSelecionado(matricula._id);
                                                     setMatriculaSelecionada(matricula);
                                                     setDecisao("RECUSADA");
-                                                    if (matricula.matricula?.user?._id) {
-                                                        buscarMatricula(matricula.matricula?.user?._id);
+                                                    if (matricula.user._id) {
+                                                        buscarMatricula(matricula.user._id);
                                                     }
                                                 }}
                                                 type="button">
-                                                Recusar</button>
+                                                Recusar
+                                            </button>
                                         </div>
                                     )}
 
-                                    {matricula.matricula?.status !== "PENDENTE" && (
+                                    {matricula.status !== "PENDENTE" && (
                                         <div className="relative dropdown-container">
                                             <button
                                                 type="button"
@@ -364,8 +391,6 @@ export function MatriculaPage() {
 
             </section>
 
-
-
             {isModalEdicaoOpen && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
@@ -374,14 +399,12 @@ export function MatriculaPage() {
                         <div className="flex flex-col gap-4 mb-6">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Nome do Aluno
+                                    Aluno
                                 </label>
-                                <input
-                                    type="text"
-                                    value={formEdicao.name}
-                                    onChange={(e) => setFormEdicao({ ...formEdicao, name: e.target.value })}
-                                    className="w-full border border-slate-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
+
+                                <p className="w-full border border-slate-200 rounded p-2 bg-slate-50 text-slate-700">
+                                    {matriculaSelecionada?.user.name}
+                                </p>
                             </div>
 
                             <div>
@@ -407,7 +430,11 @@ export function MatriculaPage() {
                         <div className="flex justify-end gap-2">
                             <button
                                 type="button"
-                                onClick={() => setIsModalEdicaoOpen(false)}
+                                onClick={() => {
+                                    setIsModalEdicaoOpen(false);
+                                    setIdSelecionado(null);
+                                    setMatriculaSelecionada(null);
+                                }}
                                 className="px-4 py-2 border rounded text-slate-600 hover:bg-slate-100"
                             >
                                 Cancelar
@@ -424,19 +451,31 @@ export function MatriculaPage() {
                 </div>
             )}
 
-            {/*Aqui onde ele abre o Modal (Componente) para o ADM fazer a validação do usuário */}
             {isModalOpen && matriculaSelecionada && (
                 <div>
                     <ModalForms
-                        titulo={`${decisao === "APROVADA" ? "Aprovar" : "Recusar"} Matrícula`}
-                        message={`Tem certeza que deseja ${decisao === "APROVADA" ? "aprovar" : "recusar"} esta matrícula?`}
+                        titulo={`${decisao === "APROVADA"
+                            ? "Aprovar"
+                            : "Recusar"} Matrícula`}
+
+                        message={`Tem certeza que deseja ${decisao === "APROVADA"
+                                ? "aprovar"
+                                : "recusar"
+                            } esta matrícula?`}
+
                         decisao={decisao}
                         texto="Sim"
+
                         opSim={() => {
-                            handleDecisao(idSelecionado!, decisao!);
+                            handleDecisao(
+                                idSelecionado!,
+                                decisao!
+                            );
+
                             setIsModalOpen(false);
                             setMatriculaSelecionada(null);
                         }}
+
                         opNao={() => {
                             setIsModalOpen(false);
                             setDecisao(null);
@@ -445,33 +484,53 @@ export function MatriculaPage() {
                         }}
 
                         dados_formulario={dadosMatricula}
+                        matricula={matriculaSelecionada}
                     />
                 </div>
             )}
-
-
 
             {isModalVisualizarOpen && matriculaSelecionada && (
                 <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
                         <h2 className="text-xl font-bold text-slate-800 mb-4">Detalhes da Matrícula</h2>
                         <div className="flex flex-col gap-2 text-sm text-slate-700 mb-6">
-                            <p><strong>Nome:</strong> {matriculaSelecionada.matricula?.user?.name}</p>
-                            <p><strong>CPF:</strong> {matriculaSelecionada.matricula?.user?.cpf}</p>
-                            <p>
-                                <strong>Data de Nascimento:</strong>{" "}
-                                {matriculaSelecionada.matricula?.user?.dt_nascimento
-                                    ? formatDate(matriculaSelecionada.matricula.user?.dt_nascimento)
-                                    : "Não informada"}
+                            <p><strong>Nome:</strong>{" "}{matriculaSelecionada.user.name}</p>
+                            <p><strong>CPF:</strong>{" "}{matriculaSelecionada.user.cpf}</p>
+                            <p><strong>Data de Nascimento:</strong>{" "}{matriculaSelecionada.user.dt_nascimento
+                                ? formatDate(matriculaSelecionada.user.dt_nascimento) : "Não informada"}
                             </p>
-                            <p><strong>Telefone Principal:</strong> {matriculaSelecionada?.matricula?.user?.telefone_principal || "Não informado"}</p>
-                            <p><strong>Profissão:</strong> {matriculaSelecionada?.matricula?.user?.profissao || "Não informada"}</p>
-                            <p><strong>Problemas de Saúde:</strong> {matriculaSelecionada?.matricula?.user?.problemas_saude || "Nenhum informado"}</p>
-                            <p><strong>Curso:</strong> {matriculaSelecionada?.matricula?.turma?.curso?.name}</p>
-                            <p><strong>Turno:</strong> {matriculaSelecionada?.matricula?.turma?.turno}</p>
-                            <p><strong>Status:</strong> {matriculaSelecionada?.matricula?.status}</p>
-                            <p><strong>Interesse:</strong> {matriculaSelecionada?.matricula?.interesse_servicos}</p>
-                            <p><strong>Como soube do curso:</strong> {matriculaSelecionada.matricula?.como_soube}</p>
+                            <p><strong>Telefone Principal:</strong>{" "}{matriculaSelecionada.user.telefone_principal || "Não informado"}</p>
+                            <p><strong>Profissão:</strong>{" "}{matriculaSelecionada.user.profissao || "Não informada"}</p>
+
+                            <p>
+                                <strong>Problemas de Saúde:</strong>{" "}
+                                {matriculaSelecionada.user.problemas_saude || "Nenhum informado"}
+                            </p>
+
+                            <p>
+                                <strong>Curso:</strong>{" "}
+                                {matriculaSelecionada.turma.curso.name}
+                            </p>
+
+                            <p>
+                                <strong>Turno:</strong>{" "}
+                                {matriculaSelecionada.turma.turno}
+                            </p>
+
+                            <p>
+                                <strong>Status:</strong>{" "}
+                                {matriculaSelecionada.status}
+                            </p>
+
+                            <p>
+                                <strong>Interesse:</strong>{" "}
+                                {matriculaSelecionada.interesse_servicos.join(", ")}
+                            </p>
+
+                            <p>
+                                <strong>Como soube do curso:</strong>{" "}
+                                {matriculaSelecionada.como_soube}
+                            </p>
                         </div>
                         <div className="flex justify-end">
                             <button

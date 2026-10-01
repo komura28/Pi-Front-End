@@ -25,7 +25,6 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
         user?: { papelUsuario?: string };
         logout: () => void;
     };
-    const [serverError, setServerError] = useState("");
     const [openMenus, setOpenMenus] = useState(false);
 
     async function handlePerfil() {
@@ -38,16 +37,10 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
         }
     }
 
-    async function handleLogout() {
-        try {
-            setServerError("");
-            setOpenMenus(false);
-            await logout();
-            navigate("/login");
-        } catch (error) {
-            console.log(error);
-            setServerError(error instanceof Error ? error.message : "Erro ao realizar logout.");
-        }
+    function handleLogout() {
+        setOpenMenus(false);
+        logout();
+        navigate("/login");
     }
 
     return (

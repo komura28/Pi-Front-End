@@ -21,12 +21,8 @@ interface SideBarProps {
     link: string;
 }
 
-
-
 export function SideBar({ navigationItems, link }: SideBarProps) {
     const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(true);
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 
     useEffect(() => {
@@ -35,19 +31,15 @@ export function SideBar({ navigationItems, link }: SideBarProps) {
                 const data = await getDashboardData();
                 setDashboardData(data);
             } catch (error) {
-                if (error instanceof Error) {
-                    setError(`Erro ao carregar os dados do curso: ${error.message}`);
-                } else {
-                    setError("Erro ao carregar os dados do curso");
-                }
-            } finally {
-                setLoading(false);
+                console.error(
+                    "Erro ao carregar dashboard:",
+                    error
+                );
             }
         }
+
         carregarMatriculasPendentes();
     }, []);
-
-
 
     return (
         <>
