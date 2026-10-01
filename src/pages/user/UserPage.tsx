@@ -282,9 +282,9 @@ export function UserPage() {
 
             {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">Confirmar Exclusão de Curso</h3>
+                        <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">Confirmar Exclusão de Usuário</h3>
                         <p className="text-slate-600 mb-6 justify-center text-center">
                             Tem certeza que deseja excluir este usuário? Esta ação não poderá ser desfeita.
                         </p>

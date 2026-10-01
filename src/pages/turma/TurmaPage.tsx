@@ -335,7 +335,7 @@ export function TurmaPage() {
                 />
             )}
             {isEditModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                         <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Turma</h3>
 
