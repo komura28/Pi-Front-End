@@ -441,7 +441,7 @@ export function CursoPage() {
             </section>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                         <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">Confirmar Exclusão de Curso</h3>
                         <p className="text-slate-600 mb-6 justify-center text-center">
@@ -452,7 +452,7 @@ export function CursoPage() {
 
                             <button
                                 onClick={handleConfirmarExclusao}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 Sim
                             </button>
@@ -469,7 +469,7 @@ export function CursoPage() {
             )}
 
             {isEditModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                         <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Curso</h3>
 
