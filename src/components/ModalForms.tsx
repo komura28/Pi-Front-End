@@ -1,5 +1,6 @@
 import type { MatriculaDTO } from "../types/matricula/matricula-types";
 import type { IUserDTO } from "../types/user/user-types";
+import { formatDate } from "../utils/formatters";
 
 interface IModalForms {
   titulo: string;
@@ -70,10 +71,7 @@ export function ModalForms({
               <p>
                 <strong>Data de nascimento:</strong>{" "}
                 {dados_formulario.dt_nascimento
-                  ? new Date(
-                    dados_formulario.dt_nascimento
-                  ).toLocaleDateString("pt-BR")
-                  : "Não informada"}
+                  ? formatDate(dados_formulario.dt_nascimento) : "Não informada"}
               </p>
 
               <p>
