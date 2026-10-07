@@ -86,6 +86,7 @@ export function CardTurma({ turma }: CardProps) {
             setCandidaturas(prev => [...prev, novaCandidatura]);
             fecharModalCandidatura();
             setMostrarModalSucesso(true);
+            console.log(novaCandidatura);
         } catch (error) {
             console.error("Erro ao candidatar-se à turma:", error);
             setFormError("Erro ao enviar candidatura. Por favor, tente novamente.");
