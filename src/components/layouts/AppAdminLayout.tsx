@@ -45,6 +45,11 @@ const adminNavItems = [
         href: "/app/user",
         icon: <FaUsers/>
     },
+    {
+        label: "Lista de Alunos",
+        href: "/app/aluno",
+        icon: <FaUsers/>
+    },
 
 ]
 
