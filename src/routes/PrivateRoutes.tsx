@@ -8,6 +8,7 @@ import { CursoCadastroPage } from "../pages/curso/CursoCadastroPage";
 import { TurmaCadastroPage } from "../pages/turma/TurmaCadastroPage";
 import { TurmaPage } from "../pages/turma/TurmaPage";
 import { UserPage } from "../pages/user/UserPage";
+import { AlunoPage } from "../pages/aluno/AlunoPage";
 
 export function PrivateRoutes() {
     return (
@@ -43,6 +44,10 @@ export function PrivateRoutes() {
 
             <Route path="/register-turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <TurmaCadastroPage />
+            </ProtectedRoutes>} />
+
+            <Route path="/aluno" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+                <AlunoPage />
             </ProtectedRoutes>} />
 
             <Route path="/*" element={<Navigate to="/app/home" replace />} />
