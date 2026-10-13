@@ -108,6 +108,7 @@ export function PerfilPage() {
                         className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
                         disabled
                     />
+
                     <label
                         htmlFor="cpf"
                         className="text-slate-800 font-medium"
@@ -117,6 +118,45 @@ export function PerfilPage() {
 
                     <input
                         value={user?.cpf}
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
+                        disabled
+                    />
+
+                    <label
+                        htmlFor="telefone_principal"
+                        className="text-slate-800 font-medium"
+                    >
+                        Telefone Principal
+                    </label>
+
+                    <input
+                        value={user?.telefone_principal}
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
+                        disabled
+                    />
+
+                    <label
+                        htmlFor="telefone_secundario"
+                        className="text-slate-800 font-medium"
+                    >
+                        Telefone Secundário
+                    </label>
+
+                    <input
+                        value={user?.telefone_secundario}
+                        className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
+                        disabled
+                    />
+
+                    <label
+                        htmlFor="profissao"
+                        className="text-slate-800 font-medium"
+                    >
+                        Profissão
+                    </label>
+
+                    <input
+                        value={user?.profissao}
                         className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-900"
                         disabled
                     />

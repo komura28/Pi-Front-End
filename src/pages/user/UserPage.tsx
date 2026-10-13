@@ -209,9 +209,9 @@ export function UserPage() {
                             <th className="text-slate-800 font-medium p-2 border-b">
                                 Papel
                             </th>
-                            <th className="text-slate-800 font-medium p-2 border-b">
+                            {/* <th className="text-slate-800 font-medium p-2 border-b">
                                 Ações
-                            </th>
+                            </th> */}
                         </tr>
                     </thead>
 
@@ -241,13 +241,13 @@ export function UserPage() {
                                             onClick={() => abrirModalEdicao(curso)}
                                         /> */}
 
-                                        <Button
+                                        {/* <Button
                                             isSubmitting={isDeleting}
                                             label={<FaTrash />}
                                             loadingLabel="Excluindo..."
                                             className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
                                             onClick={() => confirmarExclusao(user._id)}
-                                        />
+                                        />  */}
                                     </div>
                                 </td>
                             </tr>
@@ -280,7 +280,7 @@ export function UserPage() {
                 </div>
             </section>
 
-            {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO */}
+            {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
             {isModalOpen && (
                 <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
@@ -307,7 +307,7 @@ export function UserPage() {
                         </div>
                     </div>
                 </div>
-            )}
+            )}  */}
 
             {/* NOVO MODAL DE EDIÇÃO 
             Aguardando Back
