@@ -70,45 +70,36 @@ export function TurmaPage() {
     }
 
     useEffect(() => {
-        async function carregarTurmas() {
-            try {
-                setLoading(true);
-                const data = await getTurma();
-                console.log("getTurma response:", data);
+    async function carregarDados() {
+        try {
+            setLoading(true);
+            setError("");
 
-                if (Array.isArray(data)) {
-                    setTurmas(data);
-                } else if (data && Array.isArray((data as any).turmas)) {
-                    setTurmas((data as any).turmas);
-                } else if (data && Array.isArray((data as any).data)) {
-                    setTurmas((data as any).data);
-                } else if (data) {
-                    setTurmas([data as any]);
-                } else {
-                    setTurmas([]);
-                }
-            } catch (error) {
-                console.error("Erro ao buscar turmas", error);
-                if (error instanceof Error) {
-                    setError(`Erro ao carregar os dados da turma: ${error.message}`);
-                } else {
-                    setError("Erro ao carregar os dados da turma");
-                }
-            } finally {
-                setLoading(false);
-            }
+            const [turmasData, cursosData] =
+                await Promise.all([
+                    getTurma(),
+                    getCurso(),
+                ]);
 
-            async function carregarCursos() {
-                const data = await getCurso();
-                setCursos(data);
-            }
+            setTurmas(turmasData);
+            setCursos(cursosData);
 
-            carregarCursos();
+        } catch (error) {
+            console.error(
+                "Erro ao carregar turmas:",
+                error
+            );
+
+            setError(
+                "Erro ao carregar os dados das turmas"
+            );
+        } finally {
+            setLoading(false);
         }
+    }
 
-
-        carregarTurmas();
-    }, [])
+    carregarDados();
+}, []);
 
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
