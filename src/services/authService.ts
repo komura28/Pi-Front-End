@@ -1,4 +1,4 @@
-import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse } from "../types/auth/auth-types";
+import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse, TurmaMatricula } from "../types/auth/auth-types";
 import { api } from "./api";
 
 
@@ -90,7 +90,7 @@ export async function getUser() {
     return response.data;
 }
 
-export async function getTurma() {
-    const response = await api.get("/turma")
+export async function getTurma(): Promise<TurmaMatricula[]> {
+    const response = await api.get<TurmaMatricula[]>("/turma");
     return response.data;
 }
