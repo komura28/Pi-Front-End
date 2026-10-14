@@ -153,7 +153,7 @@ hover:text-white
             active:scale-95
         "
                     >
-                        <FaWhatsapp className="h-[1em] w-[1em]" shrink-0 />
+                        <FaWhatsapp className="h-[1em] w-[1em] shrink-0" />
                         Suporte via WhatsApp
                     </a>
                 </div>

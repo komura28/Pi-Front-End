@@ -8,7 +8,7 @@ import { formatDate } from "../../utils/formatters";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 import { atualizarStatusMatricula, getMatriculas } from "../../services/matriculaService";
 
-type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA";
+type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA" | "CANCELADA";
 
 export function MatriculaPage() {
     const [matriculas, setMatriculas] = useState<MatriculaDTO[]>([]);
@@ -62,6 +62,7 @@ export function MatriculaPage() {
     const totalPendentes = matriculas.filter((m) => m.status === "PENDENTE").length;
     const totalAprovadas = matriculas.filter((m) => m.status === "APROVADA").length;
     const totalRecusadas = matriculas.filter((m) => m.status === "RECUSADA").length;
+    const totalCanceladas = matriculas.filter((m) => m.status === "CANCELADA").length;
 
 
     async function handleDecisao(
@@ -255,6 +256,29 @@ export function MatriculaPage() {
                             {totalRecusadas}
                         </span>
                     </button>
+
+                    {/*Filtro de Canceladas*/}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setAbaAtiva("CANCELADA");
+                            setPaginaAtual(1);
+                        }}
+                        className={`flex items-center gap-2 py-3 px-6 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${abaAtiva === "CANCELADA"
+                            ? "border-red-500 text-red-600 bg-red-50/50"
+                            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                            }`}
+                    >
+                        Canceladas
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${abaAtiva === "CANCELADA" ? "bg-red-200 text-red-800" : "bg-slate-100 text-slate-600"
+                            }`}>
+                            {totalCanceladas}
+                        </span>
+                    </button>
+
+                    
+
+                    
                 </div>
 
                 <div className="flex w-full items-center justify-between gap-4">

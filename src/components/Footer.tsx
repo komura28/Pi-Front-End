@@ -7,7 +7,7 @@ export function Footer() {
             <div className="max-w-5xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
 
                 {/* SOBRE */}
-                <div md:justify-self-start>
+                <div className="md:justify-self-start">
                     <h2 className="text-white font-semibold text-lg mb-3">
                         Aticurando
                     </h2>
