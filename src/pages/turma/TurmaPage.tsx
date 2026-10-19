@@ -136,7 +136,7 @@ export function TurmaPage() {
         try {
             // Chama a API passando o ID e os novos dados. 
             // Ajuste os parâmetros de acordo com o que sua API espera receber.
-            await editarTurmaAPI(turmaToEditId, { curso: editCurso, capacidade: parseInt(editCapacidade), turno: editTurno, dataInicio: editDataInicio, dataFim: editDataFim });
+            await editarTurmaAPI(turmaToEditId, { curso: editCurso, capacidade: Number.parseInt(editCapacidade), turno: editTurno, dataInicio: editDataInicio, dataFim: editDataFim });
 
             setMostrarModalEdicao(true);
 
@@ -149,7 +149,7 @@ export function TurmaPage() {
                             turma: {
                                 ...item.turma,
                                 curso: cursoSelecionado || item.turma.curso,
-                                capacidade: parseInt(editCapacidade),
+                                capacidade: Number.parseInt(editCapacidade),
                                 turno: editTurno,
                                 dataInicio: editDataInicio,
                                 dataFim: editDataFim,
