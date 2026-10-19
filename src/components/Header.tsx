@@ -106,7 +106,8 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                         <>
                             <div
                                 className="fixed inset-0 z-40"
-                                onClick={() => setOpenMenus(false)}
+                                onClick={() => setOpenMenus(false)} 
+                                role="button"
                             />
                             <div className="absolute right-0 mt-2 bg-white rounded-md shadow w-48 p-1 z-50">
                                 <button
