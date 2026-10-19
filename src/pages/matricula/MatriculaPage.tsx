@@ -7,8 +7,12 @@ import type { IUserDTO } from "../../types/user/user-types";
 import { formatDate } from "../../utils/formatters";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 import { atualizarStatusMatricula, getMatriculas } from "../../services/matriculaService";
+import { useOutletContext } from "react-router-dom";
 
 type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA";
+type AdminOutletContext = {
+    atualizarMatriculasPendentes: () => Promise<void>;
+};
 
 export function MatriculaPage() {
     const [matriculas, setMatriculas] = useState<MatriculaDTO[]>([]);
@@ -25,6 +29,7 @@ export function MatriculaPage() {
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
     const [pesquisar, setPesquisar] = useState("");
     const [abaAtiva, setAbaAtiva] = useState<StatusTab>("PENDENTE");
+    const {atualizarMatriculasPendentes} = useOutletContext<AdminOutletContext>();
 
     const [loadError, setLoadError] = useState("");
     const [actionError, setActionError] = useState("");
@@ -82,6 +87,8 @@ export function MatriculaPage() {
                 )
             );
 
+            await atualizarMatriculasPendentes();
+
             if (status === "APROVADA") {
                 setMostrarModalAprovacao(true);
             } else {
@@ -126,6 +133,9 @@ export function MatriculaPage() {
                         : item
                 )
             );
+
+            await atualizarMatriculasPendentes();
+
             setIsModalEdicaoOpen(false);
             setIdSelecionado(null);
             setMatriculaSelecionada(null);

@@ -4,6 +4,8 @@ import { Header } from "../Header";
 import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
 import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 import { LucideBellRing } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getDashboardData } from "../../services/dashboardService";
 
 const adminNavItems = [
     {
@@ -54,14 +56,32 @@ const adminNavItems = [
 ]
 
 export function AppAdminLayout() {
+
+    const [matriculasPendentes, setMatriculasPendentes] = useState(0);
+
+    async function atualizarMatriculasPendentes() {
+        const data = await getDashboardData();
+        setMatriculasPendentes(data.matriculasPendentes);
+    }
+
+    useEffect(() => {
+        atualizarMatriculasPendentes();
+    }, []);
+
     return (
         <>
             <div className="min-h-screen bg-muted/40">
-                <SideBar navigationItems={adminNavItems} link="/app/home" />
+                <SideBar navigationItems={adminNavItems} link="/app/home"
+                    matriculasPendentes={matriculasPendentes}
+                />
                 <div className="flex min-h-screen flex-col pl-64">
                     <Header   mode="ADM"/>
                     <main className="flex-1 p-6">
-                        <Outlet />
+                        <Outlet 
+                            context={{
+                                atualizarMatriculasPendentes,
+                            }}
+                        />
                     </main>
                 </div>
             </div>
