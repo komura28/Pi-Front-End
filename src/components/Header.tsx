@@ -104,10 +104,11 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
 
                     {openMenus && (
                         <>
-                            <div
+                            <button
+                                type="button"
+                                aria-label="Fechar menu"
                                 className="fixed inset-0 z-40"
-                                onClick={() => setOpenMenus(false)} 
-                                role="button"
+                                onClick={() => setOpenMenus(false)}
                             />
                             <div className="absolute right-0 mt-2 bg-white rounded-md shadow w-48 p-1 z-50">
                                 <button
