@@ -11,46 +11,46 @@ const adminNavItems = [
     {
         label: "Home",
         href: "/app/home",
-        icon: <FaHome/>
+        icon: <FaHome />
 
     },
     {
         label: "Cursos",
         isSelect: true,
-        icon: <FaGraduationCap/>,
+        icon: <FaGraduationCap />,
         options: [
-            { label: "Cadastrar Curso", href: "/app/register-curso", iconF: <FaPlus/> },
-            { label: "Listar Cursos", href: "/app/curso", iconF: <FaList/> },
+            { label: "Cadastrar Curso", href: "/app/register-curso", iconF: <FaPlus /> },
+            { label: "Listar Cursos", href: "/app/curso", iconF: <FaList /> },
         ]
-        
+
 
     },
     {
         label: "Turmas",
         isSelect: true,
-        icon: <FaChalkboardTeacher/>,
+        icon: <FaChalkboardTeacher />,
         options: [
-            {label: "Cadastrar Turma", href: "/app/register-turma", iconF: <FaPlus/>},
-            {label: "Listar Turmas", href: "/app/turma", iconF: <FaList/>},
+            { label: "Cadastrar Turma", href: "/app/register-turma", iconF: <FaPlus /> },
+            { label: "Listar Turmas", href: "/app/turma", iconF: <FaList /> },
         ]
 
     },
     {
         label: "Matrículas",
         href: "/app/matricula",
-        icon: <HiOutlineDocumentCheck/>,
-        iconContador: <LucideBellRing/>
+        icon: <HiOutlineDocumentCheck />,
+        iconContador: <LucideBellRing />
 
     },
     {
         label: "Lista de Usuários",
         href: "/app/user",
-        icon: <FaUsers/>
+        icon: <FaUsers />
     },
     {
         label: "Lista de Alunos",
         href: "/app/aluno",
-        icon: <FaUsers/>
+        icon: <FaUsers />
     },
 
 ]
@@ -65,7 +65,18 @@ export function AppAdminLayout() {
     }
 
     useEffect(() => {
-        atualizarMatriculasPendentes();
+        async function carregarMatriculasPendentes() {
+            try {
+                await atualizarMatriculasPendentes();
+            } catch (error) {
+                console.error(
+                    "Erro ao carregar matrículas pendentes:",
+                    error
+                );
+            }
+        }
+
+        void carregarMatriculasPendentes();
     }, []);
 
     return (
@@ -75,9 +86,9 @@ export function AppAdminLayout() {
                     matriculasPendentes={matriculasPendentes}
                 />
                 <div className="flex min-h-screen flex-col pl-64">
-                    <Header   mode="ADM"/>
+                    <Header mode="ADM" />
                     <main className="flex-1 p-6">
-                        <Outlet 
+                        <Outlet
                             context={{
                                 atualizarMatriculasPendentes,
                             }}
