@@ -25,3 +25,8 @@ export async function getMinhasMatriculas(): Promise<MatriculaDTO[]> {
     const response = await api.get("/matricula/candidaturas");
     return response.data;
 }
+
+export async function cancelarMatricula(id: string, motivoCancelamento: string) {
+    const response = await api.patch(`/matricula/${id}/cancelar`, { motivoCancelamento });
+    return response.data;
+}
