@@ -419,7 +419,7 @@ export function CursoPage() {
                     <button
                         onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
                         disabled={paginaAtual === 1}
-                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         Anterior
                     </button>
@@ -433,7 +433,7 @@ export function CursoPage() {
                             setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
                         }
                         disabled={paginaAtual === totalPaginas}
-                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         Próxima
                     </button>
