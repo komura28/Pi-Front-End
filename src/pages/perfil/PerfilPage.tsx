@@ -74,10 +74,11 @@ const CLASSE_CAMPO_EDICAO =
     "w-full rounded-md border border-slate-300 bg-white p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
 
 function CampoLeitura({ label, value, full = false }: { label: string; value: string; full?: boolean }) {
+    const fieldId = `leitura-${label.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
     return (
         <div className={full ? "sm:col-span-2" : ""}>
-            <label className="mb-1 block text-slate-800 font-medium">{label}</label>
-            <input value={value} className={CLASSE_CAMPO_LEITURA} disabled readOnly />
+            <label htmlFor={fieldId} className="mb-1 block text-slate-800 font-medium">{label}</label>
+            <input id={fieldId} value={value} className={CLASSE_CAMPO_LEITURA} disabled readOnly />
         </div>
     );
 }
@@ -286,8 +287,9 @@ export function PerfilPage() {
 
                         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="sm:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-slate-700">Nome</label>
+                                <label htmlFor="modal-name" className="mb-1 block text-sm font-medium text-slate-700">Nome</label>
                                 <input
+                                    id="modal-name"
                                     type="text"
                                     value={form.name}
                                     onChange={(e) => setCampo("name", e.target.value)}
@@ -296,8 +298,9 @@ export function PerfilPage() {
                             </div>
 
                             <div className="sm:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-slate-700">E-mail</label>
+                                <label htmlFor="modal-email" className="mb-1 block text-sm font-medium text-slate-700">E-mail</label>
                                 <input
+                                    id="modal-email"
                                     type="email"
                                     value={user.email}
                                     className={`${CLASSE_CAMPO_EDICAO} cursor-not-allowed bg-slate-100 text-slate-500`}
@@ -307,8 +310,9 @@ export function PerfilPage() {
                             </div>
 
                             <div className="sm:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-slate-700">CPF</label>
+                                <label htmlFor="modal-cpf" className="mb-1 block text-sm font-medium text-slate-700">CPF</label>
                                 <input
+                                    id="modal-cpf"
                                     type="text"
                                     value={formatarCPF(user.cpf)}
                                     className={`${CLASSE_CAMPO_EDICAO} cursor-not-allowed bg-slate-100 text-slate-500`}
@@ -318,8 +322,9 @@ export function PerfilPage() {
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700">Data de Nascimento</label>
+                                <label htmlFor="modal-dt-nascimento" className="mb-1 block text-sm font-medium text-slate-700">Data de Nascimento</label>
                                 <input
+                                    id="modal-dt-nascimento"
                                     type="date"
                                     value={form.dt_nascimento}
                                     onChange={(e) => setCampo("dt_nascimento", e.target.value)}
@@ -328,8 +333,9 @@ export function PerfilPage() {
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700">Estado Civil</label>
+                                <label htmlFor="modal-estado-civil" className="mb-1 block text-sm font-medium text-slate-700">Estado Civil</label>
                                 <select
+                                    id="modal-estado-civil"
                                     value={form.estado_civil}
                                     onChange={(e) => setCampo("estado_civil", e.target.value)}
                                     className={CLASSE_CAMPO_EDICAO}
@@ -344,8 +350,9 @@ export function PerfilPage() {
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700">Telefone Principal</label>
+                                <label htmlFor="modal-tel-principal" className="mb-1 block text-sm font-medium text-slate-700">Telefone Principal</label>
                                 <input
+                                    id="modal-tel-principal"
                                     type="text"
                                     inputMode="tel"
                                     placeholder="(00) 00000-0000"
@@ -356,8 +363,9 @@ export function PerfilPage() {
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700">Telefone Secundário/Reserva</label>
+                                <label htmlFor="modal-tel-secundario" className="mb-1 block text-sm font-medium text-slate-700">Telefone Secundário/Reserva</label>
                                 <input
+                                    id="modal-tel-secundario"
                                     type="text"
                                     inputMode="tel"
                                     placeholder="(00) 00000-0000"
@@ -368,8 +376,9 @@ export function PerfilPage() {
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700">Profissão</label>
+                                <label htmlFor="modal-profissao" className="mb-1 block text-sm font-medium text-slate-700">Profissão</label>
                                 <select
+                                    id="modal-profissao"
                                     value={form.profissao}
                                     onChange={(e) => setCampo("profissao", e.target.value)}
                                     className={CLASSE_CAMPO_EDICAO}
@@ -385,10 +394,11 @@ export function PerfilPage() {
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700">
+                                <label htmlFor="modal-participacao" className="mb-1 block text-sm font-medium text-slate-700">
                                     Você já foi ou é palhaço voluntário?
                                 </label>
                                 <select
+                                    id="modal-participacao"
                                     value={form.participacao_anterior}
                                     onChange={(e) => setCampo("participacao_anterior", e.target.value)}
                                     className={CLASSE_CAMPO_EDICAO}
@@ -401,10 +411,11 @@ export function PerfilPage() {
 
                             {form.profissao === "Outro" && (
                                 <div className="sm:col-span-2">
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">
+                                    <label htmlFor="modal-profissao-custom" className="mb-1 block text-sm font-medium text-slate-700">
                                         Qual é a sua profissão?
                                     </label>
                                     <input
+                                        id="modal-profissao-custom"
                                         type="text"
                                         placeholder="Digite sua profissão"
                                         value={form.profissao_custom}
@@ -415,10 +426,11 @@ export function PerfilPage() {
                             )}
 
                             <div className="sm:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-slate-700">
+                                <label htmlFor="modal-tem-problema-saude" className="mb-1 block text-sm font-medium text-slate-700">
                                     Possui problema de saúde?
                                 </label>
                                 <select
+                                    id="modal-tem-problema-saude"
                                     value={form.tem_problema_saude}
                                     onChange={(e) => setCampo("tem_problema_saude", e.target.value)}
                                     className={CLASSE_CAMPO_EDICAO}
@@ -431,10 +443,11 @@ export function PerfilPage() {
 
                             {form.tem_problema_saude === "Sim" && (
                                 <div className="sm:col-span-2">
-                                    <label className="mb-1 block text-sm font-medium text-slate-700">
+                                    <label htmlFor="modal-problemas-saude-desc" className="mb-1 block text-sm font-medium text-slate-700">
                                         Qual problema de saúde/doença você possui?
                                     </label>
                                     <input
+                                        id="modal-problemas-saude-desc"
                                         type="text"
                                         placeholder="Digite a doença ou condição de saúde"
                                         value={form.problemas_saude_descricao}
