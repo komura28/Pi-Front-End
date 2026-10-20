@@ -7,8 +7,13 @@ import type { IUserDTO } from "../../types/user/user-types";
 import { formatDate } from "../../utils/formatters";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 import { atualizarStatusMatricula, getMatriculas } from "../../services/matriculaService";
+import { useOutletContext } from "react-router-dom";
 
 type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA" | "CANCELADA";
+type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA";
+type AdminOutletContext = {
+    atualizarMatriculasPendentes: () => Promise<void>;
+};
 
 export function MatriculaPage() {
     const [matriculas, setMatriculas] = useState<MatriculaDTO[]>([]);
@@ -25,12 +30,14 @@ export function MatriculaPage() {
     const [menuAbertoId, setMenuAbertoId] = useState<string | null>(null);
     const [pesquisar, setPesquisar] = useState("");
     const [abaAtiva, setAbaAtiva] = useState<StatusTab>("PENDENTE");
+    const {atualizarMatriculasPendentes} = useOutletContext<AdminOutletContext>();
 
     const [loadError, setLoadError] = useState("");
     const [actionError, setActionError] = useState("");
 
 
     const matriculasFiltro = matriculas.filter((matricula) => {
+        if (!matricula.user) return false;
         const digitado = pesquisar.trim().toLowerCase();
         const nameMatches = matricula.user.name.toLowerCase().includes(digitado);
         const cpfMatches = matricula.user.cpf.toString().includes(digitado);
@@ -82,6 +89,8 @@ export function MatriculaPage() {
                 )
             );
 
+            await atualizarMatriculasPendentes();
+
             if (status === "APROVADA") {
                 setMostrarModalAprovacao(true);
             } else {
@@ -126,6 +135,9 @@ export function MatriculaPage() {
                         : item
                 )
             );
+
+            await atualizarMatriculasPendentes();
+
             setIsModalEdicaoOpen(false);
             setIdSelecionado(null);
             setMatriculaSelecionada(null);
@@ -322,10 +334,10 @@ export function MatriculaPage() {
                     <tbody className="border-b">
                         {matriculasPaginaAtual.map((matricula) => (
                             <tr key={matricula._id} className="border-b">
-                                <td>{matricula.user.name}</td>
-                                <td>{matricula.user.cpf}</td>
-                                <td>{matricula.turma.curso.name}</td>
-                                <td>{matricula.turma.turno}</td>
+                                <td>{matricula.user?.name || <span className="text-red-500 italic">Usuário excluído</span>}</td>
+                                <td>{matricula.user?.cpf || "-"}</td>
+                                <td>{matricula.turma?.curso?.name}</td>
+                                <td>{matricula.turma?.turno}</td>
                                 <td>{matricula.status}</td>
                                 <td className="p-2 flex justify-center items-center gap-2">
 

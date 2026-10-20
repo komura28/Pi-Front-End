@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { FaChevronDown, FaChevronUp, FaUserGraduate } from "react-icons/fa";
 import { getTurma } from "../../services/authService";
 import { getMatriculas } from "../../services/matriculaService";
-import type { authTurma } from "../../types/auth/auth-types";
+import type { TurmaMatricula } from "../../types/auth/auth-types";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 
 export function AlunoPage() {
-  const [turmas, setTurmas] = useState<authTurma[]>([]);
+  const [turmas, setTurmas] = useState<TurmaMatricula[]>([]);
   const [matriculas, setMatriculas] = useState<MatriculaDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,37 +17,26 @@ export function AlunoPage() {
     async function carregarDados() {
       try {
         setLoading(true);
+        setError("");
 
-        const [resTurmas, resMatriculas] = await Promise.allSettled([
-          getTurma(),
-          getMatriculas(),
-        ]);
+        const [turmasData, matriculasData] =
+          await Promise.all([
+            getTurma(),
+            getMatriculas(),
+          ]);
 
-        if (resTurmas.status === "fulfilled") {
-          const val = resTurmas.value;
-          const listaTurmas = Array.isArray(val)
-            ? val
-            : (val as any)?.turmas || (val as any)?.data || [];
-          setTurmas(listaTurmas);
-        } else {
-          console.error("Erro ao buscar turmas:", resTurmas.reason);
-        }
+        setTurmas(turmasData);
+        setMatriculas(matriculasData);
 
-        if (resMatriculas.status === "fulfilled") {
-          const val = resMatriculas.value;
-          const listaMatriculas = Array.isArray(val)
-            ? val
-            : (val as any)?.matriculas || (val as any)?.data || [];
-          setMatriculas(listaMatriculas);
-        } else {
-          console.error("Erro ao buscar matrículas:", resMatriculas.reason);
-        }
       } catch (err) {
-        if (err instanceof Error) {
-          setError(`Erro ao carregar dados: ${err.message}`);
-        } else {
-          setError("Erro inesperado ao carregar dados.");
-        }
+        console.error(
+          "Erro ao carregar alunos por turma:",
+          err
+        );
+
+        setError(
+          "Erro ao carregar turmas e alunos."
+        );
       } finally {
         setLoading(false);
       }
@@ -89,25 +78,21 @@ export function AlunoPage() {
       )}
 
       <div className="flex flex-col gap-3 w-full">
-        {turmas.map((turma, index) => {
+        {turmas.map((item, index) => {
+          const turma = item.turma;
+
           const keyTurma = turma._id || `turma-${index}`;
+
           const isOpen = openTurmaIds.includes(keyTurma);
 
-          // Vincula as matrículas com a turma correspondente
-          const matriculasDaTurma = matriculas.filter((m) => {
-            if (!m.turma) return false;
-            const idTurmaMatricula = typeof m.turma === "string" ? m.turma : m.turma._id;
-            return idTurmaMatricula === turma._id;
-          });
+          const matriculasDaTurma =
+            matriculas.filter((matricula) =>
+              matricula.status === "APROVADA" &&
+              matricula.turma._id === turma._id
+            );
 
-          // Busca o nome do curso/turma nos formatos comuns retornados pela API
-          const tAny = turma as any;
-          const nomeTurma =
-            tAny.nome ||
-            tAny.name ||
-            tAny.curso?.nome ||
-            tAny.curso?.name ||
-            (tAny.turno ? `Turma - ${tAny.turno}` : "Turma sem nome");
+
+          const nomeTurma = `${turma.curso.name} - ${turma.turno}`;
 
           const quantidadeAlunos = matriculasDaTurma.length;
 

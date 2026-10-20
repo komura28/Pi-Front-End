@@ -19,28 +19,12 @@ interface NavigationItem {
 interface SideBarProps {
     navigationItems: NavigationItem[];
     link: string;
+    matriculasPendentes: number;
 }
 
-export function SideBar({ navigationItems, link }: SideBarProps) {
+export function SideBar({ navigationItems, link, matriculasPendentes }: SideBarProps) {
     const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
-    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-
-    useEffect(() => {
-        async function carregarMatriculasPendentes() {
-            try {
-                const data = await getDashboardData();
-                setDashboardData(data);
-            } catch (error) {
-                console.error(
-                    "Erro ao carregar dashboard:",
-                    error
-                );
-            }
-        }
-
-        carregarMatriculasPendentes();
-    }, []);
-
+    
     return (
         <>
             <aside className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background bg-[#0F172A]">
@@ -133,7 +117,7 @@ hover:text-white
                             >
                                 {item.icon && <span className="text-base">{item.icon}</span>}
                                 <span>{item.label}</span>
-                                {(dashboardData?.matriculasPendentes ?? 0) > 0 && item.iconContador && (<span className="ml-auto text-yellow-500">{item.iconContador}</span>)}
+                                {matriculasPendentes > 0 && item.iconContador && (<span className="ml-auto text-yellow-500">{item.iconContador}</span>)}
                             </NavLink>
                         );
                     })}
