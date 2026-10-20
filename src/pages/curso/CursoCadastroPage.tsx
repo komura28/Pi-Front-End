@@ -161,11 +161,11 @@ export function CursoCadastroPage() {
                                     }
                                 }} />
                             <button
-                                type="button"
-                                onClick={handleMateria}
-                                className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
+                            type="button"
+                            onClick={handleMateria}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-xl font-bold text-white transition hover:bg-blue-700 cursor-pointer pb-1 leading-none"
                             >
-                                Adicionar
+                                 +
                             </button>
                         </div>
                     </div>
