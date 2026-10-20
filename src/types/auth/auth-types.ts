@@ -1,7 +1,7 @@
 export type papelUsuario = "ALUNO" | "ADM" | "PROFESSOR";
 
 export interface authUser{
-    _id: string;
+    id: string;
     name: string;
     cpf: number;
     email: string;
