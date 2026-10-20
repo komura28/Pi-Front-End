@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 import { cancelarMatricula, getMinhasMatriculas } from "../../services/matriculaService";
 import type { TurmaMatricula } from "../../types/auth/auth-types";
+import { Modal } from "../../components/Modal";
 
 type CardProps = {
     turma: TurmaMatricula;
@@ -12,37 +13,47 @@ export function CursoAlunoPage({ turma }: CardProps) {
     const [candidaturas, setCandidaturas] = useState<MatriculaDTO[]>([]);
     const [error, setError] = useState("");
     const [mostrarModalSucesso, setMostrarModalSucesso] = useState(false);
-    const [formError, setFormError] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [confirmarCancelamento, setConfirmarCancelamento] = useState(false);
 
-    {/*Cancelamento de Matrícula*/ }
-    const matriculaAtual = candidaturas.find(
-        (solicitacao) => solicitacao.turma._id === turma.turma._id &&
-            solicitacao.status === "APROVADA"
-    );
-    const [modalCancelamento, setModalCancelamento] = useState(false);
+    const [formError, setFormError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [matriculaSelecionada, setMatriculaSelecionada] = useState<MatriculaDTO | null>(null);
     const [motivo, setMotivo] = useState("");
+
+    const handleConfirmarCancelamento = () => {
+        if (!motivo) {
+            setFormError("Por favor, informe o motivo do cancelamento.");
+            return;
+        }
+        setFormError("");
+        setConfirmarCancelamento(true);
+    }
 
     {// Função de Cancelar Matrícula}
         const handleCancelarMatricula = async () => {
-            if (!motivo) {
-                setFormError("Por favor, informe o motivo do cancelamento.");
-                return;
-            }
 
             setIsSubmitting(true);
             setFormError("");
 
+
             try {
-                if (!matriculaAtual) {
+
+                if (!matriculaSelecionada) {
                     setFormError("Não foi possível encontrar a matrícula para cancelamento.");
                     return;
                 }
-                await cancelarMatricula(matriculaAtual._id, motivo);
-                setCandidaturas(prev => prev.filter(c => c._id !== matriculaAtual._id));
+
+                await cancelarMatricula(matriculaSelecionada._id, motivo);
+                setCandidaturas(prev => prev.map(c => c._id === matriculaSelecionada._id
+                    ? { ...c, status: "CANCELADA" }
+                    : c
+                ));
                 setMotivo("");
+                setConfirmarCancelamento(false);
+                setMatriculaSelecionada(null);
                 setMostrarModalSucesso(true);
-                setModalCancelamento(false);
+                
+
             } catch (error) {
                 setFormError(error instanceof Error ? error.message : "Erro ao Cancelar matrícula. Tente novamente.");
             } finally {
@@ -50,13 +61,14 @@ export function CursoAlunoPage({ turma }: CardProps) {
             }
         };
 
-        function abrirModalCancelamento() {
+        function abrirModalCancelamento(candidatura: MatriculaDTO) {
             setFormError("");
-            setModalCancelamento(true);
+            setMatriculaSelecionada(candidatura);
         }
 
         function fecharModalCancelamento() {
-            setModalCancelamento(false);
+            setConfirmarCancelamento(false);
+            setMatriculaSelecionada(null);
             setMotivo("");
             setFormError("");
         }
@@ -68,6 +80,8 @@ export function CursoAlunoPage({ turma }: CardProps) {
                     return "bg-green-100 text-green-700";
                 case "RECUSADA":
                     return "bg-red-100 text-red-700";
+                case "CANCELADA":
+                    return "bg-red-100 text-gray-700";
                 default:
                     return "bg-yellow-100 text-yellow-700";
             }
@@ -107,9 +121,20 @@ export function CursoAlunoPage({ turma }: CardProps) {
                                 key={candidatura._id}
                                 className="rounded-xl bg-white p-6 shadow-md"
                             >
-                                <h2 className="mb-3 text-xl font-semibold text-gray-800">
-                                    Curso: {candidatura.turma?.curso?.name}
-                                </h2>
+                                <div className="flex items-start justify-between gap-4 mb-3">
+                                    <h2 className="text-xl font-semibold text-gray-800">
+                                        Curso: {candidatura.turma?.curso?.name}
+                                    </h2>
+
+                                    {candidatura.status === "APROVADA" && (
+                                        //Botão de Cancelamento de Matrícula
+                                        <button
+                                            onClick={() => abrirModalCancelamento(candidatura)}
+                                            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition bg-red-600 hover:bg-red-700 shrink-0"
+                                        >
+                                            Cancelar Matrícula
+                                        </button>)}
+                                </div>
 
                                 <p className="mb-2 text-gray-600">
                                     <span className="font-medium">
@@ -125,76 +150,84 @@ export function CursoAlunoPage({ turma }: CardProps) {
                                         candidatura.status
                                     )}`}
                                 >
-                                    {candidatura.status}
+                                    {candidatura?.status}
                                 </span>
-                                {matriculaAtual && (
-                                    //Botão de Cancelamento de Matrícula
-                                    <button
-                                        onClick={abrirModalCancelamento}
-                                        className="w-full rounded-lg px-4 py-2 font-semibold text-white transition bg-red-600 hover:bg-red-700"
-                                    >
-                                        Cancelar Matrícula
-                                    </button>)}
-
-                                {modalCancelamento && (
-                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                                        <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-                                            <h3 className="text-xl font-semibold text-slate-900 mb-4">
-                                                Antes de cancelar...
-                                            </h3>
-
-                                            <div className="mb-5">
-                                                <p className="text-sm font-medium text-slate-700 mb-2">
-                                                    Digite o motivo do cancelamento da matrícula:
-                                                </p>
-
-                                                <div className="flex flex-col gap-2">
-                                                    <input
-                                                        value={motivo}
-                                                        onChange={(e) => setMotivo(e.target.value)}
-                                                        placeholder="Digite o motivo do cancelamento"
-                                                        className="border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            {formError && (
-                                                <p className="mb-4 text-sm text-red-600">
-                                                    {formError}
-                                                </p>
-                                            )}
-
-                                            <div className="flex justify-end gap-3">
-                                                <button
-                                                    onClick={fecharModalCancelamento}
-                                                    className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
-                                                >
-                                                    Cancelar
-                                                </button>
-                                                <button
-                                                    onClick={handleCancelarMatricula}
-                                                    disabled={isSubmitting}
-                                                    className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                                                >
-                                                    {isSubmitting ? "Cancelando..." : "Confirmar Cancelamento"}
-
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-
-                                )}
-
 
                             </div>
                         ))
                     )}
+                    {matriculaSelecionada && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                            <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+                                <h3 className="text-xl font-semibold text-slate-900 mb-4">
+                                    Antes de cancelar...
+                                </h3>
+
+                                <div className="mb-5">
+                                    <p className="text-sm font-medium text-slate-700 mb-2">
+                                        Digite o motivo do cancelamento da matrícula:
+                                    </p>
+
+                                    <div className="flex flex-col gap-2">
+                                        <input
+                                            value={motivo}
+                                            onChange={(e) => setMotivo(e.target.value)}
+                                            placeholder="Digite o motivo do cancelamento"
+                                            className="border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                {formError && (
+                                    <p className="mb-4 text-sm text-red-600">
+                                        {formError}
+                                    </p>
+                                )}
+
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        onClick={fecharModalCancelamento}
+                                        className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmarCancelamento}
+                                        disabled={isSubmitting}
+                                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                    >
+                                        {isSubmitting ? "Cancelando..." : "Confirmar Cancelamento"}
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
 
+                    )}
+                    {confirmarCancelamento && (
+                        <Modal
+                            titulo="Confirmar Cancelamento"
+                            message="Tem certeza que deseja cancelar a matrícula?"
+                            decisao={null}
+                            texto="Sim"
+                            opSim={handleCancelarMatricula}
+                            opNao= {() => setConfirmarCancelamento(false)}
+                        />
+                    )}
+
+                    {mostrarModalSucesso && (
+                        <Modal
+                            titulo="Cancelamento"
+                            message="Matéria cancelada com sucesso!"
+                            decisao={null}
+                            texto="Ok"
+                            opSim={() => setMostrarModalSucesso(false)}
+                        />
+                    )}
 
                 </div>
             </main>

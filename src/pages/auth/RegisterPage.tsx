@@ -73,6 +73,11 @@ export function RegistroPage() {
           data.tem_problema_saude === "Sim" ? data.problemas_saude_custom ?? "" : "Não"
       };
 
+      if(data.senha.length < 8) {
+        setServerError("A senha deve ter no mínimo 8 caracteres.");
+        return;
+      }
+
       await cadastrar(payload);
       console.log("Dados do cadastro enviados:", payload);
       setModal(true);
