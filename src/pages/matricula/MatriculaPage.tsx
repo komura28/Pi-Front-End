@@ -10,7 +10,6 @@ import { atualizarStatusMatricula, getMatriculas } from "../../services/matricul
 import { useOutletContext } from "react-router-dom";
 
 type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA" | "CANCELADA";
-type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA";
 type AdminOutletContext = {
     atualizarMatriculasPendentes: () => Promise<void>;
 };
