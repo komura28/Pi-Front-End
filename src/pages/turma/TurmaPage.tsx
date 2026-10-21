@@ -169,24 +169,6 @@ export function TurmaPage() {
         }
     }
 
-    if (turmas.length === 0) {
-        return (
-            <div className="p-8"><p>Nenhuma turma encontrada</p>
-                {mostrarModalExclusao && (
-                <Modal
-                    titulo="Exclusão"
-                    decisao={null}
-                    message="Turma Excluída com Sucesso!"
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalExclusao(false);
-                        navigate("/app/turma");
-                    }}
-                />)}
-            </div>
-        );
-    }
-
     return (
         <div>
             <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">

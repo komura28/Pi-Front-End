@@ -19,7 +19,7 @@ export function AlunoPage() {
 
   // Paginação principal dos cards de turmas
   const [paginaTurmas, setPaginaTurmas] = useState(1);
-  const turmasPorPagina = 5; // Defina quantas turmas quer por página
+  const turmasPorPagina = 5;
 
   useEffect(() => {
     async function carregarDados() {
@@ -101,7 +101,7 @@ export function AlunoPage() {
               matricula.turma._id === turma._id
           );
 
-          const nomeTurma = `${turma.curso.name} - ${turma.turno}`;
+          const nomeTurma = `${turma.curso?.name || "Curso"} - ${turma.turno}`;
           const quantidadeAlunos = matriculasDaTurma.length;
 
           // Paginação interna dos alunos da turma
@@ -230,12 +230,12 @@ export function AlunoPage() {
         })}
       </div>
 
-      {/* Controles de Paginação dos Cards de Turmas */}
+      {/* Controles de Paginação dos Cards de Turmas (Limpo e sem texto duplicado) */}
       {!loading && totalPaginasTurmas > 1 && (
         <div className="flex items-center justify-between mt-6 px-2 text-sm text-slate-600">
-           <span className="text-slate-600">
-                        Página {paginaTurmas} de {totalPaginasTurmas}
-                    </span>
+          <span className="text-slate-600">
+            Página {paginaTurmas} de {totalPaginasTurmas}
+          </span>
           <div className="flex items-center gap-1">
             <button
               type="button"
@@ -245,9 +245,6 @@ export function AlunoPage() {
             >
               Anterior
             </button>
-            <span className="px-3 py-1.5 font-medium text-slate-700">
-              {paginaTurmas} / {totalPaginasTurmas}
-            </span>
             <button
               type="button"
               onClick={() =>

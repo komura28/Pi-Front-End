@@ -340,25 +340,6 @@ export function CursoPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
-    if (cursos.length === 0) {
-        return (
-            <div className="p-8">
-                <p>Nenhum curso encontrado</p>
-        {mostrarModalExclusao && (
-                <Modal
-                    titulo="Exclusão"
-                    message="Curso Excluído com Sucesso!"
-                    decisao={null}
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalExclusao(false);
-                        navigate("/app/curso");
-                    }}
-                />)}
-            </div>
-        );
-    }
-
     return (
         <div>
             <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
