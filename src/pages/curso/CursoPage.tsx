@@ -340,25 +340,6 @@ export function CursoPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
-    if (cursos.length === 0) {
-        return (
-            <div className="p-8">
-                <p>Nenhum curso encontrado</p>
-        {mostrarModalExclusao && (
-                <Modal
-                    titulo="Exclusão"
-                    message="Curso Excluído com Sucesso!"
-                    decisao={null}
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalExclusao(false);
-                        navigate("/app/curso");
-                    }}
-                />)}
-            </div>
-        );
-    }
-
     return (
         <div>
             <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
@@ -419,7 +400,7 @@ export function CursoPage() {
                     <button
                         onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
                         disabled={paginaAtual === 1}
-                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         Anterior
                     </button>
@@ -433,7 +414,7 @@ export function CursoPage() {
                             setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
                         }
                         disabled={paginaAtual === totalPaginas}
-                        className="px-4 py-2 border rounded-md disabled:opacity-50"
+                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         Próxima
                     </button>
