@@ -5,6 +5,7 @@ export interface authUser{
     name: string;
     cpf: number;
     email: string;
+    photo?: string | null;
     papelUsuario: papelUsuario;
     dt_nascimento?: string;
     participacao_anterior?: boolean;

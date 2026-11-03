@@ -5,6 +5,7 @@ import { useForm, type FieldErrors } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
+import { AtualizarFotoPerfilAPI } from "../../services/authService";
 
 interface CadastroFormData {
   name: string;
@@ -22,11 +23,12 @@ interface CadastroFormData {
   telefone_principal: string;
   telefone_secundario: string;
   aceite_lgpd: boolean;
+  photo?: FileList
 }
 
 export function RegistroPage() {
   const navigate = useNavigate();
-  const { cadastrar } = useAuth();
+  const { cadastrar, login } = useAuth();
   const [serverError, setServerError] = useState("");
   const [modal, setModal] = useState(false);
   const [modalLgpdOpen, setModalLgpdOpen] = useState(false);
@@ -61,13 +63,16 @@ export function RegistroPage() {
   const senhaUser = watch("senha");
   const profissaoSelecionada = watch("profissao");
   const temProblemaSaude = watch("tem_problema_saude");
+  const previewFoto = watch("photo")?.[0];
 
   async function handleCadastro(data: CadastroFormData) {
     try {
       setServerError("");
 
+      const {photo, ...dadosCadastro} = data;
+
       const payload = {
-        ...data,
+        ...dadosCadastro,
         cpf: Number(data.cpf.replace(/\D/g, "")),
         profissao: data.profissao === "Outro" ? data.profissao_custom ?? "" : data.profissao,
         problemas_saude:
@@ -80,7 +85,14 @@ export function RegistroPage() {
       }
 
       await cadastrar(payload);
-      console.log("Dados do cadastro enviados:", payload);
+      await login({
+        email: data.email,
+        senha: data.senha
+      });
+
+      if(photo?.[0]) {
+        await AtualizarFotoPerfilAPI(photo[0])
+      }
       setModal(true);
     } catch (error) {
       console.log(error);
@@ -394,6 +406,25 @@ export function RegistroPage() {
             {errors.confirmarSenha && (
               <p className="mt-1 text-sm text-red-600">
                 {errors.confirmarSenha.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="photo"
+            className="mb-1 block text-sm font-medium text-gray-700">
+              Foto de Perfil(Opcional)
+            </label>
+            <input 
+            id="photo"
+            type="file"
+            accept="image/*"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            {...register("photo")}
+            />
+            {previewFoto && (
+              <p className="mt-2 text-sm text-gray-500">
+                Imagem Selecionada: {previewFoto.name}
               </p>
             )}
           </div>

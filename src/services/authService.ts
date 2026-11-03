@@ -2,9 +2,24 @@ import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaR
 import { api } from "./api";
 
 
-export async function Register(data: RegisterRequest): Promise<authUser> {
-    const response = await api.post("/auth/register", data)
+export async function Register(data: RegisterRequest, foto?: File): Promise<authUser> {
+    const formData = new FormData();
+
+
+    if(foto) {
+        formData.append("photo", foto);
+    }
+
+    const response = await api.post("/auth/register", formData, data);
     return response.data;
+}
+
+export async function AtualizarFotoPerfilAPI(arquivo: File) {
+    const  formData = new FormData();
+
+    formData.append("photo", arquivo);
+
+    const response = await api.put("/user/me/photo", formData);
 }
 
 export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
