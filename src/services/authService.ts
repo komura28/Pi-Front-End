@@ -5,12 +5,17 @@ import { api } from "./api";
 export async function Register(data: RegisterRequest, foto?: File): Promise<authUser> {
     const formData = new FormData();
 
+    Object.entries(data).forEach(([key, value]) => {
+        if(value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+        }
+    });
 
     if(foto) {
         formData.append("photo", foto);
     }
 
-    const response = await api.post("/auth/register", formData, data);
+    const response = await api.post("/auth/register", formData);
     return response.data;
 }
 

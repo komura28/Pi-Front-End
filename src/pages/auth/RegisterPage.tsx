@@ -5,7 +5,6 @@ import { useForm, type FieldErrors } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
-import { AtualizarFotoPerfilAPI } from "../../services/authService";
 
 interface CadastroFormData {
   name: string;
@@ -84,15 +83,11 @@ export function RegistroPage() {
         return;
       }
 
-      await cadastrar(payload);
+      await cadastrar(payload, photo?.[0]);
       await login({
         email: data.email,
         senha: data.senha
       });
-
-      if(photo?.[0]) {
-        await AtualizarFotoPerfilAPI(photo[0])
-      }
       setModal(true);
     } catch (error) {
       console.log(error);
