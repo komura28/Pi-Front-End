@@ -63,7 +63,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                     <>
                         <div>
                             <p className="text-sm text-white">Bem-vindo a </p>
-                            <h1 className="text-lg font-semibold text-white">TESTE DOCKER!</h1>
+                            <h1 className="text-lg font-semibold text-white">Aticurando</h1>
                         </div>
 
 
