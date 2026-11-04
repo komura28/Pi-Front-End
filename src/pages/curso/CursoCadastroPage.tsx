@@ -144,7 +144,7 @@ export function CursoCadastroPage() {
                         </div>
 
                         <label className="mb-1 block text-gray-700 font-bold text-sm">
-                         Descrição (Matéria)
+                            Descrição (Matéria)
                         </label>
 
                         <div className="flex flex-wrap gap-2">
@@ -161,11 +161,11 @@ export function CursoCadastroPage() {
                                     }
                                 }} />
                             <button
-                            type="button"
-                            onClick={handleMateria}
-                            className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-xl font-bold text-white transition hover:bg-blue-700 cursor-pointer pb-1 leading-none"
+                                type="button"
+                                onClick={handleMateria}
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-xl font-bold text-white transition hover:bg-blue-700 cursor-pointer pb-1 leading-none"
                             >
-                                 +
+                                +
                             </button>
                         </div>
                     </div>
@@ -233,6 +233,12 @@ export function CursoCadastroPage() {
 
                         ))}
                     </div>
+
+                    {serverError && (
+                        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
+                            {serverError}
+                        </div>
+                    )}
 
                     <button
                         type="submit"

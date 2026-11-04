@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { getCurso, getTurma } from "../../services/authService";
-import type { authCurso, authTurma, TurmaMatricula } from "../../types/auth/auth-types";
+import { getTurma } from "../../services/authService";
+import type { TurmaMatricula } from "../../types/auth/auth-types";
 import { CardTurma } from "../../components/CardTurma";
 import { Carousel } from "../../components/Carousel";
 
 
 export function HomeAlunoPage() {
 
-    const [cursos, setCursos] = useState<authCurso[]>([]);
     const [turmas, setTurmas] = useState<TurmaMatricula[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -64,6 +63,22 @@ export function HomeAlunoPage() {
         carregarTurmas();
     }, []);
 
+    if (loading) {
+        return (
+            <div className="p-8">
+                <p>Carregando turmas...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-8 text-red-600">
+                <p>{error}</p>
+            </div>
+        );
+    }
+
     return (
         <main className="min-h-screen bg-gray-100 p-8">
             <div className="mb-8 rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-700 p-8 text-white shadow-lg">
@@ -76,9 +91,9 @@ export function HomeAlunoPage() {
                 </p>
             </div>
 
-             <div className="mb-10 overflow-hidden rounded-2xl shadow-lg">
+            <div className="mb-10 overflow-hidden rounded-2xl shadow-lg">
                 <Carousel />
-            </div> 
+            </div>
 
             <h2 className="mb-6 text-2xl font-semibold text-gray-800">
                 Confira as oportunidades disponíveis e candidate-se:

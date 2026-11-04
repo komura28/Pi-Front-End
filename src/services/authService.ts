@@ -1,4 +1,5 @@
 import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse, TurmaMatricula } from "../types/auth/auth-types";
+import type { IUserDTO } from "../types/user/user-types";
 import { api } from "./api";
 
 
@@ -84,8 +85,8 @@ export async function getCurso() {
     return response.data;
 }
 
-export async function getUser() {
-    const response = await api.get("/user")
+export async function getUser(): Promise<IUserDTO[]> {
+    const response = await api.get<IUserDTO[]>("/user")
 
     return response.data;
 }
