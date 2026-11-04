@@ -67,6 +67,18 @@ export interface RegisterCursoRequest{
     materias: authMateriaInput[];
 }
 
+export interface RegisterProfessorRequest{
+    name: string;
+    cpf: string;
+    email: string;
+    senha: string;
+    confirmarSenha: string;
+    dt_nascimento: string;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario: string;
+}
+
 export interface authTurma{
     _id: string,
     curso: authCurso,

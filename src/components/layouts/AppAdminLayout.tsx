@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { SideBar } from "../SideBar";
 import { Header } from "../Header";
-import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
+import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers, FaUserTie } from "react-icons/fa"
 import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 import { LucideBellRing } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,6 +34,11 @@ const adminNavItems = [
             { label: "Listar Turmas", href: "/app/turma", iconF: <FaList /> },
         ]
 
+    },
+    {
+        label: "Cadastrar Professor",
+        href: "/app/register-professor",
+        icon: <FaUserTie />,
     },
     {
         label: "Matrículas",
