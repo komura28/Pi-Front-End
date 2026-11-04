@@ -1,6 +1,6 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
@@ -407,21 +407,33 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="photo"
-            className="mb-1 block text-sm font-medium text-gray-700">
-              Foto de Perfil(Opcional)
+            className="mb-2 block text-sm font-medium text-gray-700">
+              Foto de Perfil<span className="text-gray-400">(Opcional)</span>
+            </label>
+            <label 
+            htmlFor="photo" 
+            className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 transition hover:border-blue-500 hover:bg-blue-50">
+              <i className="fa-solid fa-cloud-arrow-up mb-3 text-3xl text-blue-500"></i>
+              <span className="text-sm font-semibold text-gray-700">
+                Clique para selecionar uma imagem
+              </span>
+              <span className="mt-1 text-xs text-gray-500">
+                PNG, JPG ou JPEG
+              </span>
+              {previewFoto && (
+                <span className="mt-3 text-sm font-medium text-blue-600">
+                  <i className="fa-solid fa-circle-check mr-1"></i>
+                  {previewFoto.name}
+                </span>
+              )}
             </label>
             <input 
             id="photo"
             type="file"
             accept="image/*"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="hidden"
             {...register("photo")}
             />
-            {previewFoto && (
-              <p className="mt-2 text-sm text-gray-500">
-                Imagem Selecionada: {previewFoto.name}
-              </p>
-            )}
           </div>
 
           <div className="flex items-start gap-2 pt-2">
