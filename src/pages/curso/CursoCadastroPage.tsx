@@ -280,11 +280,15 @@ export function CursoCadastroPage() {
                         className="space-y-5"
                     >
                         <div>
-                            <label className="mb-1 block text-sm font-bold text-gray-700">
+                            <label
+                                htmlFor="curso-nome"
+                                className="mb-1 block text-sm font-bold text-gray-700"
+                            >
                                 Nome do Curso
                             </label>
 
                             <input
+                                id="curso-nome"
                                 className={inputClass}
                                 placeholder="Digite o nome do curso"
                                 {...register("name", {
@@ -300,11 +304,15 @@ export function CursoCadastroPage() {
                         </div>
 
                         <div>
-                            <label className="mb-1 block text-sm font-bold text-gray-700">
+                            <label
+                                htmlFor="curso-descricao"
+                                className="mb-1 block text-sm font-bold text-gray-700"
+                            >
                                 Descrição
                             </label>
 
                             <textarea
+                                id="curso-descricao"
                                 rows={3}
                                 className={inputClass}
                                 placeholder="Descrição do curso"

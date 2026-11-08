@@ -45,20 +45,24 @@ export function AulaModal({
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-6">
             <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
 
-                    <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
-                        {aula ? "Editar Aula" : "Adicionar Aula"}
-                    </h2>
+                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
+                    {aula ? "Editar Aula" : "Adicionar Aula"}
+                </h2>
 
                 <form
                     onSubmit={handleSubmit(salvar)}
                     className="space-y-4"
                 >
                     <div>
-                        <label className="mb-1 block text-sm font-bold text-gray-700">
+                        <label
+                            htmlFor="aula-titulo"
+                            className="mb-1 block text-sm font-bold text-gray-700"
+                        >
                             Título
                         </label>
 
                         <input
+                            id="aula-titulo"
                             className={inputClass}
                             placeholder="Ex: Introdução à Informática"
                             {...register("titulo", {
@@ -77,11 +81,15 @@ export function AulaModal({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-bold text-gray-700">
+                        <label
+                            htmlFor="aula-descricao"
+                            className="mb-1 block text-sm font-bold text-gray-700"
+                        >
                             Descrição
                         </label>
 
                         <textarea
+                            id="aula-descricao"
                             rows={4}
                             className={inputClass}
                             placeholder="Descreva o conteúdo da aula"
@@ -101,11 +109,15 @@ export function AulaModal({
                     </div>
 
                     <div>
-                        <label className="mb-1 block text-sm font-bold text-gray-700">
+                        <label
+                            htmlFor="aula-duracao"
+                            className="mb-1 block text-sm font-bold text-gray-700"
+                        >
                             Duração (minutos)
                         </label>
 
                         <input
+                            id="aula-duracao"
                             type="number"
                             min={1}
                             step={1}
