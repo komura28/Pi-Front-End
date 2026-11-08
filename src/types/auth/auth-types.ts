@@ -1,6 +1,6 @@
 export type papelUsuario = "ALUNO" | "ADM" | "PROFESSOR";
 
-export interface authUser{
+export interface authUser {
     id: string;
     name: string;
     cpf: number;
@@ -15,17 +15,17 @@ export interface authUser{
     problemas_saude?: string;
 }
 
-export interface LoginRequest{
+export interface LoginRequest {
     email: string;
     senha: string;
 }
 
-export interface LoginResponse{
+export interface LoginResponse {
     token: string;
     user: authUser;
 }
 
-export interface RegisterRequest{
+export interface RegisterRequest {
     name: string;
     cpf: number;
     email: string;
@@ -40,34 +40,34 @@ export interface RegisterRequest{
     problemas_saude: string;
 }
 
-export interface authMateriaInput{
+export interface authMateriaInput {
     name: string;
     description: string;
 }
 
-export interface authMateria extends authMateriaInput{
+export interface authMateria extends authMateriaInput {
     _id: string;
 
 }
 
-export interface authCursoMateria{
+export interface authCursoMateria {
     materia: authMateria;
 }
 
-export interface authCurso{
+export interface authCurso {
     _id: string,
     name: string,
     description: string,
     materias: authCursoMateria[]
 }
 
-export interface RegisterCursoRequest{
+export interface RegisterCursoRequest {
     name: string;
     description: string;
     materias: authMateriaInput[];
 }
 
-export interface authTurma{
+export interface authTurma {
     _id: string,
     curso: authCurso,
     turno: string,
@@ -76,12 +76,12 @@ export interface authTurma{
     dataFim: string
 }
 
-export interface TurmaMatricula{
+export interface TurmaMatricula {
     turma: authTurma;
     vagasDisponiveis: number;
 }
 
-export interface RegisterTurmaRequest{
+export interface RegisterTurmaRequest {
     curso: string;
     turno: string;
     capacidade: number;
@@ -89,21 +89,21 @@ export interface RegisterTurmaRequest{
     dataFim: Date;
 }
 
-export interface EsqueciSenhaRequest{
+export interface EsqueciSenhaRequest {
     email: string;
 }
 
-export interface ResetarSenhaRequest{
+export interface ResetarSenhaRequest {
     token: string;
     senha: string;
     confirmarSenha: string;
 }
 
-export interface EsqueciSenhaResponse{
+export interface EsqueciSenhaResponse {
     message: string;
 }
 
-export interface ResetarSenhaResponse{
+export interface ResetarSenhaResponse {
     message: string;
 }
 
@@ -114,4 +114,40 @@ export interface RegisterAulaRequest {
     materiaId: string;
     ordem: number;
     active?: boolean;
+}
+
+export type StatusAulaTurma =
+    | "PENDENTE"
+    | "AGENDADA"
+    | "REALIZADA"
+    | "CANCELADA";
+
+export interface Professor {
+    _id: string;
+    name: string;
+    email: string;
+}
+
+export interface AulaTurma {
+    _id: string;
+    aula: {
+        _id: string;
+        titulo: string;
+        descricao: string;
+        duracao: number;
+        ordem: number;
+        materiaId: string;
+    };
+    turma: string;
+    dataInicio?: string;
+    dataFim?: string;
+    professor?: Professor | null;
+    status: StatusAulaTurma;
+}
+
+export interface AgendarAulaRequest {
+    dataInicio: string;
+    dataFim: string;
+    professor: string;
+    status: "AGENDADA";
 }
