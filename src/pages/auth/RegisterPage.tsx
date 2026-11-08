@@ -152,10 +152,11 @@ export function RegistroPage() {
           className="space-y-4"
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
               Nome
             </label>
             <input
+            id="name"
               type="text"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
               placeholder="Digite o nome"
@@ -170,10 +171,11 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="cpf" className="mb-1 block text-sm font-medium text-gray-700">
                 CPF
               </label>
               <input
+              id="cpf"
                 type="text"
                 maxLength={14}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -195,10 +197,11 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="dt_nascimento" className="mb-1 block text-sm font-medium text-gray-700">
                 Data de Nascimento
               </label>
               <input
+              id="dt_nascimento"
                 type="date"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 {...register("dt_nascimento", {
@@ -214,10 +217,11 @@ export function RegistroPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
               E-mail
             </label>
             <input
+            id="email"
               type="email"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
               placeholder="admin@gmail.com"
@@ -234,10 +238,11 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="telefone_principal" className="mb-1 block text-sm font-medium text-gray-700">
                 Telefone Principal
               </label>
               <input
+              id="telefone_principal"
                 type="text"
                 maxLength={15}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -260,10 +265,11 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="telefone_secundario" className="mb-1 block text-sm font-medium text-gray-700">
                 Telefone Secundário/Reserva
               </label>
               <input
+              id="telefone_secundario"
                 type="text"
                 maxLength={15}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -288,10 +294,11 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="estado_civil" className="mb-1 block text-sm font-medium text-gray-700">
                 Estado Civil
               </label>
               <select
+              id="estado_civil"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
                 {...register("estado_civil", {
                   required: "Selecione o estado civil",
@@ -312,10 +319,11 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="profissao" className="mb-1 block text-sm font-medium text-gray-700">
                 Profissão
               </label>
               <select
+                id="profissao"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
                 {...register("profissao", {
                   required: "Selecione a profissão",
@@ -339,10 +347,11 @@ export function RegistroPage() {
 
           {profissaoSelecionada === "Outro" && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="profissao_custom"className="mb-1 block text-sm font-medium text-gray-700">
                 Especifique a profissão
               </label>
               <input
+              id="profissao_custom"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 placeholder="Qual sua profissão?"
@@ -360,10 +369,11 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="tem_problema_saude" className="mb-1 block text-sm font-medium text-gray-700">
                 Possui problema de saúde?
               </label>
               <select
+                id="tem_problema_saude"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
                 {...register("tem_problema_saude", {
                   required: "Selecione uma opção",
@@ -381,10 +391,11 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="participacao_anterior" className="mb-1 block text-sm font-medium text-gray-700">
                 Você já foi ou é palhaço voluntário?
               </label>
               <select
+                id="participacao_anterior"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
                 {...register("participacao_anterior", {
                   setValueAs: (v) => (v === "" ? undefined : v === "true"),
@@ -406,10 +417,11 @@ export function RegistroPage() {
 
           {temProblemaSaude === "Sim" && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label htmlFor="problemas_saude_custom" className="mb-1 block text-sm font-medium text-gray-700">
                 Qual problema de saúde/doença você possui?
               </label>
               <input
+              id="problemas_saude_custom"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 placeholder="Digite a doença ou condição de saúde"
@@ -426,11 +438,12 @@ export function RegistroPage() {
           )}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="senha" className="mb-1 block text-sm font-medium text-gray-700">
               Senha
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
+              id="senha"
                 type={mostrarSenha ? "text" : "password"}
                 className="w-full bg-transparent outline-none"
                 placeholder="Digite sua Senha"
@@ -490,11 +503,12 @@ export function RegistroPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="confirmarSenha" className="mb-1 block text-sm font-medium text-gray-700">
               Confirmar Senha
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
+              id="confirmarSenha"
                 type={mostrConfirmSenha ? "text" : "password"}
                 className="w-full bg-transparent outline-none"
                 placeholder="Confirme sua Senha"
