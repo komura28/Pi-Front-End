@@ -108,3 +108,12 @@ export interface EsqueciSenhaResponse {
 export interface ResetarSenhaResponse {
     message: string;
 }
+
+export interface RegisterAulaRequest {
+    titulo: string;
+    descricao: string;
+    duracao: number;
+    materiaId: string;
+    ordem: number;
+    active?: boolean;
+}
