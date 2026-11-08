@@ -5,6 +5,7 @@ export interface authUser {
     name: string;
     cpf: number;
     email: string;
+    photo?: string | null;
     papelUsuario: papelUsuario;
     dt_nascimento?: string;
     participacao_anterior?: boolean;
@@ -38,6 +39,7 @@ export interface RegisterRequest {
     telefone_secundario: string;
     profissao: string;
     problemas_saude: string;
+    aceite_lgpd: boolean;
 }
 
 export interface authMateriaInput {
