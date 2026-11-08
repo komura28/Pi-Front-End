@@ -11,6 +11,7 @@ import { UserPage } from "../pages/user/UserPage";
 import { AlunoPage } from "../pages/aluno/AlunoPage";
 import { RegisterProfessorPage } from "../pages/professor/RegisterProfessorPage";
 
+import { AulaTurmaPage } from "../pages/aula/AulaTurmaPage";
 
 export function PrivateRoutes() {
     return (
@@ -56,6 +57,12 @@ export function PrivateRoutes() {
                 <AlunoPage />
             </ProtectedRoutes>} />
 
+            <Route path="/gerenciar-aulas"element={<ProtectedRoutes allowedRoles={["ADM"]}>
+                        <AulaTurmaPage />
+                    </ProtectedRoutes>
+                }
+            />
+            
             <Route path="/*" element={<Navigate to="/app/home" replace />} />
         </Routes>
     );

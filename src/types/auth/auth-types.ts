@@ -129,4 +129,38 @@ export interface RegisterProfessorRequest {
     telefone_principal: string;
     telefone_secundario?: string;
     aceite_lgpd: boolean;
+export type StatusAulaTurma =
+    | "PENDENTE"
+    | "AGENDADA"
+    | "REALIZADA"
+    | "CANCELADA";
+
+export interface Professor {
+    _id: string;
+    name: string;
+    email: string;
+}
+
+export interface AulaTurma {
+    _id: string;
+    aula: {
+        _id: string;
+        titulo: string;
+        descricao: string;
+        duracao: number;
+        ordem: number;
+        materiaId: string;
+    };
+    turma: string;
+    dataInicio?: string;
+    dataFim?: string;
+    professor?: Professor | null;
+    status: StatusAulaTurma;
+}
+
+export interface AgendarAulaRequest {
+    dataInicio: string;
+    dataFim: string;
+    professor: string;
+    status: "AGENDADA";
 }
