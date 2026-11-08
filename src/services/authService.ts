@@ -25,6 +25,8 @@ export async function AtualizarFotoPerfilAPI(arquivo: File) {
     formData.append("photo", arquivo);
 
     const response = await api.put("/user/me/photo", formData);
+
+    return response;
 }
 
 export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
