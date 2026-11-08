@@ -130,7 +130,7 @@ export function RegistroPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 py-8 sm:px-6 lg:px-8">
-      <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+      <section className="w-full max-w-3xl rounded-2xl bg-white p-8 shadow-lg">
         <Link to="/login" className="text-blue-500 hover:underline">
           ← Voltar
         </Link>
@@ -425,7 +425,7 @@ export function RegistroPage() {
             </div>
           )}
 
-          <div>
+<div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
               Senha
             </label>
