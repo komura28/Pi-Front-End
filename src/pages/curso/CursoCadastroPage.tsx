@@ -1,32 +1,70 @@
-import { useNavigate } from "react-router-dom";
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm, useFieldArray } from "react-hook-form";
-import type { RegisterCursoRequest } from "../../types/auth/auth-types";
-import { cadastrarCurso } from "../../services/admService";
+
+import type {
+    RegisterCursoRequest,
+    RegisterAulaRequest
+} from "../../types/auth/auth-types";
+
+import {
+    cadastrarCurso,
+    cadastrarAula
+} from "../../services/admService";
+
+import {
+    AulaModal,
+    type AulaFormData
+} from "../../components/AulaModal";
+
 import { Modal } from "../../components/Modal";
 
-interface Materia {
+interface MateriaForm {
     name: string;
-    description: string
+    description: string;
+    aulas: AulaFormData[];
 }
 
 interface CadastroCursoFormData {
     name: string;
     description: string;
-    materias: Materia[];
+    materias: MateriaForm[];
 }
+
+interface ModalAulaState {
+    materiaIndex: number;
+    aulaIndex?: number;
+}
+
+const inputClass =
+    "w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500";
 
 export function CursoCadastroPage() {
     const navigate = useNavigate();
-    const [serverError, setServerError] = useState("");
+
     const [materia, setMateria] = useState("");
     const [materiaDesc, setMateriaDesc] = useState("");
-    const [modal, setModal] = useState(false);
+
+    const [modalAula, setModalAula] =
+        useState<ModalAulaState | null>(null);
+
+    const [modalSucesso, setModalSucesso] = useState(false);
+    const [serverError, setServerError] = useState("");
+
+    const [cursoSalvo, setCursoSalvo] = useState(false);
+    const [enviandoAulas, setEnviandoAulas] = useState(false);
+
+    const [aulasPendentes, setAulasPendentes] =
+        useState<RegisterAulaRequest[]>([]);
 
     const {
         register,
         handleSubmit,
         control,
+        getValues,
+        setValue,
+        watch,
         formState: { errors, isSubmitting }
     } = useForm<CadastroCursoFormData>({
         defaultValues: {
@@ -39,229 +77,477 @@ export function CursoCadastroPage() {
     const { fields, append, remove } = useFieldArray({
         control,
         name: "materias"
-    })
+    });
 
-    async function handleCadastro(data: CadastroCursoFormData) {
+    const materiasAtuais = watch("materias") ?? [];
+
+    function adicionarMateria() {
+        const nome = materia.trim();
+
+        if (!nome) {
+            setServerError("Informe o nome da matéria.");
+            return;
+        }
+
+        append({
+            name: nome,
+            description: materiaDesc.trim(),
+            aulas: []
+        });
+
+        setMateria("");
+        setMateriaDesc("");
+        setServerError("");
+    }
+
+    function salvarAula(aula: AulaFormData) {
+        if (!modalAula) return;
+
+        const { materiaIndex, aulaIndex } = modalAula;
+
+        const aulas = [
+            ...(getValues(`materias.${materiaIndex}.aulas`) ?? [])
+        ];
+
+        if (aulaIndex !== undefined) {
+            aulas[aulaIndex] = aula;
+        } else {
+            aulas.push(aula);
+        }
+
+        setValue(
+            `materias.${materiaIndex}.aulas`,
+            aulas,
+            { shouldDirty: true, shouldValidate: true }
+        );
+
+        setModalAula(null);
+    }
+
+    function removerAula(
+        materiaIndex: number,
+        aulaIndex: number
+    ) {
+        const aulas = [
+            ...(getValues(`materias.${materiaIndex}.aulas`) ?? [])
+        ];
+
+        aulas.splice(aulaIndex, 1);
+
+        setValue(
+            `materias.${materiaIndex}.aulas`,
+            aulas,
+            { shouldDirty: true }
+        );
+    }
+
+    function mensagemErro(error: unknown): string {
+        if (
+            typeof error === "object" &&
+            error !== null &&
+            "response" in error
+        ) {
+            const axiosError = error as {
+                response?: {
+                    data?: {
+                        message?: string;
+                        error?: string;
+                    };
+                };
+            };
+
+            const mensagem =
+                axiosError.response?.data?.message ??
+                axiosError.response?.data?.error;
+
+            if (mensagem) return mensagem;
+        }
+
+        return error instanceof Error
+            ? error.message
+            : "Erro inesperado no cadastro.";
+    }
+
+    async function enviarAulas(
+        fila: RegisterAulaRequest[]
+    ) {
+        setEnviandoAulas(true);
+        setServerError("");
+
+        try {
+            for (let i = 0; i < fila.length; i++) {
+                try {
+                    await cadastrarAula(fila[i]);
+                } catch (error) {
+                    setAulasPendentes(fila.slice(i));
+                    setServerError(
+                        "O curso foi criado, mas algumas aulas não foram cadastradas. " +
+                        mensagemErro(error)
+                    );
+                    return;
+                }
+
+                setAulasPendentes(fila.slice(i + 1));
+            }
+
+            setAulasPendentes([]);
+            setModalSucesso(true);
+        } finally {
+            setEnviandoAulas(false);
+        }
+    }
+
+    async function handleCadastro(
+        data: CadastroCursoFormData
+    ) {
+        if (cursoSalvo) return;
+
         try {
             setServerError("");
-            const dados: RegisterCursoRequest = {
-                name: data.name,
-                description: data.description,
-                materias: data.materias.map(materia => ({ name: materia.name, description: materia.description }))
+
+            const dadosCurso: RegisterCursoRequest = {
+                name: data.name.trim(),
+                description: data.description.trim(),
+                materias: data.materias.map(item => ({
+                    name: item.name,
+                    description: item.description
+                }))
             };
-            await cadastrarCurso(dados);
-            setModal(true);
+
+            const cursoCriado = await cadastrarCurso(dadosCurso);
+
+            setCursoSalvo(true);
+
+            if (
+                cursoCriado.materias.length !==
+                data.materias.length
+            ) {
+                setServerError(
+                    "Curso criado, mas a quantidade de matérias retornada pela API não corresponde ao formulário."
+                );
+                return;
+            }
+
+            const fila: RegisterAulaRequest[] = [];
+
+            data.materias.forEach((materia, index) => {
+                const materiaId =
+                    cursoCriado.materias[index]?.materia?._id;
+
+                if (!materiaId) {
+                    throw new Error(
+                        "Não foi possível obter o ID da matéria criada."
+                    );
+                }
+
+                materia.aulas.forEach((aula, aulaIndex) => {
+                    fila.push({
+                        titulo: aula.titulo,
+                        descricao: aula.descricao,
+                        duracao: aula.duracao,
+                        materiaId,
+                        ordem: aulaIndex + 1,
+                        active: true
+                    });
+                });
+            });
+
+            setAulasPendentes(fila);
+            await enviarAulas(fila);
+
         } catch (error) {
-            console.log(error);
-            setServerError(error instanceof Error ? error.message : "Erro na hora de realizar o cadastro")
+            setServerError(mensagemErro(error));
         }
-        console.log("objeto: ", data);
     }
 
-    const onError = (errors: any) => {
-        console.log("Erros de validação do formulário:", errors);
-    }
-
-    const handleMateria = () => {
-        const limpo = materia.trim();
-        const limpoDesc = materiaDesc.trim();
-
-        if (!limpo) return;
-
-        append({ name: limpo, description: limpoDesc });
-
-        setMateriaDesc("");
-        setMateria("");
-    };
-
+    const aulaEmEdicao =
+        modalAula?.aulaIndex !== undefined
+            ? materiasAtuais[modalAula.materiaIndex]
+                ?.aulas?.[modalAula.aulaIndex]
+            : undefined;
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-white px-4">
+        <main className="flex min-h-screen items-center justify-center bg-white px-4 py-8">
             <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
-                <h1 className="mb-2 text-center text-3xl font-bold text-gray-800">
+
+                <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
                     Cadastro de Curso
                 </h1>
 
-                <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
-
-                    <div>
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Nome
-                        </label>
-
-                        <input
-                            type="text"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite o nome do curso"
-                            {...register("name", {
-                                required: "O nome é obrigatório",
-                            })}
-                        />
-                        {errors.name && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.name.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-sm font-bold text-gray-700">
-                            Descrição
-                        </label>
-                        <input
-                            type="text"
-                            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
-                            placeholder="Digite a descrição"
-                            {...register("description", {
-                                required: "A descrição é obrigatório",
-                            })}
-                        />
-                        {errors.description && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.description.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Nome da Matéria
-                        </label>
-
-                        <div className="flex flex-col gap-3">
-                            <input
-                                type="text"
-                                value={materia}
-                                onChange={(e) => setMateria(e.target.value)}
-                                className="mb-5 flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                placeholder="Digite o nome da matéria"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        handleMateria();
-                                    }
-                                }} />
-                        </div>
-
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Descrição (Matéria)
-                        </label>
-
-                        <div className="flex flex-wrap gap-2">
-                            <input
-                                type="text"
-                                value={materiaDesc}
-                                onChange={(e) => setMateriaDesc(e.target.value)}
-                                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                                placeholder="Digite a descrição da matéria"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        handleMateria();
-                                    }
-                                }} />
-                            <button
-                                type="button"
-                                onClick={handleMateria}
-                                className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-xl font-bold text-white transition hover:bg-blue-700 cursor-pointer pb-1 leading-none"
+                {!cursoSalvo ? (
+                    <form
+                        onSubmit={handleSubmit(handleCadastro)}
+                        className="space-y-5"
+                    >
+                        <div>
+                            <label
+                                htmlFor="curso-nome"
+                                className="mb-1 block text-sm font-bold text-gray-700"
                             >
-                                +
-                            </button>
+                                Nome do Curso
+                            </label>
+
+                            <input
+                                id="curso-nome"
+                                className={inputClass}
+                                placeholder="Digite o nome do curso"
+                                {...register("name", {
+                                    required: "O nome é obrigatório"
+                                })}
+                            />
+
+                            {errors.name && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.name.message}
+                                </p>
+                            )}
                         </div>
-                    </div>
 
-                    <div className="mt-4 max-h-60 overflow-y-auto space-y-2">
-                        {fields.length > 0 && (
-                            <div className="grid grid-cols-12 gap-2 px-3 py-1 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                <span className="col-span-4">Nome</span>
-                                <span className="col-span-6">Descrição</span>
-                                <span className="col-span-2">Ação</span>
-                            </div>
+                        <div>
+                            <label
+                                htmlFor="curso-descricao"
+                                className="mb-1 block text-sm font-bold text-gray-700"
+                            >
+                                Descrição
+                            </label>
 
-                        )}
-                        {fields.map((field, index) => (
-                            <div key={field.id}
-                                className="grid grid-cols-12 gap-2 items-center rounded-lg bg-gray-50 px-3 py-2 border border-gray-200 text-sm">
-                                <div className="col-span-4 font-medium text-gray-900 break-words whitespace-normal">
+                            <textarea
+                                id="curso-descricao"
+                                rows={3}
+                                className={inputClass}
+                                placeholder="Descrição do curso"
+                                {...register("description", {
+                                    required: "A descrição é obrigatória"
+                                })}
+                            />
+
+                            {errors.description && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.description.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="border-t border-gray-200 pt-5">
+                            <h2 className="mb-4 text-xl font-bold text-gray-800">
+                                Matérias do Curso
+                            </h2>
+
+                            <div className="space-y-3">
+                                <input
+                                    value={materia}
+                                    onChange={e => setMateria(e.target.value)}
+                                    className={inputClass}
+                                    placeholder="Nome da matéria"
+                                />
+
+                                <div className="flex items-center gap-2">
                                     <input
-                                        type="hidden"
-
-                                        {...register(`materias.${index}.name` as const, {
-                                            required: "O nome da matéria é obrigatório"
-                                        })}
+                                        value={materiaDesc}
+                                        onChange={e => setMateriaDesc(e.target.value)}
+                                        className={`${inputClass} flex-1 min-w-0`}
+                                        placeholder="Descrição da matéria"
                                     />
-                                    {field.name}
-                                </div>
 
-                                <div className="col-span-6 text-gray-600 break-words whitespace-normal">
-                                    <input
-
-                                        type="hidden"
-
-                                        {...register(`materias.${index}.description` as const, {
-                                            required: "A descrição da matéria é obrigatório"
-                                        })}
-                                    />
-                                    {field.description}
-                                </div>
-
-
-
-                                {errors.materias?.[index]?.name && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                        {errors.materias[index].name.message}
-                                    </p>
-                                )}
-
-                                <div className="col-span-2 text-right">
                                     <button
                                         type="button"
-                                        onClick={() => remove(index)}
-                                        disabled={isSubmitting}
-                                        className="w-auto rounded-lg bg-red-100 px-3 py-2 font-medium text-red-600 transition hover:bg-red-200 cursor-pointer disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                        onClick={adicionarMateria}
+                                        title="Adicionar matéria"
+                                        aria-label="Adicionar matéria"
+                                        className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold leading-none text-white transition hover:bg-blue-700"
                                     >
-                                        {isSubmitting ? "Removendo..." : "Remover"}
+                                        +
                                     </button>
                                 </div>
-
-                                {errors.materias?.[index]?.name && (
-                                    <p className="col-span-12 mt-1 text-xs text-red-600">
-                                        {errors.materias[index]?.name.message}
-                                    </p>
-                                )}
                             </div>
-
-                        ))}
-                    </div>
-
-                    {serverError && (
-                        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
-                            {serverError}
                         </div>
-                    )}
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer disabled:bg-blue-300"
-                    >
-                        {isSubmitting ? "Cadastando..." : "Cadastrar"}
-                    </button>
-                </form>
-                {modal && (
+                        <div className="space-y-4">
+                            {fields.map((field, index) => {
+                                const aulas =
+                                    materiasAtuais[index]?.aulas ?? [];
+
+                                return (
+                                    <div
+                                        key={field.id}
+                                        className="rounded-xl border border-gray-200 bg-gray-50 p-4"
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <h3 className="font-bold text-gray-800">
+                                                    {field.name}
+                                                </h3>
+
+                                                <p className="text-sm text-gray-600">
+                                                    {field.description}
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => remove(index)}
+                                                className="cursor-pointer text-sm font-semibold text-red-600 hover:text-red-800"
+                                            >
+                                                Remover
+                                            </button>
+                                        </div>
+
+                                        <input
+                                            type="hidden"
+                                            {...register(
+                                                `materias.${index}.name`
+                                            )}
+                                        />
+
+                                        <input
+                                            type="hidden"
+                                            {...register(
+                                                `materias.${index}.description`
+                                            )}
+                                        />
+
+                                        <div className="mt-4 border-t border-gray-200 pt-3">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <p className="text-sm font-semibold text-gray-700">
+                                                    {aulas.length} aula(s)
+                                                </p>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setModalAula({
+                                                            materiaIndex: index
+                                                        })
+                                                    }
+                                                    title="Adicionar aula"
+                                                    aria-label="Adicionar aula"
+                                                    className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold leading-none text-white transition hover:bg-blue-700"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+
+                                            {aulas.length > 0 && (
+                                                <div className="mt-3 space-y-2">
+                                                    {aulas.map((aula, aulaIndex) => (
+                                                        <div
+                                                            key={aulaIndex}
+                                                            className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-3"
+                                                        >
+                                                            <div className="min-w-0">
+                                                                <p className="truncate text-sm font-semibold text-gray-800">
+                                                                    {aulaIndex + 1}. {aula.titulo}
+                                                                </p>
+
+                                                                <p className="text-xs text-gray-500">
+                                                                    {aula.duracao} minutos
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="flex shrink-0 gap-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setModalAula({
+                                                                            materiaIndex: index,
+                                                                            aulaIndex
+                                                                        })
+                                                                    }
+                                                                    className="cursor-pointer text-sm font-semibold text-blue-600"
+                                                                >
+                                                                    Editar
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        removerAula(
+                                                                            index,
+                                                                            aulaIndex
+                                                                        )
+                                                                    }
+                                                                    className="cursor-pointer text-sm font-semibold text-red-600"
+                                                                >
+                                                                    Remover
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {serverError && (
+                            <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700">
+                                {serverError}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting || enviandoAulas}
+                            className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                        >
+                            {isSubmitting || enviandoAulas
+                                ? "Cadastrando..."
+                                : "Cadastrar Curso"}
+                        </button>
+                    </form>
+                ) : (
+                    <div className="space-y-4">
+                        <p className="font-semibold text-gray-800">
+                            O curso e as matérias foram salvos.
+                        </p>
+
+                        {serverError && (
+                            <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700">
+                                {serverError}
+                            </div>
+                        )}
+
+                        {aulasPendentes.length > 0 && (
+                            <button
+                                type="button"
+                                disabled={enviandoAulas}
+                                onClick={() =>
+                                    void enviarAulas(aulasPendentes)
+                                }
+                                className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
+                            >
+                                {enviandoAulas
+                                    ? "Enviando aulas..."
+                                    : "Tentar cadastrar aulas pendentes"}
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {modalAula && (
+                    <AulaModal
+                        key={`${modalAula.materiaIndex}-${modalAula.aulaIndex ?? "nova"}`}
+                        aula={aulaEmEdicao}
+                        onClose={() => setModalAula(null)}
+                        onSave={salvarAula}
+                    />
+                )}
+
+                {modalSucesso && (
                     <Modal
                         titulo="Cadastro"
-                        message="Curso Cadastrado com Sucesso!"
+                        message="Curso, matérias e aulas cadastrados com sucesso!"
                         decisao={null}
                         texto="Ok"
                         opSim={() => {
-                            setModal(false);
+                            setModalSucesso(false);
                             navigate("/app/curso");
-
                         }}
-                    />)}
-
+                    />
+                )}
             </section>
         </main>
     );
-};
+}
