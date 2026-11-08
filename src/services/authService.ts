@@ -3,12 +3,34 @@ import type { IUserDTO } from "../types/user/user-types";
 import { api } from "./api";
 
 
-export async function Register(data: RegisterRequest): Promise<authUser> {
-    const response = await api.post("/auth/register", data)
+export async function Register(data: RegisterRequest, foto?: File): Promise<authUser> {
+    const formData = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+        if(value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+        }
+    });
+
+    if(foto) {
+        formData.append("photo", foto);
+    }
+
+    const response = await api.post("/auth/register", formData);
     return response.data;
 }
 
-export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> {
+export async function AtualizarFotoPerfilAPI(arquivo: File) {
+    const  formData = new FormData();
+
+    formData.append("photo", arquivo);
+
+    const response = await api.put("/user/me/photo", formData);
+
+    return response;
+}
+
+export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
     const response = await api.post("/curso", data)
     return response.data
 }

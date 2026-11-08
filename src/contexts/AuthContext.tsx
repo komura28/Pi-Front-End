@@ -8,7 +8,7 @@ interface AuthContextData {
     isAuthenticated: boolean;
     isAdmin: boolean;
     control: boolean;
-    cadastrar: (data: RegisterRequest) => Promise<void>;
+    cadastrar: (data: RegisterRequest, foto?: File) => Promise<void>;
     login: (data: LoginRequest) => Promise<authUser>;
     logout: () => void;
     esqueciSenha: (data: EsqueciSenhaRequest) => Promise<void>;
@@ -84,8 +84,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await ResetarSenhaApi(data)
     }
 
-    async function cadastrar(data: RegisterRequest) {
-        await Register(data); //UsuarioService
+    async function cadastrar(data: RegisterRequest, foto?: File) {
+        await Register(data, foto); //UsuarioService
     }
 
     function logout() {
