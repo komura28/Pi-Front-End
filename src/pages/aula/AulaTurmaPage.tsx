@@ -33,6 +33,40 @@ function formatarData(data?: string | null) {
     });
 }
 
+function calcularTerminoPrevisto(
+    inicio: string,
+    duracao: number
+): string | null {
+    if (!inicio || !Number.isFinite(duracao) || duracao <= 0) {
+        return null;
+    }
+
+    const dataInicio = new Date(inicio);
+
+    if (Number.isNaN(dataInicio.getTime())) {
+        return null;
+    }
+
+    const ano = dataInicio.getFullYear();
+
+    if (ano < 1900 || ano > 2100) {
+        return null;
+    }
+
+    const dataFim = new Date(
+        dataInicio.getTime() + duracao * 60_000
+    );
+
+    if (Number.isNaN(dataFim.getTime())) {
+        return null;
+    }
+
+    return dataFim.toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short"
+    });
+}
+
 function formatarDia(data: string) {
     return data.slice(0, 10).split("-").reverse().join("/");
 }
@@ -272,11 +306,30 @@ export function AulaTurmaPage() {
             return;
         }
 
+        const ano = dataInicio.getFullYear();
+
+        if (
+            Number.isNaN(dataInicio.getTime()) ||
+            ano < 1900 ||
+            ano > 2100 ||
+            !Number.isFinite(duracao) ||
+            duracao <= 0
+        ) {
+            setErroModal(
+                "Informe uma data válida entre os anos 1900 e 2100."
+            );
+            return;
+        }
+
         const dataFim = new Date(
             dataInicio.getTime() + duracao * 60_000
         );
 
-        // Validar período permitido da turma
+        if (Number.isNaN(dataFim.getTime())) {
+            setErroModal("Não foi possível calcular o término da aula.");
+            return;
+        }
+
         const inicioTurma = turma.dataInicio.slice(0, 10);
         const fimTurma = turma.dataFim.slice(0, 10);
 
@@ -313,7 +366,6 @@ export function AulaTurmaPage() {
                 }))
             );
 
-            // Verificar se há outra aula da mesma turma
             const conflitoTurma = agendas.some(agenda => {
                 if (agenda.turmaId !== turma._id) {
                     return false;
@@ -518,7 +570,6 @@ export function AulaTurmaPage() {
                 </button>
             </div>
 
-            {/* Modal da turma */}
             {turmaSelecionada && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-6 backdrop-blur-sm">
                     <section
@@ -693,6 +744,8 @@ export function AulaTurmaPage() {
                                         <input
                                             id={inicioId}
                                             type="datetime-local"
+                                            min="1900-01-01T00:00"
+                                            max="2100-12-31T23:59"
                                             value={inicio}
                                             onChange={e => setInicio(e.target.value)}
                                             className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-blue-500"
@@ -726,19 +779,17 @@ export function AulaTurmaPage() {
                                         </select>
                                     </div>
 
-                                    {inicio && aulaSelecionada.aula && (
+                                    {aulaSelecionada.aula && (
                                         <div className="rounded-lg bg-blue-50 p-4">
                                             <p className="text-sm text-gray-600">
                                                 Término previsto
                                             </p>
 
                                             <p className="font-semibold text-blue-700">
-                                                {formatarData(
-                                                    new Date(
-                                                        new Date(inicio).getTime() +
-                                                        aulaSelecionada.aula.duracao * 60_000
-                                                    ).toISOString()
-                                                )}
+                                                {calcularTerminoPrevisto(
+                                                    inicio,
+                                                    aulaSelecionada.aula.duracao
+                                                ) ?? "Informe uma data e horário válidos"}
                                             </p>
                                         </div>
                                     )}
