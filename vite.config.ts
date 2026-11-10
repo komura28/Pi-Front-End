@@ -7,4 +7,13 @@ export default defineConfig({
   plugins: [react(),
     tailwindcss()
   ],
+
+  server: {
+    proxy: {
+      '/aticurando': {
+        target: 'http://localhost:3002',
+        changeOrigin: true
+      }
+    }
+  }
 })

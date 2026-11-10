@@ -1,4 +1,5 @@
-import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse, TurmaMatricula } from "../types/auth/auth-types";
+import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterAulaRequest, RegisterCursoRequest, RegisterProfessorRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse, TurmaMatricula } from "../types/auth/auth-types";
+import type { IUserDTO } from "../types/user/user-types";
 import { api } from "./api";
 
 
@@ -25,6 +26,8 @@ export async function AtualizarFotoPerfilAPI(arquivo: File) {
     formData.append("photo", arquivo);
 
     const response = await api.put("/user/me/photo", formData);
+
+    return response;
 }
 
 export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCurso> { 
@@ -32,10 +35,10 @@ export async function RegisterCurso(data: RegisterCursoRequest): Promise<authCur
     return response.data
 }
 
- export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> { 
+export async function RegisterTurma(data: RegisterTurmaRequest): Promise<authTurma> {
     const response = await api.post("/turma", data)
     return response.data
- }
+}
 
 export async function getMe() {
     const response = await api.get("/auth/me")
@@ -43,17 +46,17 @@ export async function getMe() {
     return response.data;
 }
 
-export async function deletarUserAPI(_id: string) {    
+export async function deletarUserAPI(_id: string) {
     const response = await api.delete(`/user/${_id}`)
     return response.data;
 }
 
-export async function deletarCursoAPI(_id: string) {    
+export async function deletarCursoAPI(_id: string) {
     const response = await api.delete(`/curso/${_id}`)
     return response.data;
 }
 
-export async function deletarTurmaAPI(_id: string) {    
+export async function deletarTurmaAPI(_id: string) {
     const response = await api.delete(`/turma/${_id}`)
     return response.data;
 }
@@ -104,13 +107,35 @@ export async function getCurso() {
     return response.data;
 }
 
-export async function getUser() {
-    const response = await api.get("/user")
+export async function getUser(): Promise<IUserDTO[]> {
+    const response = await api.get<IUserDTO[]>("/user")
 
     return response.data;
 }
 
 export async function getTurma(): Promise<TurmaMatricula[]> {
     const response = await api.get<TurmaMatricula[]>("/turma");
+    return response.data;
+}
+
+export async function RegisterAula(data: RegisterAulaRequest) {
+    const response = await api.post("/aula", data);
+    return response.data;
+}
+
+export async function RegisterProfessor(data: RegisterProfessorRequest, foto?: File) {
+    const formData = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+        if(value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+        }
+    });
+
+    if(foto) {
+        formData.append("photo", foto);
+    }
+
+    const response = await api.post("/user/professor", formData);
     return response.data;
 }

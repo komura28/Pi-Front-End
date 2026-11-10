@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 import { cancelarMatricula, getMinhasMatriculas } from "../../services/matriculaService";
-import type { TurmaMatricula } from "../../types/auth/auth-types";
 import { Modal } from "../../components/Modal";
 
-type CardProps = {
-    turma: TurmaMatricula;
-}
 
-export function CursoAlunoPage({ turma }: CardProps) {
+export function CursoAlunoPage() {
 
     const [candidaturas, setCandidaturas] = useState<MatriculaDTO[]>([]);
     const [error, setError] = useState("");
@@ -52,7 +48,7 @@ export function CursoAlunoPage({ turma }: CardProps) {
                 setConfirmarCancelamento(false);
                 setMatriculaSelecionada(null);
                 setMostrarModalSucesso(true);
-                
+
 
             } catch (error) {
                 setFormError(error instanceof Error ? error.message : "Erro ao Cancelar matrícula. Tente novamente.");
@@ -108,6 +104,11 @@ export function CursoAlunoPage({ turma }: CardProps) {
                 </h1>
 
                 <div className="space-y-4">
+                    {error && (
+                        <div className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
+                            {error}
+                        </div>
+                    )}
 
                     {candidaturas.length === 0 ? (
                         <div className="p-8">
@@ -215,7 +216,7 @@ export function CursoAlunoPage({ turma }: CardProps) {
                             decisao={null}
                             texto="Sim"
                             opSim={handleCancelarMatricula}
-                            opNao= {() => setConfirmarCancelamento(false)}
+                            opNao={() => setConfirmarCancelamento(false)}
                         />
                     )}
 

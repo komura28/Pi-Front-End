@@ -26,7 +26,7 @@ export function LoginPage() {
             const loggedUser = await login(data);
             if (loggedUser.papelUsuario === "ALUNO") {
                 navigate("/api/home");
-            } else if (loggedUser.papelUsuario === "ADM") {
+            } else if (loggedUser.papelUsuario === "ADM" || loggedUser.papelUsuario === "PROFESSOR") {
                 navigate("/app/home");
             }
             console.log("data: ", data);
