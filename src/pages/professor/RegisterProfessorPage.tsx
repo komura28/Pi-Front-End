@@ -64,7 +64,7 @@ export function RegisterProfessorPage() {
     }
   };
 
-  async function handleCadastro(data: CadastroFormData) {
+  async function handleCadastrarProfessor(data: CadastroFormData) {
     try {
       setServerError("");
 
@@ -104,7 +104,7 @@ export function RegisterProfessorPage() {
         </h1>
 
         <form
-          onSubmit={handleSubmit(handleCadastro, onError)}
+          onSubmit={handleSubmit(handleCadastrarProfessor, onError)}
           className="space-y-4"
         >
           <div>
