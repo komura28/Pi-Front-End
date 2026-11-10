@@ -3,6 +3,15 @@ import { getTurma } from "../../services/authService";
 import type { TurmaMatricula } from "../../types/auth/auth-types";
 import { CardTurma } from "../../components/CardTurma";
 import { Carousel } from "../../components/Carousel";
+import { FaSearch } from "react-icons/fa";
+
+
+
+const normalizar = (texto: string) =>
+    texto
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
 
 
 export function HomeAlunoPage() {
@@ -11,57 +20,70 @@ export function HomeAlunoPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const [paginaAtual, setPaginaAtual] = useState(1);
+    const itensPorPagina = 6;
+
+    const [busca, setBusca] = useState("");
 
     useEffect(() => {
-        /* async function carregarCursos() {
-            try {
-                setLoading(true);
-                const data = await getCurso();
-                setCursos(data);
-            } catch (error) {
-                if (error instanceof Error) {
-                    setError(`Erro ao carregar os dados do curso: ${error.message}`);
-                } else {
-                    setError("Erro ao carregar os dados do curso");
-                }
-            } finally {
-                setLoading(false);
-            }
-        } */
-
-        //carregarCursos();
+        let ativo = true;
 
         async function carregarTurmas() {
             try {
                 setLoading(true);
-                const data = await getTurma();
-                console.log("getTurma response:", data);
+                setError("");
 
-                if (Array.isArray(data)) {
+                const data = await getTurma();
+
+                if (ativo) {
                     setTurmas(data);
-                } else if (data && Array.isArray((data as any).turmas)) {
-                    setTurmas((data as any).turmas);
-                } else if (data && Array.isArray((data as any).data)) {
-                    setTurmas((data as any).data);
-                } else if (data) {
-                    setTurmas([data as any]);
-                } else {
-                    setTurmas([]);
                 }
+
             } catch (error) {
-                console.error("Erro ao buscar turmas", error);
-                if (error instanceof Error) {
-                    setError(`Erro ao carregar os dados da turma: ${error.message}`);
-                } else {
-                    setError("Erro ao carregar os dados da turma");
-                }
+                if (!ativo) return;
+
+                console.error("Erro ao buscar turmas:", error);
+
+                setError(
+                    error instanceof Error
+                        ? `Erro ao carregar os dados da turma: ${error.message}`
+                        : "Erro ao carregar os dados da turma"
+                );
+
             } finally {
-                setLoading(false);
+                if (ativo) {
+                    setLoading(false);
+                }
             }
         }
 
         carregarTurmas();
+
+        return () => {
+            ativo = false;
+        };
     }, []);
+
+    const termoBusca = normalizar(busca.trim());
+
+    const turmasFiltradas = turmas.filter(({ turma }) =>
+        [
+            turma.curso?.name,
+            turma.curso?.description,
+            turma.turno
+        ].some((campo) =>
+            normalizar(campo ?? "").includes(termoBusca)
+        )
+    );
+
+    const indiceUltimoItem = paginaAtual * itensPorPagina;
+    const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
+
+    const totalPaginas = Math.ceil(turmasFiltradas.length / itensPorPagina);
+    const turmasPaginadas = turmasFiltradas.slice(
+        indicePrimeiroItem,
+        indiceUltimoItem
+    );
 
     if (loading) {
         return (
@@ -99,21 +121,80 @@ export function HomeAlunoPage() {
                 Confira as oportunidades disponíveis e candidate-se:
             </h2>
 
+            <div className="relative mb-6 max-w-xl">
+                <FaSearch
+                    aria-hidden="true"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    size={18}
+                />
 
-            {
-                turmas.length > 0 ? (
+                <input
+                    type="search"
+                    value={busca}
+                    onChange={(e) => {
+                        setBusca(e.target.value);
+                        setPaginaAtual(1);
+                    }}
+                    placeholder="Pesquise por curso, descrição ou turno..."
+                    aria-label="Pesquisar turmas"
+                    className="w-full rounded-lg border border-slate-300 bg-white py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
+
+            {turmasFiltradas.length > 0 ? (
+                <>
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {turmas.map((turma) => (
+                        {turmasPaginadas.map((turma) => (
                             <CardTurma
                                 key={turma.turma._id}
                                 turma={turma}
                             />
                         ))}
                     </div>
-                ) : (
-                    <p className="text-gray-600">Nenhuma turma disponível no momento.</p>
-                )
-            }
+
+                    {totalPaginas > 1 && (
+                        <nav
+                            aria-label="Paginação das turmas"
+                            className="flex justify-center items-center gap-2 mt-6"
+                        >
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setPaginaAtual((p) => Math.max(p - 1, 1))
+                                }
+                                disabled={paginaAtual === 1}
+                                className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                                Anterior
+                            </button>
+
+                            <span className="text-slate-600" aria-live="polite">
+                                Página {paginaAtual} de {totalPaginas}
+                            </span>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setPaginaAtual((p) =>
+                                        Math.min(p + 1, totalPaginas)
+                                    )
+                                }
+                                disabled={paginaAtual === totalPaginas}
+                                className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                                Próxima
+                            </button>
+                        </nav>
+                    )}
+                </>
+            ) : (
+                <p className="text-gray-600">
+                    {busca.trim()
+                        ? "Nenhuma turma encontrada para essa pesquisa."
+                        : "Nenhuma turma disponível no momento."}
+                </p>
+            )}
         </main>
     );
 }
