@@ -4,6 +4,7 @@ import { useForm, type FieldErrors } from "react-hook-form";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
 import { cadastrarProfessor } from "../../services/admService";
+import { formatarCPF, formatarTelefone } from "../../utils/formatters";
 
 interface CadastroFormData {
   name: string;
@@ -28,23 +29,6 @@ export function RegisterProfessorPage() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
   const fotoRef = useRef<HTMLInputElement>(null);
-
-  const formatarCPF = (valor: string) => {
-    return valor
-      .replace(/\D/g, "")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-      .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, "$1.$2.$3-$4")
-      .substring(0, 14);
-  };
-
-  const formatarTelefone = (valor: string) => {
-    const digitos = valor.replace(/\D/g, "").substring(0, 11);
-    if (digitos.length <= 10) {
-      return digitos.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim();
-    }
-    return digitos.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
-  };
 
   const {
     register,
