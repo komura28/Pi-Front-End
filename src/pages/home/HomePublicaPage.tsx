@@ -70,6 +70,7 @@ export function HomePublicaPage() {
                                 <Link
                                     to="/cadastro"
                                     className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                    state={{ origem: "home" }}
                                 >
                                     Cadastre-se
                                 </Link>
@@ -111,13 +112,13 @@ export function HomePublicaPage() {
                         <Link
                             to="/cadastro"
                             className="rounded-lg border border-slate-300 bg-white px-7 py-3 font-semibold text-slate-700 transition hover:border-blue-600 hover:text-blue-600"
+                            state={{ origem: "home" }}
                         >
                             Faça parte
                         </Link>
                     </div>
 
                 </section>
-
 
                 <section
                     aria-label="Apresentação do Aticurando"
@@ -168,6 +169,7 @@ export function HomePublicaPage() {
                                     ? rotaPainel
                                     : "/cadastro"
                                 }
+                                state={{ origem: "home" }}
                                 className="mt-8 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
                             >
                                 {isAuthenticated && rotaPainel
@@ -204,7 +206,6 @@ export function HomePublicaPage() {
                     </div>
                 </section>
 
-                {/* ATIVIDADES */}
                 <section className="bg-white px-4 py-20 sm:px-6">
                     <div className="mx-auto max-w-6xl">
                         <div className="mb-12 text-center">
@@ -289,12 +290,13 @@ export function HomePublicaPage() {
                                 ? rotaPainel
                                 : "/cadastro"
                             }
+                            state={{ origem: "home" }}
                             className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 font-bold text-blue-700 transition hover:bg-blue-50"
                         >
                             {isAuthenticated && rotaPainel
                                 ? "Ir para meu painel"
                                 : "Cadastre-se gratuitamente"}
-
+                                
                             <FaArrowRight />
                         </Link>
                     </div>
