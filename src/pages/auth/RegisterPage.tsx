@@ -8,8 +8,6 @@ import { Modal } from "../../components/Modal";
 import { UploadFoto } from "../../components/UploadFoto";
 import axios from "axios";
 import { formatarCPF, formatarTelefone } from "../../utils/formatters";
-import { ModalLGPD } from "../../components/ModalLGPD";
-import { CampoSenha } from "../../components/CampoSenha";
 
 interface CadastroFormData {
   name: string;
@@ -34,9 +32,10 @@ export function RegistroPage() {
   const navigate = useNavigate();
   const { cadastrar, login } = useAuth();
   const [serverError, setServerError] = useState("");
-  const [modalLgpdOpen, setModalLgpdOpen] = useState(false);
-
   const [modal, setModal] = useState(false);
+  const [modalLgpdOpen, setModalLgpdOpen] = useState(false);
+  const [mostrConfirmSenha, setMostrConfirmSenha] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const {
     register,
@@ -82,13 +81,13 @@ export function RegistroPage() {
       setModal(true);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(
-          "Erros detalhados:",
-          JSON.stringify(error.response?.data, null, 2)
-        );
-      }
+    console.log(
+      "Erros detalhados:",
+      JSON.stringify(error.response?.data, null, 2)
+    );
+  }
 
-      console.error(error);
+  console.error(error);
       setServerError(
         error instanceof Error
           ? error.message
@@ -446,27 +445,146 @@ export function RegistroPage() {
             </div>
           )}
 
-          <CampoSenha
-            id="senha"
-            label="Senha"
-            placeholder="Digite sua Senha"
-            registro={register("senha", {
-              required: "Senha é obrigatória",
-            })}
-            erro={errors.senha?.message}
-          />
+          <div>
+            <label
+              htmlFor="senha"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Senha
+            </label>
+            <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
+              <input
+                id="senha"
+                type={mostrarSenha ? "text" : "password"}
+                className="w-full bg-transparent outline-none"
+                placeholder="Digite sua Senha"
+                {...register("senha", {
+                  required: "Senha é obrigatório",
+                })}
+              />
+              <button
+                className="cursor-pointer"
+                type="button"
+                onClick={() => setMostrarSenha(!mostrarSenha)}
+              >
+                {mostrarSenha ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 0 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
 
-          <CampoSenha
-            id="confirmarSenha"
-            label="Confirmar Senha"
-            placeholder="Confirme sua senha"
-            registro={register("confirmarSenha", {
-              required: "Confirmação é obrigatória",
-              validate: (senhaValida) =>
-                senhaUser === senhaValida || "Senhas não coincidem",
-            })}
-            erro={errors.confirmarSenha?.message}
-          />
+            {errors.senha && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.senha.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirmarSenha"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Confirmar Senha
+            </label>
+            <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
+              <input
+                id="confirmarSenha"
+                type={mostrConfirmSenha ? "text" : "password"}
+                className="w-full bg-transparent outline-none"
+                placeholder="Confirme sua Senha"
+                {...register("confirmarSenha", {
+                  required: "Confirmação é obrigatório",
+                  validate: (senhaValida) => {
+                    if (senhaUser !== senhaValida) {
+                      return "Senhas não coincidem";
+                    }
+                  },
+                })}
+              />
+              <button
+                className="cursor-pointer"
+                type="button"
+                onClick={() => setMostrConfirmSenha(!mostrConfirmSenha)}
+              >
+                {mostrConfirmSenha ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {errors.confirmarSenha && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.confirmarSenha.message}
+              </p>
+            )}
+          </div>
 
           <UploadFoto
             foto={watch("photo")?.[0]}
@@ -537,7 +655,88 @@ export function RegistroPage() {
         )}
 
         {modalLgpdOpen && (
-          <ModalLGPD onFechar={() => setModalLgpdOpen(false)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-xl bg-white p-6 sm:p-8 shadow-2xl">
+              <h2 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2">
+                Termos de Privacidade e Proteção de Dados (LGPD)
+              </h2>
+
+              <div className="space-y-4 text-sm text-gray-600">
+                <p>
+                  Para fins de transparência e em cumprimento à Lei Geral de
+                  Proteção de Dados (Lei nº 13.709/2018), informamos
+                  detalhadamente quais dados são coletados e qual a sua
+                  finalidade:
+                </p>
+
+                <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    1. Dados Pessoais Identificáveis:
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>
+                      <strong>Nome completo:</strong> Para identificação do
+                      usuário na plataforma.
+                    </li>
+                    <li>
+                      <strong>CPF:</strong> Para validação única e autenticidade
+                      da conta.
+                    </li>
+                    <li>
+                      <strong>Data de Nascimento:</strong> Para validação de
+                      faixa etária.
+                    </li>
+                    <li>
+                      <strong>E-mail:</strong> Para login, comunicações e
+                      recuperação de senha.
+                    </li>
+                    <li>
+                      <strong>Telefones (Principal e Secundário):</strong> Para
+                      contato e avisos organizacionais.
+                    </li>
+                    <li>
+                      <strong>Estado Civil e Profissão:</strong> Para mapeamento
+                      de perfil dos integrantes.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    2. Dados Sensíveis (Saúde):
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>
+                      <strong>Problemas de Saúde e Condições Médicas:</strong>{" "}
+                      Utilizados exclusivamente para segurança do participante
+                      em atividades presenciais ou eventos da instituição.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    3. Finalidade e Armazenamento:
+                  </h3>
+                  <p>
+                    Os dados são armazenados em ambiente seguro com controle de
+                    acesso estrito e não são compartilhados com terceiros para
+                    fins comerciais.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setModalLgpdOpen(false)}
+                  className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
+                >
+                  Entendi e Fechar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </section>
     </main>
