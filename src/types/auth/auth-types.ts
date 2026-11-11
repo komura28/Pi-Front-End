@@ -129,6 +129,8 @@ export interface RegisterProfessorRequest {
     telefone_principal: string;
     telefone_secundario?: string;
     aceite_lgpd: boolean;
+}
+
 export type StatusAulaTurma =
     | "PENDENTE"
     | "AGENDADA"

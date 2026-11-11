@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
@@ -29,7 +29,6 @@ export function RegisterProfessorPage() {
   const [mostrConfirmSenha, setMostrConfirmSenha] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
-  const fotoRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -54,16 +53,7 @@ export function RegisterProfessorPage() {
     return () => URL.revokeObjectURL(url);
   }, [previewFoto]);
 
-  const removeFoto = () => {
-    setValue("photo", undefined, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-
-    if ( fotoRef.current) {
-      fotoRef.current.value = "";
-    }
-  };
+  
 
   async function handleCadastro(data: CadastroFormData) {
     try {
