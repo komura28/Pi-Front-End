@@ -1,13 +1,15 @@
 import type {
     RegisterCursoRequest,
     RegisterTurmaRequest,
-    RegisterAulaRequest
+    RegisterAulaRequest,
+    RegisterProfessorRequest
 } from "../types/auth/auth-types";
 
 import {
     RegisterCurso,
     RegisterTurma,
-    RegisterAula
+    RegisterAula,
+    RegisterProfessor
 } from "./authService";
 
 export async function cadastrarCurso(data: RegisterCursoRequest) {
@@ -20,4 +22,8 @@ export async function cadastrarTurma(data: RegisterTurmaRequest) {
 
 export async function cadastrarAula(data: RegisterAulaRequest) {
     return await RegisterAula(data);
+}
+
+export async function cadastrarProfessor(data: RegisterProfessorRequest, foto?: File) {
+    return await RegisterProfessor(data, foto);
 }

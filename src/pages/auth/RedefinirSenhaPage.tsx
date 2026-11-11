@@ -53,7 +53,7 @@ export function ResetarSenhaPage() {
 
     return (
         <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
-            <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg rounded-lg">
+            <section className="w-full max-w-md bg-white p-8 shadow-lg rounded-lg">
                 <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
                 <h1 className="mb-2 text-center text-2xl font-bold text-gray-800">
                     Redefinir Senha

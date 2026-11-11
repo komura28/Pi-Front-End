@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/logo.png";
 import { FaRightFromBracket, FaUser } from "react-icons/fa6";
+import { api } from "../services/api";
 
 interface NavigationItem {
     label: string;
@@ -20,18 +21,21 @@ interface HeaderProps {
 
 export function Header({ navigationItems, link, mode }: HeaderProps) {
 
+    const { user, logout } = useAuth();
+    const foto = user?.photo
+    ? new URL(user.photo, api.defaults.baseURL).toString()
+    : perfilImage;
+
     const navigate = useNavigate();
-    const { user, logout } = useAuth() as {
-        user?: { papelUsuario?: string };
-        logout: () => void;
-    };
     const [openMenus, setOpenMenus] = useState(false);
 
     async function handlePerfil() {
         if (user?.papelUsuario === "ALUNO") {
             setOpenMenus(false);
             navigate("/api/perfil");
-        } else if (user?.papelUsuario === "ADM") {
+        } else if (user?.papelUsuario === "ADM" ||
+                    user?.papelUsuario === "PROFESSOR"
+        ) {
             setOpenMenus(false);
             navigate("/app/perfil");
         }
@@ -52,7 +56,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                             <div className="flex items-center gap-2 p-12">
                                 <div>
                                     <Link to={link ?? "/"}>
-                                        <img src={logo} alt="Logo" className="h-15  w-auto object-contain" />
+                                        <img src={logo} alt="Logo" className="h-15 w-auto object-contain" />
                                     </Link>
                                 </div>
                             </div>
@@ -98,7 +102,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                     <button
                         onClick={() => setOpenMenus((prev) => !prev)}
                         className="w-auto h-15 rounded-full overflow-hidden cursor-pointer object-contain">
-                        <img src={perfilImage} alt="Foto de Perfil"
+                        <img src={foto} alt="Foto de Perfil"
                             className="w-full h-full object-cover" />
                     </button>
 

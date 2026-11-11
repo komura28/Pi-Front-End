@@ -36,6 +36,11 @@ const adminNavItems = [
 
     },
     {
+        label: "Cadastrar Professor",
+        href: "/app/register-professor",
+        icon: <FaChalkboardTeacher />
+    },
+    {
         label: "Matrículas",
         href: "/app/matricula",
         icon: <HiOutlineDocumentCheck />,

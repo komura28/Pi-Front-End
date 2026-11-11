@@ -1,10 +1,13 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
+import { UploadFoto } from "../../components/UploadFoto";
+import axios from "axios";
+import { formatarCPF, formatarTelefone } from "../../utils/formatters";
 
 interface CadastroFormData {
   name: string;
@@ -33,24 +36,6 @@ export function RegistroPage() {
   const [modalLgpdOpen, setModalLgpdOpen] = useState(false);
   const [mostrConfirmSenha, setMostrConfirmSenha] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
-  const [previewURL, setPreviewURL] = useState<string | null>(null);
-
-  const formatarCPF = (valor: string) => {
-    return valor
-      .replace(/\D/g, "")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-      .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, "$1.$2.$3-$4")
-      .substring(0, 14);
-  };
-
-  const formatarTelefone = (valor: string) => {
-    const digitos = valor.replace(/\D/g, "").substring(0, 11);
-    if (digitos.length <= 10) {
-      return digitos.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim();
-    }
-    return digitos.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
-  };
 
   const {
     register,
@@ -63,26 +48,6 @@ export function RegistroPage() {
   const senhaUser = watch("senha");
   const profissaoSelecionada = watch("profissao");
   const temProblemaSaude = watch("tem_problema_saude");
-  const previewFoto = watch("photo")?.[0];
-
-  useEffect(() => {
-    if (!previewFoto) {
-      setPreviewURL(null);
-      return;
-    }
-
-    const url = URL.createObjectURL(previewFoto);
-    setPreviewURL(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [previewFoto]);
-
-  const removeFoto = () => {
-    setValue("photo", undefined, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  };
 
   async function handleCadastro(data: CadastroFormData) {
     try {
@@ -115,7 +80,14 @@ export function RegistroPage() {
       });
       setModal(true);
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error)) {
+    console.log(
+      "Erros detalhados:",
+      JSON.stringify(error.response?.data, null, 2)
+    );
+  }
+
+  console.error(error);
       setServerError(
         error instanceof Error
           ? error.message
@@ -152,11 +124,14 @@ export function RegistroPage() {
           className="space-y-4"
         >
           <div>
-            <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               Nome
             </label>
             <input
-            id="name"
+              id="name"
               type="text"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
               placeholder="Digite o nome"
@@ -171,11 +146,14 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="cpf" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="cpf"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 CPF
               </label>
               <input
-              id="cpf"
+                id="cpf"
                 type="text"
                 maxLength={14}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -197,11 +175,14 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label htmlFor="dt_nascimento" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="dt_nascimento"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Data de Nascimento
               </label>
               <input
-              id="dt_nascimento"
+                id="dt_nascimento"
                 type="date"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 {...register("dt_nascimento", {
@@ -217,11 +198,14 @@ export function RegistroPage() {
           </div>
 
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               E-mail
             </label>
             <input
-            id="email"
+              id="email"
               type="email"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
               placeholder="admin@gmail.com"
@@ -238,11 +222,14 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="telefone_principal" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="telefone_principal"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Telefone Principal
               </label>
               <input
-              id="telefone_principal"
+                id="telefone_principal"
                 type="text"
                 maxLength={15}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -265,11 +252,14 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label htmlFor="telefone_secundario" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="telefone_secundario"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Telefone Secundário/Reserva
               </label>
               <input
-              id="telefone_secundario"
+                id="telefone_secundario"
                 type="text"
                 maxLength={15}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -294,11 +284,14 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="estado_civil" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="estado_civil"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Estado Civil
               </label>
               <select
-              id="estado_civil"
+                id="estado_civil"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
                 {...register("estado_civil", {
                   required: "Selecione o estado civil",
@@ -319,7 +312,10 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label htmlFor="profissao" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="profissao"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Profissão
               </label>
               <select
@@ -347,11 +343,14 @@ export function RegistroPage() {
 
           {profissaoSelecionada === "Outro" && (
             <div>
-              <label htmlFor="profissao_custom"className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="profissao_custom"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Especifique a profissão
               </label>
               <input
-              id="profissao_custom"
+                id="profissao_custom"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 placeholder="Qual sua profissão?"
@@ -369,7 +368,10 @@ export function RegistroPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="tem_problema_saude" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="tem_problema_saude"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Possui problema de saúde?
               </label>
               <select
@@ -391,7 +393,10 @@ export function RegistroPage() {
             </div>
 
             <div>
-              <label htmlFor="participacao_anterior" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="participacao_anterior"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Você já foi ou é palhaço voluntário?
               </label>
               <select
@@ -417,11 +422,14 @@ export function RegistroPage() {
 
           {temProblemaSaude === "Sim" && (
             <div>
-              <label htmlFor="problemas_saude_custom" className="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="problemas_saude_custom"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Qual problema de saúde/doença você possui?
               </label>
               <input
-              id="problemas_saude_custom"
+                id="problemas_saude_custom"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 placeholder="Digite a doença ou condição de saúde"
@@ -438,12 +446,15 @@ export function RegistroPage() {
           )}
 
           <div>
-            <label htmlFor="senha" className="mb-1 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="senha"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               Senha
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
-              id="senha"
+                id="senha"
                 type={mostrarSenha ? "text" : "password"}
                 className="w-full bg-transparent outline-none"
                 placeholder="Digite sua Senha"
@@ -503,12 +514,15 @@ export function RegistroPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmarSenha" className="mb-1 block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="confirmarSenha"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               Confirmar Senha
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
-              id="confirmarSenha"
+                id="confirmarSenha"
                 type={mostrConfirmSenha ? "text" : "password"}
                 className="w-full bg-transparent outline-none"
                 placeholder="Confirme sua Senha"
@@ -572,74 +586,20 @@ export function RegistroPage() {
             )}
           </div>
 
-          <div>
-            <label
-              htmlFor="photo"
-              className="mb-2 block text-sm font-semibold text-gray-700"
-            >
-              Foto de Perfil
-              <span className="ml-1 font-normal text-gray-400">(Opcional)</span>
-            </label>
-            <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 transition-colors hover:border-blue-400 hover:bg-blue-50/30">
-              <input
-                id="photo"
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                {...register("photo")}
-              />
-
-              {previewURL && (
-              <div className="relative mx-auto h-40 w-40">
-                <img
-                  src={previewURL}
-                  alt="Preview da Foto"
-                  className="h-full w-full rounded-full border-4 border-white object-cover shadow-md"
-                />
-
-                <button
-                  type="button"
-                  onClick={removeFoto}
-                  className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow-md transition hover:bg-red-700 cursor-pointer"
-                  aria-label="Remover Foto">
-                  X
-                </button>
-                </div>
-            )}
-
-            {!previewURL && (
-              <label
-                htmlFor="photo"
-                className="flex cursor-pointer flex-col items-center justify-center gap-2"
-              >
-                <div className="rounded-full bg-blue-100 p-4">
-                  <svg
-                    className="h-8 w-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 16V4m0 0L8 8m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"
-                    />
-                  </svg>
-                  
-                </div>
-
-                <p className="text-sm font-semibold text-gray-700">
-                  Clique para Selecionar uma imagem
-                </p>
-
-                <p className="text-xs text-gray-500">JPG, PNG ou WEBP</p>
-              </label>
-  )}
-            </div>
-
-            
-          </div>
+          <UploadFoto
+            foto={watch("photo")?.[0]}
+            onChange={(foto) => {
+              setValue(
+                "photo",
+                foto ? ([foto] as unknown as FileList) : undefined,
+                {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                },
+              );
+            }}
+            onError={setServerError}
+          />
 
           <div className="flex items-start gap-2 pt-2">
             <input

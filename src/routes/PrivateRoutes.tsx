@@ -9,13 +9,15 @@ import { TurmaCadastroPage } from "../pages/turma/TurmaCadastroPage";
 import { TurmaPage } from "../pages/turma/TurmaPage";
 import { UserPage } from "../pages/user/UserPage";
 import { AlunoPage } from "../pages/aluno/AlunoPage";
+import { RegisterProfessorPage } from "../pages/professor/RegisterProfessorPage";
+
 import { AulaTurmaPage } from "../pages/aula/AulaTurmaPage";
 
 export function PrivateRoutes() {
     return (
         <Routes>
 
-            <Route path="/home" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+            <Route path="/home" element={<ProtectedRoutes allowedRoles={["ADM", "PROFESSOR"]}>
                 <HomePage />
             </ProtectedRoutes>} />
 
@@ -31,7 +33,7 @@ export function PrivateRoutes() {
                 <TurmaPage />
             </ProtectedRoutes>} />
 
-            <Route path="/perfil" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+            <Route path="/perfil" element={<ProtectedRoutes allowedRoles={["ADM", "PROFESSOR"]}>
                 <PerfilPage />
             </ProtectedRoutes>} />
 
@@ -45,6 +47,10 @@ export function PrivateRoutes() {
 
             <Route path="/register-turma" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <TurmaCadastroPage />
+            </ProtectedRoutes>} />
+
+            <Route path="register-professor" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+                <RegisterProfessorPage />
             </ProtectedRoutes>} />
 
             <Route path="/aluno" element={<ProtectedRoutes allowedRoles={["ADM"]}>

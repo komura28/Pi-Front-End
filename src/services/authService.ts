@@ -1,4 +1,4 @@
-import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterAulaRequest, RegisterCursoRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse, TurmaMatricula } from "../types/auth/auth-types";
+import type { authCurso, authTurma, authUser, EsqueciSenhaRequest, EsqueciSenhaResponse, LoginRequest, LoginResponse, RegisterAulaRequest, RegisterCursoRequest, RegisterProfessorRequest, RegisterRequest, RegisterTurmaRequest, ResetarSenhaRequest, ResetarSenhaResponse, TurmaMatricula } from "../types/auth/auth-types";
 import type { IUserDTO } from "../types/user/user-types";
 import { api } from "./api";
 
@@ -120,5 +120,22 @@ export async function getTurma(): Promise<TurmaMatricula[]> {
 
 export async function RegisterAula(data: RegisterAulaRequest) {
     const response = await api.post("/aula", data);
+    return response.data;
+}
+
+export async function RegisterProfessor(data: RegisterProfessorRequest, foto?: File) {
+    const formData = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+        if(value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+        }
+    });
+
+    if(foto) {
+        formData.append("photo", foto);
+    }
+
+    const response = await api.post("/user/professor", formData);
     return response.data;
 }
