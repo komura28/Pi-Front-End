@@ -14,7 +14,7 @@ interface NavigationItem {
 interface HeaderProps {
     navigationItems?: NavigationItem[] | null;
     link?: string;
-    mode: "ALUNO" | "ADM"
+    mode: "ALUNO" | "ADM" | "PROFESSOR"
 }
 
 
@@ -27,13 +27,15 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
     };
     const [openMenus, setOpenMenus] = useState(false);
 
-    async function handlePerfil() {
+    function handlePerfil() {
+        setOpenMenus(false);
+
         if (user?.papelUsuario === "ALUNO") {
-            setOpenMenus(false);
             navigate("/api/perfil");
         } else if (user?.papelUsuario === "ADM") {
-            setOpenMenus(false);
             navigate("/app/perfil");
+        } else if (user?.papelUsuario === "PROFESSOR") {
+            navigate("/professor/perfil");
         }
     }
 
@@ -59,7 +61,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                         </div>
                     </>
                 }
-                {mode === "ADM" &&
+                {(mode === "ADM" || mode === "PROFESSOR") &&
                     <>
                         <div>
                             <p className="text-sm text-white">Bem-vindo a </p>
