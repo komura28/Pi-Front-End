@@ -63,11 +63,6 @@ export function UploadFoto({ foto, onChange, onError }: UploadFotoProps) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      onClick={() => {
-        if (!previewURL) {
-          fotoRef.current?.click();
-        }
-      }}
       className={`transition-all duration-200 ${
         previewURL 
           ? "flex flex-col items-center gap-2"
@@ -94,56 +89,47 @@ export function UploadFoto({ foto, onChange, onError }: UploadFotoProps) {
       />
 
       {!previewURL && (
-        <div className="flex flex-col items-center text-center">
+        <button
+          type="button"
+          onClick={() => fotoRef.current?.click()}
+          className="flex w-full flex-col items-center text-center cursor-pointer">
           <h3 className="text-base font-semibold text-gray-800">
             Adicione sua Foto de Perfil
           </h3>
+
           <p className="mb-2 text-sm text-gray-600">
             Arraste e Solte uma imagem aqui ou Selecione uma imagem do seu
             dispositivo
           </p>
-        </div>
+          </button>
       )}
       {previewURL && (
         <div className="flex flex-col items-center gap-3">
+          <button
+          type="button"
+          onClick={() => setVisualizarFoto(true)}
+          aria-label="Ampliar Foto de Perfil">
+          
           <img
             src={previewURL}
             alt="Preview"
-            onClick={(e) => {
-              e.stopPropagation();
-              setVisualizarFoto(true);
-            }}
-            className="h-32 w-32 rounded-full object-cover border-2 border-gray-300 cursor-pointer"
+            className="relative z-10 h-32 w-32 rounded-full object-cover border-2 border-gray-300 cursor-pointer"
           />
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-
-              onChange(undefined);
-              onError("");
-              if (fotoRef.current) {
-                fotoRef.current.value = "";
-              }
-            }}
-            className="cursor-pointer text-sm text-red-600 hover:underline"
-          >
-            Remover Foto
           </button>
         </div>
       )}
 
       {visualizarFoto && previewURL && (
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            setVisualizarFoto(false);
-          }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 cursor-pointer"
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 cursor-pointer">
+          <button
+            type="button"
+            onClick={() => setVisualizarFoto(false)}
+            aria-label="Fechar Visualização"
+            className="absolute inset-0 cursor-pointer border-0 bg-transparent"
+            />
           <img
             src={previewURL}
-            alt="Foto Ampliada"
+            alt="preview"
             className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
           />
         </div>

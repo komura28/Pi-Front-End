@@ -136,6 +136,13 @@ export async function RegisterProfessor(data: RegisterProfessorRequest, foto?: F
         formData.append("photo", foto);
     }
 
+    for (const [key, value] of formData.entries()) {
+    console.log(key, key === "senha" || key === "confirmarSenha" ? "***" : value);
+}
+
+console.log("Senha preenchida:", Boolean(formData.get("senha")));
+console.log("Confirmação preenchida:", Boolean(formData.get("confirmarSenha")));
+
     const response = await api.post("/user/professor", formData);
     return response.data;
 }
