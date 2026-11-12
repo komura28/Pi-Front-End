@@ -9,7 +9,6 @@ import { AppAlunoLayout } from "../components/layouts/AppAlunoLayout";
 import { AlunoPrivateRoutes } from "./AlunoPrivateRoutes";
 import { AppProfessorLayout } from "../components/layouts/AppProfessorLayout";
 import { ProfessorPrivateRoutes } from "./ProfessorPrivateRoutes";
-import { PerfilPage } from "../pages/perfil/PerfilPage";
 
 export function AppRoutes() {
     const { control } = useAuth();
@@ -28,13 +27,17 @@ export function AppRoutes() {
         <BrowserRouter>
             <Routes>
                 <Route element={<AppAdminLayout />}>
-                    <Route path="/app/*" element={<PrivateRoutes />} />
-                    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                    <Route
+                        path="/app/*"
+                        element={<PrivateRoutes />}
+                    />
                 </Route>
 
                 <Route element={<AppAlunoLayout />}>
-                    <Route path="/api/*" element={<AlunoPrivateRoutes />} />
-                    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                    <Route
+                        path="/api/*"
+                        element={<AlunoPrivateRoutes />}
+                    />
                 </Route>
 
                 <Route
@@ -51,16 +54,15 @@ export function AppRoutes() {
                 </Route>
 
                 <Route
-                    path="/perfil"
-                    element={
-                        <ProtectedRoutes allowedRoles={["PROFESSOR"]}>
-                            <PerfilPage />
-                        </ProtectedRoutes>
-                    }
+                    path="/unauthorized"
+                    element={<UnauthorizedPage />}
                 />
 
-                <Route path="/*" element={<PublicRoutes />} />
+                <Route
+                    path="/*"
+                    element={<PublicRoutes />}
+                />
             </Routes>
         </BrowserRouter>
-    )
+    );
 }
