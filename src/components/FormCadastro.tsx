@@ -9,6 +9,7 @@ import { cpf } from "cpf-cnpj-validator";
 import { UploadFoto } from "./UploadFoto";
 import { Modal } from "./Modal";
 import { CampoSenha } from "./CampoSenha";
+import { cadastrarProfessor } from "../services/admService";
 
 interface CadastroFormDataProps {
     tipo?: "comum" | "professor"
@@ -76,11 +77,16 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                 return;
             }
 
+            if(tipo === "professor") {
+                await cadastrarProfessor(payload, photo?.[0]);
+            } else{
+
             await cadastrar(payload, photo?.[0]);
             await login({
                 email: data.email,
                 senha: data.senha,
             });
+        }
             setModal(true);
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -312,7 +318,7 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                         )}
                     </div>
 
-                    
+                    {tipo === "comum" && (
                     <div>
                         <label
                             htmlFor="profissao"
@@ -341,9 +347,11 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                             </p>
                         )}
                     </div>
+                    )}
                 </div>
 
-                {profissaoSelecionada === "Outro" && (
+                
+                {tipo === "comum" && profissaoSelecionada === "Outro" && (
                     <div>
                         <label
                             htmlFor="profissao_custom"
@@ -368,6 +376,8 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                     </div>
                 )}
 
+                {tipo === "comum" && (
+                    <>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label
@@ -445,6 +455,8 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                             </p>
                         )}
                     </div>
+                )}
+                </>
                 )}
 
                 <CampoSenha
