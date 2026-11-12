@@ -6,6 +6,7 @@ import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
 import { FaArrowLeft } from "react-icons/fa";
+import axios from "axios";
 
 interface CadastroFormData {
   name: string;
@@ -62,6 +63,7 @@ export function RegistroPage() {
     handleSubmit,
     watch,
     setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<CadastroFormData>({ mode: "onBlur" });
 
@@ -108,24 +110,53 @@ export function RegistroPage() {
             : "Não",
       };
 
-      if (data.senha.length < 8) {
-        setServerError("A senha deve ter no mínimo 8 caracteres.");
-        return;
-      }
-
       await cadastrar(payload, photo?.[0]);
       await login({
         email: data.email,
         senha: data.senha,
       });
       setModal(true);
-    } catch (error) {
-      console.log(error);
-      setServerError(
-        error instanceof Error
-          ? error.message
-          : "Erro na hora de realizar o cadastro",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const mensagem = error.response?.data?.message;
+
+        if (
+          status === 409 &&
+          typeof mensagem === "string" &&
+          mensagem.includes("E-mail já cadastrado")
+        ) {
+          setError("email", {
+            type: "server",
+            message: "Este e-mail já está cadastrado. Utilize outro ou faça login.",
+          });
+
+          return;
+        }
+
+        if (
+          status === 409 &&
+          typeof mensagem === "string" &&
+          mensagem.includes("CPF já cadastrado")
+        ) {
+          setError("cpf", {
+            type: "server",
+            message: "Este CPF já está cadastrado.",
+          });
+
+          return;
+        }
+
+        setServerError(
+          typeof mensagem === "string"
+            ? mensagem
+            : "Não foi possível realizar o cadastro."
+        );
+
+        return;
+      }
+
+      setServerError("Erro inesperado ao realizar o cadastro.");
     }
   }
 
@@ -162,7 +193,7 @@ export function RegistroPage() {
         >
           <div>
             <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-              Nome
+              Nome <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
               id="name"
@@ -181,7 +212,7 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="cpf" className="mb-1 block text-sm font-medium text-gray-700">
-                CPF
+                CPF <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="cpf"
@@ -207,7 +238,7 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="dt_nascimento" className="mb-1 block text-sm font-medium text-gray-700">
-                Data de Nascimento
+                Data de Nascimento <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="dt_nascimento"
@@ -227,7 +258,7 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-              E-mail
+              E-mail <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
               id="email"
@@ -248,7 +279,7 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="telefone_principal" className="mb-1 block text-sm font-medium text-gray-700">
-                Telefone Principal
+                Telefone Principal <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="telefone_principal"
@@ -275,7 +306,7 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="telefone_secundario" className="mb-1 block text-sm font-medium text-gray-700">
-                Telefone Secundário/Reserva
+                Contato de Emergência  <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="telefone_secundario"
@@ -304,7 +335,7 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="estado_civil" className="mb-1 block text-sm font-medium text-gray-700">
-                Estado Civil
+                Estado Civil <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="estado_civil"
@@ -329,7 +360,7 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="profissao" className="mb-1 block text-sm font-medium text-gray-700">
-                Profissão
+                Profissão <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="profissao"
@@ -357,7 +388,7 @@ export function RegistroPage() {
           {profissaoSelecionada === "Outro" && (
             <div>
               <label htmlFor="profissao_custom" className="mb-1 block text-sm font-medium text-gray-700">
-                Especifique a profissão
+                Especifique a profissão <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="profissao_custom"
@@ -379,7 +410,7 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="tem_problema_saude" className="mb-1 block text-sm font-medium text-gray-700">
-                Possui problema de saúde?
+                Possui problema de saúde? <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="tem_problema_saude"
@@ -401,7 +432,7 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="participacao_anterior" className="mb-1 block text-sm font-medium text-gray-700">
-                Você já foi ou é palhaço voluntário?
+                Você já foi ou é palhaço voluntário? <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="participacao_anterior"
@@ -427,7 +458,7 @@ export function RegistroPage() {
           {temProblemaSaude === "Sim" && (
             <div>
               <label htmlFor="problemas_saude_custom" className="mb-1 block text-sm font-medium text-gray-700">
-                Qual problema de saúde/doença você possui?
+                Qual problema de saúde/doença você possui? <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
                 id="problemas_saude_custom"
@@ -448,7 +479,7 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="senha" className="mb-1 block text-sm font-medium text-gray-700">
-              Senha
+              Senha <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
@@ -458,6 +489,12 @@ export function RegistroPage() {
                 placeholder="Digite sua Senha"
                 {...register("senha", {
                   required: "Senha é obrigatório",
+                  minLength: {
+                    value: 8,
+                    message: "A senha deve possuir pelo menos 8 caracteres",
+                  },
+
+                  deps: ["confirmarSenha"],
                 })}
               />
               <button
@@ -513,7 +550,7 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="confirmarSenha" className="mb-1 block text-sm font-medium text-gray-700">
-              Confirmar Senha
+              Confirmar Senha <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
@@ -522,12 +559,15 @@ export function RegistroPage() {
                 className="w-full bg-transparent outline-none"
                 placeholder="Confirme sua Senha"
                 {...register("confirmarSenha", {
-                  required: "Confirmação é obrigatório",
-                  validate: (senhaValida) => {
-                    if (senhaUser !== senhaValida) {
-                      return "Senhas não coincidem";
-                    }
+                  required: "A confirmação da senha é obrigatória",
+
+                  minLength: {
+                    value: 8,
+                    message: "A confirmação deve possuir pelo menos 8 caracteres",
                   },
+
+                  validate: (valor) =>
+                    valor === senhaUser || "As senhas não coincidem",
                 })}
               />
               <button
