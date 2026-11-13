@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../Header";
 import { SideBar } from "../SideBar";
-import { FaCalendarAlt, FaHome } from "react-icons/fa";
+import { FaCalendarAlt, FaHome, FaUsers } from "react-icons/fa";
 
 const professorNavItems = [
     {
@@ -13,6 +13,11 @@ const professorNavItems = [
         label: "Minha Agenda",
         href: "/professor/agenda",
         icon: <FaCalendarAlt />
+    },
+    {
+        label: "Minhas Turmas",
+        href: "/professor/turmas",
+        icon: <FaUsers />
     }
 ];
 

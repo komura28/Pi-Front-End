@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import {
-    X,
     Clock3,
     CalendarDays,
     Users,
@@ -79,7 +78,7 @@ export function AulaDetalhesModal({
                     <span className="text-sm font-semibold text-blue-300">
                         DETALHES DA AULA
                     </span>
-                    
+
                 </div>
 
                 <h2
