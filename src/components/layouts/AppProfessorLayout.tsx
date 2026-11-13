@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../Header";
 import { SideBar } from "../SideBar";
-import { FaHome } from "react-icons/fa";
+import { FaCalendarAlt, FaHome } from "react-icons/fa";
 
 const professorNavItems = [
     {
@@ -9,6 +9,11 @@ const professorNavItems = [
         href: "/professor/home",
         icon: <FaHome />,
     },
+    {
+        label: "Minha Agenda",
+        href: "/professor/agenda",
+        icon: <FaCalendarAlt />
+    }
 ];
 
 export function AppProfessorLayout() {
