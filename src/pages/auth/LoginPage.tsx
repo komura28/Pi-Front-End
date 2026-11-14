@@ -29,6 +29,8 @@ export function LoginPage() {
                 navigate("/api/home");
             } else if (loggedUser.papelUsuario === "ADM") {
                 navigate("/app/home");
+            } else if (loggedUser.papelUsuario === "PROFESSOR") {
+                navigate("/professor/home");
             }
             console.log("data: ", data);
         } catch (error) {

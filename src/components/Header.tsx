@@ -1,9 +1,9 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import perfilImage from "../assets/perfil.png"
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../assets/logo.png";
 import { FaRightFromBracket, FaUser } from "react-icons/fa6";
+import { AvatarPerfil } from "./AvatarPerfil";
 
 interface NavigationItem {
     label: string;
@@ -14,26 +14,25 @@ interface NavigationItem {
 interface HeaderProps {
     navigationItems?: NavigationItem[] | null;
     link?: string;
-    mode: "ALUNO" | "ADM"
+    mode: "ALUNO" | "ADM" | "PROFESSOR"
 }
 
 
 export function Header({ navigationItems, link, mode }: HeaderProps) {
 
     const navigate = useNavigate();
-    const { user, logout } = useAuth() as {
-        user?: { papelUsuario?: string };
-        logout: () => void;
-    };
+    const { user, logout } = useAuth();
     const [openMenus, setOpenMenus] = useState(false);
 
-    async function handlePerfil() {
+    function handlePerfil() {
+        setOpenMenus(false);
+
         if (user?.papelUsuario === "ALUNO") {
-            setOpenMenus(false);
             navigate("/api/perfil");
         } else if (user?.papelUsuario === "ADM") {
-            setOpenMenus(false);
             navigate("/app/perfil");
+        } else if (user?.papelUsuario === "PROFESSOR") {
+            navigate("/professor/perfil");
         }
     }
 
@@ -59,7 +58,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                         </div>
                     </>
                 }
-                {mode === "ADM" &&
+                {(mode === "ADM" || mode === "PROFESSOR") &&
                     <>
                         <div>
                             <p className="text-sm text-white">Bem-vindo a </p>
@@ -98,8 +97,11 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
                     <button
                         onClick={() => setOpenMenus((prev) => !prev)}
                         className="w-auto h-15 rounded-full overflow-hidden cursor-pointer object-contain">
-                        <img src={perfilImage} alt="Foto de Perfil"
-                            className="w-full h-full object-cover" />
+                        <AvatarPerfil
+                            foto={user?.photo}
+                            nome={user?.name}
+                            tamanho="sm"
+                        />
                     </button>
 
                     {openMenus && (
@@ -120,9 +122,7 @@ export function Header({ navigationItems, link, mode }: HeaderProps) {
 
                                 </button>
 
-
                                 <button
-
                                     className="w-full text-left px-3 py-2 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
                                     type="button"
                                     onClick={() => handleLogout()}>
