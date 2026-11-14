@@ -1,10 +1,12 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import logo from "../../assets/logo2.png";
 import { cpf } from "cpf-cnpj-validator";
 import { Modal } from "../../components/Modal";
+import { FaArrowLeft } from "react-icons/fa";
+import axios from "axios";
 
 interface CadastroFormData {
   name: string;
@@ -27,6 +29,10 @@ interface CadastroFormData {
 
 export function RegistroPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const voltarPara =
+    location.state?.origem === "home" ? "/" : "/login";
   const { cadastrar, login } = useAuth();
   const [serverError, setServerError] = useState("");
   const [modal, setModal] = useState(false);
@@ -57,6 +63,7 @@ export function RegistroPage() {
     handleSubmit,
     watch,
     setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<CadastroFormData>({ mode: "onBlur" });
 
@@ -103,24 +110,53 @@ export function RegistroPage() {
             : "Não",
       };
 
-      if (data.senha.length < 8) {
-        setServerError("A senha deve ter no mínimo 8 caracteres.");
-        return;
-      }
-
       await cadastrar(payload, photo?.[0]);
       await login({
         email: data.email,
         senha: data.senha,
       });
       setModal(true);
-    } catch (error) {
-      console.log(error);
-      setServerError(
-        error instanceof Error
-          ? error.message
-          : "Erro na hora de realizar o cadastro",
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        const mensagem = error.response?.data?.message;
+
+        if (
+          status === 409 &&
+          typeof mensagem === "string" &&
+          mensagem.includes("E-mail já cadastrado")
+        ) {
+          setError("email", {
+            type: "server",
+            message: "Este e-mail já está cadastrado. Utilize outro ou faça login.",
+          });
+
+          return;
+        }
+
+        if (
+          status === 409 &&
+          typeof mensagem === "string" &&
+          mensagem.includes("CPF já cadastrado")
+        ) {
+          setError("cpf", {
+            type: "server",
+            message: "Este CPF já está cadastrado.",
+          });
+
+          return;
+        }
+
+        setServerError(
+          typeof mensagem === "string"
+            ? mensagem
+            : "Não foi possível realizar o cadastro."
+        );
+
+        return;
+      }
+
+      setServerError("Erro inesperado ao realizar o cadastro.");
     }
   }
 
@@ -131,8 +167,12 @@ export function RegistroPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4 py-8 sm:px-6 lg:px-8">
       <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
-        <Link to="/login" className="text-blue-500 hover:underline">
-          ← Voltar
+        <Link
+          to={voltarPara}
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-blue-600 transition hover:text-blue-800 hover:underline"
+        >
+          <FaArrowLeft aria-hidden="true" />
+          Voltar
         </Link>
         <img
           src={logo}
@@ -153,10 +193,10 @@ export function RegistroPage() {
         >
           <div>
             <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-              Nome
+              Nome <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
-            id="name"
+              id="name"
               type="text"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
               placeholder="Digite o nome"
@@ -172,10 +212,10 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="cpf" className="mb-1 block text-sm font-medium text-gray-700">
-                CPF
+                CPF <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
-              id="cpf"
+                id="cpf"
                 type="text"
                 maxLength={14}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -198,10 +238,10 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="dt_nascimento" className="mb-1 block text-sm font-medium text-gray-700">
-                Data de Nascimento
+                Data de Nascimento <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
-              id="dt_nascimento"
+                id="dt_nascimento"
                 type="date"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 {...register("dt_nascimento", {
@@ -218,10 +258,10 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-              E-mail
+              E-mail <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <input
-            id="email"
+              id="email"
               type="email"
               className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
               placeholder="admin@gmail.com"
@@ -239,10 +279,10 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="telefone_principal" className="mb-1 block text-sm font-medium text-gray-700">
-                Telefone Principal
+                Telefone Principal <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
-              id="telefone_principal"
+                id="telefone_principal"
                 type="text"
                 maxLength={15}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -266,10 +306,10 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="telefone_secundario" className="mb-1 block text-sm font-medium text-gray-700">
-                Telefone Secundário/Reserva
+                Contato de Emergência  <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
-              id="telefone_secundario"
+                id="telefone_secundario"
                 type="text"
                 maxLength={15}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
@@ -295,10 +335,10 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="estado_civil" className="mb-1 block text-sm font-medium text-gray-700">
-                Estado Civil
+                Estado Civil <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
-              id="estado_civil"
+                id="estado_civil"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
                 {...register("estado_civil", {
                   required: "Selecione o estado civil",
@@ -320,7 +360,7 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="profissao" className="mb-1 block text-sm font-medium text-gray-700">
-                Profissão
+                Profissão <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="profissao"
@@ -347,11 +387,11 @@ export function RegistroPage() {
 
           {profissaoSelecionada === "Outro" && (
             <div>
-              <label htmlFor="profissao_custom"className="mb-1 block text-sm font-medium text-gray-700">
-                Especifique a profissão
+              <label htmlFor="profissao_custom" className="mb-1 block text-sm font-medium text-gray-700">
+                Especifique a profissão <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
-              id="profissao_custom"
+                id="profissao_custom"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 placeholder="Qual sua profissão?"
@@ -370,7 +410,7 @@ export function RegistroPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="tem_problema_saude" className="mb-1 block text-sm font-medium text-gray-700">
-                Possui problema de saúde?
+                Possui problema de saúde? <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="tem_problema_saude"
@@ -392,7 +432,7 @@ export function RegistroPage() {
 
             <div>
               <label htmlFor="participacao_anterior" className="mb-1 block text-sm font-medium text-gray-700">
-                Você já foi ou é palhaço voluntário?
+                Você já foi ou é palhaço voluntário? <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <select
                 id="participacao_anterior"
@@ -418,10 +458,10 @@ export function RegistroPage() {
           {temProblemaSaude === "Sim" && (
             <div>
               <label htmlFor="problemas_saude_custom" className="mb-1 block text-sm font-medium text-gray-700">
-                Qual problema de saúde/doença você possui?
+                Qual problema de saúde/doença você possui? <span className="text-red-500" aria-hidden="true">*</span>
               </label>
               <input
-              id="problemas_saude_custom"
+                id="problemas_saude_custom"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
                 placeholder="Digite a doença ou condição de saúde"
@@ -439,16 +479,22 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="senha" className="mb-1 block text-sm font-medium text-gray-700">
-              Senha
+              Senha <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
-              id="senha"
+                id="senha"
                 type={mostrarSenha ? "text" : "password"}
                 className="w-full bg-transparent outline-none"
                 placeholder="Digite sua Senha"
                 {...register("senha", {
                   required: "Senha é obrigatório",
+                  minLength: {
+                    value: 8,
+                    message: "A senha deve possuir pelo menos 8 caracteres",
+                  },
+
+                  deps: ["confirmarSenha"],
                 })}
               />
               <button
@@ -504,21 +550,24 @@ export function RegistroPage() {
 
           <div>
             <label htmlFor="confirmarSenha" className="mb-1 block text-sm font-medium text-gray-700">
-              Confirmar Senha
+              Confirmar Senha <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
               <input
-              id="confirmarSenha"
+                id="confirmarSenha"
                 type={mostrConfirmSenha ? "text" : "password"}
                 className="w-full bg-transparent outline-none"
                 placeholder="Confirme sua Senha"
                 {...register("confirmarSenha", {
-                  required: "Confirmação é obrigatório",
-                  validate: (senhaValida) => {
-                    if (senhaUser !== senhaValida) {
-                      return "Senhas não coincidem";
-                    }
+                  required: "A confirmação da senha é obrigatória",
+
+                  minLength: {
+                    value: 8,
+                    message: "A confirmação deve possuir pelo menos 8 caracteres",
                   },
+
+                  validate: (valor) =>
+                    valor === senhaUser || "As senhas não coincidem",
                 })}
               />
               <button
@@ -590,55 +639,55 @@ export function RegistroPage() {
               />
 
               {previewURL && (
-              <div className="relative mx-auto h-40 w-40">
-                <img
-                  src={previewURL}
-                  alt="Preview da Foto"
-                  className="h-full w-full rounded-full border-4 border-white object-cover shadow-md"
-                />
+                <div className="relative mx-auto h-40 w-40">
+                  <img
+                    src={previewURL}
+                    alt="Preview da Foto"
+                    className="h-full w-full rounded-full border-4 border-white object-cover shadow-md"
+                  />
 
-                <button
-                  type="button"
-                  onClick={removeFoto}
-                  className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow-md transition hover:bg-red-700 cursor-pointer"
-                  aria-label="Remover Foto">
-                  X
-                </button>
+                  <button
+                    type="button"
+                    onClick={removeFoto}
+                    className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow-md transition hover:bg-red-700 cursor-pointer"
+                    aria-label="Remover Foto">
+                    X
+                  </button>
                 </div>
-            )}
+              )}
 
-            {!previewURL && (
-              <label
-                htmlFor="photo"
-                className="flex cursor-pointer flex-col items-center justify-center gap-2"
-              >
-                <div className="rounded-full bg-blue-100 p-4">
-                  <svg
-                    className="h-8 w-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 16V4m0 0L8 8m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"
-                    />
-                  </svg>
-                  
-                </div>
+              {!previewURL && (
+                <label
+                  htmlFor="photo"
+                  className="flex cursor-pointer flex-col items-center justify-center gap-2"
+                >
+                  <div className="rounded-full bg-blue-100 p-4">
+                    <svg
+                      className="h-8 w-8 text-blue-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 16V4m0 0L8 8m4-4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"
+                      />
+                    </svg>
 
-                <p className="text-sm font-semibold text-gray-700">
-                  Clique para Selecionar uma imagem
-                </p>
+                  </div>
 
-                <p className="text-xs text-gray-500">JPG, PNG ou WEBP</p>
-              </label>
-  )}
+                  <p className="text-sm font-semibold text-gray-700">
+                    Clique para Selecionar uma imagem
+                  </p>
+
+                  <p className="text-xs text-gray-500">JPG, PNG ou WEBP</p>
+                </label>
+              )}
             </div>
 
-            
+
           </div>
 
           <div className="flex items-start gap-2 pt-2">

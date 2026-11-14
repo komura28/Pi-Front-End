@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import logo from "../../assets/logo2.png";
+import { FaArrowLeft } from "react-icons/fa6";
 
 interface LoginFormData {
     email: string;
@@ -44,6 +45,13 @@ export function LoginPage() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
             <section className="w-full max-w-md rounded-2x1 bg-white p-8 shadow-lg rounded-lg">
+                <Link
+                    to="/"
+                    className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-blue-600 transition hover:text-blue-800 hover:underline"
+                >
+                    <FaArrowLeft aria-hidden="true" />
+                    Voltar para a Home
+                </Link>
                 <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
                 <h1 className="mb-2 text-center text-2x1 font-bold text-gray-800">
                     Aticurando
@@ -66,11 +74,6 @@ export function LoginPage() {
                                 required: "O e-mail é obrigatório",
                             })}
                         />
-                        {/* {errors.email && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.email.message}
-                            </p>
-                        )} */}
                     </div>
 
                     <div>
