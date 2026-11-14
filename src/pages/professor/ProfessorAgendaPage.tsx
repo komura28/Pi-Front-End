@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { CalendarDays, Clock3, BookOpen, Hourglass, CheckCircle2, CalendarCheck2 } from "lucide-react";
 
-import { getMinhasAulas } from "../../services/professorService";
+import { getMinhasAulas, getResumoChamadas } from "../../services/professorService";
 
 import type { AulaTurmaProfessor, StatusAula } from
     "../../types/professor/professor-types";
 import { ProfessorStatCard } from "../../components/professor/ProfessorStatCard";
 import { AulaDetalhesModal } from "../../components/professor/AulaDetalhesModal";
+import { useNavigate } from "react-router-dom";
+import type { ResumoChamada } from "../../types/professor/chamada-types";
+import { useAgora } from "../../hooks/useAgora";
+import { mensagemDisponibilidadeChamada, podeAcessarChamada } from "../../utils/professor/chamadaDisponibilidade";
+import { LembreteFinalizacao } from "../../components/professor/LembreteFinalizacao";
 
 const filtros: {
     label: string;
@@ -40,8 +45,10 @@ export function ProfessorAgendaPage() {
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState("");
 
+    const navigate = useNavigate();
+
     const [filtroStatus, setFiltroStatus] =
-        useState<StatusAula | "TODAS">("TODAS");
+        useState<StatusAula | "TODAS">("AGENDADA");
 
     const [dataInicial, setDataInicial] = useState("");
     const [dataFinal, setDataFinal] = useState("");
@@ -49,20 +56,40 @@ export function ProfessorAgendaPage() {
     const [aulaSelecionada, setAulaSelecionada] =
         useState<AulaTurmaProfessor | null>(null);
 
+    const [resumoChamadas, setResumoChamadas] =
+        useState<ResumoChamada[]>([]);
+
+    const [erroResumo, setErroResumo] = useState("");
+
+    const agora = useAgora();
+
     useEffect(() => {
         let ativo = true;
 
         async function carregarAgenda() {
             try {
-                const dados = await getMinhasAulas();
+                const [resultadoAulas, resultadoResumo] =
+                    await Promise.allSettled([
+                        getMinhasAulas(),
+                        getResumoChamadas()
+                    ]);
 
-                if (ativo) {
-                    setAulas(dados);
-                }
-            } catch {
-                if (ativo) {
+                if (!ativo) return;
+
+                if (resultadoAulas.status === "fulfilled") {
+                    setAulas(resultadoAulas.value);
+                } else {
                     setErro("Não foi possível carregar sua agenda.");
                 }
+
+                if (resultadoResumo.status === "fulfilled") {
+                    setResumoChamadas(resultadoResumo.value);
+                } else {
+                    setErroResumo(
+                        "Não foi possível verificar as chamadas registradas."
+                    );
+                }
+
             } finally {
                 if (ativo) {
                     setLoading(false);
@@ -141,6 +168,10 @@ export function ProfessorAgendaPage() {
         });
     };
 
+    const chamadasRegistradas = new Set(
+        resumoChamadas.map((item) => item.aulaTurmaId)
+    );
+
     return (
         <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
@@ -160,6 +191,13 @@ export function ProfessorAgendaPage() {
                     Consulte e acompanhe suas aulas no Aticurando.
                 </p>
             </section>
+
+            {!loading && !erro && (
+                <LembreteFinalizacao
+                    aulas={aulas}
+                    agora={agora}
+                />
+            )}
 
             {!loading && !erro && (
                 <section
@@ -267,6 +305,15 @@ export function ProfessorAgendaPage() {
                 </div>
             </section>
 
+            {!loading && !erro && erroResumo && (
+                <p
+                    role="status"
+                    className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+                >
+                    {erroResumo} Você ainda pode abrir suas aulas normalmente.
+                </p>
+            )}
+
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
                 <h2 className="mb-6 text-xl font-bold text-slate-800">
@@ -334,14 +381,69 @@ export function ProfessorAgendaPage() {
 
                                 </div>
 
-                                <div className="mt-5 flex justify-end">
+                                {!erroResumo && (
+                                    chamadasRegistradas.has(item._id) ||
+                                    item.status === "AGENDADA" ||
+                                    item.status === "REALIZADA"
+                                ) && (
+                                        <div className="mt-4 flex items-center gap-2 text-sm">
+
+                                            {chamadasRegistradas.has(item._id) ? (
+                                                <>
+                                                    <CheckCircle2
+                                                        size={18}
+                                                        className="text-green-600"
+                                                    />
+
+                                                    <span className="font-semibold text-green-700">
+                                                        Chamada registrada
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Clock3
+                                                        size={18}
+                                                        className="text-slate-400"
+                                                    />
+
+                                                    <span className="text-slate-500">
+                                                        Chamada não registrada
+                                                    </span>
+                                                </>
+                                            )}
+
+                                        </div>
+                                    )}
+
+                                <div className="mt-5 flex flex-wrap justify-end gap-3">
+
                                     <button
                                         type="button"
                                         onClick={() => setAulaSelecionada(item)}
-                                        className="cursor-pointer rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                                        className="cursor-pointer rounded-xl border border-blue-200 bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-50"
                                     >
                                         Ver detalhes
                                     </button>
+
+                                    {podeAcessarChamada(item, agora) ? (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                navigate(`/professor/aulas/${item._id}/chamada`)
+                                            }
+                                            className="cursor-pointer rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                                        >
+                                            {item.status === "REALIZADA"
+                                                ? "Consultar chamada"
+                                                : !erroResumo && chamadasRegistradas.has(item._id)
+                                                    ? "Consultar chamada"
+                                                    : "Realizar chamada"}
+                                        </button>
+                                    ) : item.status === "AGENDADA" ? (
+                                        <p className="flex items-center text-sm font-medium text-amber-700">
+                                            {mensagemDisponibilidadeChamada(item)}
+                                        </p>
+                                    ) : null}
                                 </div>
                             </article>
                         ))}

@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { ProfessorStatCard } from "../../components/professor/ProfessorStatCard";
 import { ProximaAulaCard, type ProximaAula } from "../../components/professor/ProximaAulaCard";
 import { useAuth } from "../../contexts/AuthContext";
-import { CalendarDays, GraduationCap, Users } from "lucide-react";
+import { BookOpen, CalendarDays, GraduationCap, Users } from "lucide-react";
 import { getMinhasAulas } from "../../services/professorService";
 import { AgendaResumo } from "../../components/professor/AgendaResumo";
+import type { AulaTurmaProfessor } from "../../types/professor/professor-types";
+import { useAgora } from "../../hooks/useAgora";
+import { LembreteFinalizacao } from "../../components/professor/LembreteFinalizacao";
 
 const inicioMock = new Date();
 
@@ -24,24 +27,8 @@ export function ProfessorHomePage() {
         year: "numeric",
     }).format(new Date());
 
-    const indicadores = [
-        {
-            titulo: "Minhas Turmas",
-            valor: 4,
-            icone: Users
-        },
-        {
-            titulo: "Aulas Hoje",
-            valor: 2,
-            icone: CalendarDays
-        },
-        {
-            titulo: "Alunos",
-            valor: 68,
-            icone: GraduationCap
-        }
-    ];
-
+    const [aulasProfessor, setAulasProfessor] =
+        useState<AulaTurmaProfessor[]>([]);
 
     const [proximaAula, setProximaAula] =
         useState<ProximaAula | null>(null);
@@ -54,17 +41,81 @@ export function ProfessorHomePage() {
 
     const [agenda, setAgenda] = useState<ProximaAula[]>([]);
 
+    const totalTurmas = new Set(
+        aulasProfessor.flatMap((item) =>
+            item.turma ? [item.turma._id] : []
+        )
+    ).size;
+
+    const totalAgendadas = aulasProfessor.filter(
+        (item) => item.status === "AGENDADA"
+    ).length;
+
+    const hoje = new Date();
+
+    const agora = useAgora();
+
+    const [aulasParaLembrete, setAulasParaLembrete] =
+        useState<AulaTurmaProfessor[]>([]);
+
+    const aulasHoje = aulasProfessor.filter((item) => {
+        if (
+            !item.dataInicio ||
+            !["AGENDADA", "REALIZADA"].includes(item.status)
+        ) {
+            return false;
+        }
+
+        const dataAula = new Date(item.dataInicio);
+
+        if (Number.isNaN(dataAula.getTime())) {
+            return false;
+        }
+
+        return (
+            dataAula.getDate() === hoje.getDate() &&
+            dataAula.getMonth() === hoje.getMonth() &&
+            dataAula.getFullYear() === hoje.getFullYear()
+        );
+    }).length;
+
+    const valorIndicador = (valor: number) =>
+        carregandoAulas ? "..." : erroAulas ? "—" : valor;
+
+    const indicadores = [
+        {
+            titulo: "Minhas Turmas",
+            valor: valorIndicador(totalTurmas),
+            icone: Users
+        },
+        {
+            titulo: "Aulas Hoje",
+            valor: valorIndicador(aulasHoje),
+            icone: CalendarDays
+        },
+        {
+            titulo: "Aulas Agendadas",
+            valor: valorIndicador(totalAgendadas),
+            icone: BookOpen
+        }
+    ];
+
     useEffect(() => {
         let ativo = true;
 
         async function carregarProximaAula() {
             try {
-                const aulas = await getMinhasAulas("AGENDADA");
+                const aulas = await getMinhasAulas();
+
+                if (ativo) {
+                    setAulasParaLembrete(aulas);
+                }
 
                 const agora = Date.now();
 
                 const futuras = aulas
                     .filter((item) =>
+                        item.status === "AGENDADA" &&
                         item.dataInicio &&
                         Number.isFinite(
                             new Date(item.dataInicio).getTime()
@@ -101,6 +152,7 @@ export function ProfessorHomePage() {
 
                 if (!ativo) return;
 
+                setAulasProfessor(aulas);
                 setAgenda(aulasFormatadas);
                 setProximaAula(aulasFormatadas[0] ?? null);
 
@@ -138,7 +190,7 @@ export function ProfessorHomePage() {
                     </div>
 
                     <h1 className="text-3xl font-bold md:text-4xl">
-                        Olá, {primeiroNome}! 👋
+                        Olá, {primeiroNome}!
                     </h1>
 
                     <p className="mt-3 max-w-xl text-blue-100">
@@ -162,6 +214,15 @@ export function ProfessorHomePage() {
                 />
 
             </section>
+
+            {
+                !carregandoAulas && !erroAulas && (
+                    <LembreteFinalizacao
+                        aulas={aulasParaLembrete}
+                        agora={agora}
+                    />
+                )
+            }
 
             <section
                 aria-label="Indicadores do professor"

@@ -10,6 +10,9 @@ import { getMinhasAulas } from "../../services/professorService";
 
 import type { AulaTurmaProfessor } from
     "../../types/professor/professor-types";
+import { AulaDetalhesModal } from "../../components/professor/AulaDetalhesModal";
+import { TurmaAulasModal } from "../../components/professor/TurmaAulasModal";
+import { useNavigate } from "react-router-dom";
 
 interface TurmaResumo {
     id: string;
@@ -55,6 +58,17 @@ export function ProfessorTurmasPage() {
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState("");
 
+    const navigate = useNavigate();
+
+    const [aulasProfessor, setAulasProfessor] =
+        useState<AulaTurmaProfessor[]>([]);
+
+    const [turmaSelecionada, setTurmaSelecionada] =
+        useState<TurmaResumo | null>(null);
+
+    const [aulaSelecionada, setAulaSelecionada] =
+        useState<AulaTurmaProfessor | null>(null);
+
     useEffect(() => {
         let ativo = true;
 
@@ -63,6 +77,7 @@ export function ProfessorTurmasPage() {
                 const aulas = await getMinhasAulas();
 
                 if (ativo) {
+                    setAulasProfessor(aulas);
                     setTurmas(agruparTurmas(aulas));
                 }
             } catch {
@@ -91,7 +106,6 @@ export function ProfessorTurmasPage() {
     return (
         <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-            {/* Cabeçalho */}
             <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
                 <div className="mb-3 flex items-center gap-2 text-blue-200">
                     <Users size={20} />
@@ -119,7 +133,6 @@ export function ProfessorTurmasPage() {
                 </p>
             ) : (
                 <>
-                    {/* Indicadores */}
                     <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
                         <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -151,7 +164,6 @@ export function ProfessorTurmasPage() {
                         </div>
                     </section>
 
-                    {/* Cards das turmas */}
                     <section>
                         <h2 className="mb-5 text-xl font-bold text-slate-800">
                             Turmas vinculadas
@@ -211,6 +223,29 @@ export function ProfessorTurmasPage() {
 
                                         </div>
 
+                                        <div className="border-t border-slate-100 p-5">
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setTurmaSelecionada(turma)}
+                                                aria-haspopup="dialog"
+                                                className="w-full cursor-pointer rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                                            >
+                                                Ver aulas
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    navigate(`/professor/turmas/${turma.id}/frequencia`)
+                                                }
+                                                className="mt-3 w-full cursor-pointer rounded-xl border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50"
+                                            >
+                                                Ver frequência
+                                            </button>
+
+                                        </div>
+
                                     </article>
                                 ))}
                             </div>
@@ -218,6 +253,30 @@ export function ProfessorTurmasPage() {
 
                     </section>
                 </>
+            )}
+
+            {turmaSelecionada && (
+                <TurmaAulasModal
+                    turma={turmaSelecionada}
+                    aulas={aulasProfessor}
+                    onClose={() => setTurmaSelecionada(null)}
+                    onVerDetalhes={setAulaSelecionada}
+                    onRealizarChamada={(aula) => {
+                        setAulaSelecionada(null);
+                        setTurmaSelecionada(null);
+
+                        navigate(
+                            `/professor/aulas/${aula._id}/chamada`
+                        );
+                    }}
+                />
+            )}
+
+            {aulaSelecionada && (
+                <AulaDetalhesModal
+                    aula={aulaSelecionada}
+                    onClose={() => setAulaSelecionada(null)}
+                />
             )}
         </main>
     );
