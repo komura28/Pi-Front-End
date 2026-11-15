@@ -36,3 +36,12 @@ export interface RegisterMatriculaRequest {
     interesseServicos: string[];
     comoSoubeCurso: string;
 }
+
+export interface FrequenciaAlunoDashboard {
+    matriculaId: string;
+    turmaId: string;
+    presentes: number;
+    faltas: number;
+    aulasContabilizadas: number;
+    frequenciaPercentual: number | null;
+}
