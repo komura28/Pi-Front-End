@@ -45,9 +45,24 @@ export function TurmaCadastroPage() {
     const {
         register,
         handleSubmit,
-        control,
         formState: { errors, isSubmitting }
     } = useForm<CadastroTurmaFormData>();
+
+    if (loading) {
+        return (
+            <div className="p-8">
+                <p>Carregando cursos...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-8 text-red-600">
+                <p>{error}</p>
+            </div>
+        );
+    }
 
     async function handleCadastro(data: CadastroTurmaFormData) {
         try {
@@ -243,7 +258,7 @@ export function TurmaCadastroPage() {
 
                         }}
                     />)}
-                
+
             </section>
         </main>
     );

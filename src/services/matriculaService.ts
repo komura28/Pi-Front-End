@@ -3,7 +3,8 @@ import { api } from "./api";
 import type {
     MatriculaDTO,
     RegisterMatriculaRequest,
-    StatusMatricula
+    StatusMatricula,
+    FrequenciaAlunoDashboard
 } from "../types/matricula/matricula-types";
 
 export async function getMatriculas():Promise<MatriculaDTO[]> {
@@ -28,5 +29,15 @@ export async function getMinhasMatriculas(): Promise<MatriculaDTO[]> {
 
 export async function cancelarMatricula(id: string, motivoCancelamento: string) {
     const response = await api.patch(`/matricula/${id}/cancelar`, { motivoCancelamento });
+    return response.data;
+}
+
+export async function getMinhaFrequencia():
+    Promise<FrequenciaAlunoDashboard[]> {
+
+    const response = await api.get<FrequenciaAlunoDashboard[]>(
+        "/matricula/minha-frequencia"
+    );
+
     return response.data;
 }

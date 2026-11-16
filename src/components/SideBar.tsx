@@ -1,10 +1,8 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa6";
 import logo from "../assets/logo.png";
 import { FaWhatsapp } from "react-icons/fa";
-import { getDashboardData } from "../services/dashboardService";
-import type { DashboardData } from "../types/dashboard/dashboard-types";
 
 
 interface NavigationItem {

@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { SideBar } from "../SideBar";
 import { Header } from "../Header";
-import { FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
+import { FaCalendarAlt, FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
 import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 import { LucideBellRing } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -51,6 +51,11 @@ const adminNavItems = [
         label: "Lista de Alunos",
         href: "/app/aluno",
         icon: <FaUsers />
+    },
+    {
+        label: "Gerenciar Aulas",
+        href: "/app/gerenciar-aulas",
+        icon: <FaCalendarAlt />
     },
 
 ]

@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import type { authUser } from "../../types/auth/auth-types";
 import { Modal } from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
 import { deletarUserAPI, getUser } from "../../services/authService";
+import type { IUserDTO } from "../../types/user/user-types";
 
 export function UserPage() {
     const navigate = useNavigate();
 
     const [isDeleting, setIsDeleting] = useState(false);
-    const [users, setUsers] = useState<authUser[]>([]);
+    const [users, setUsers] = useState<IUserDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
