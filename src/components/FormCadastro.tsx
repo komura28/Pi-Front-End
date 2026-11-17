@@ -1,5 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/logo2.png"
+import {  useNavigate } from "react-router-dom";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { useAuth } from "../contexts/AuthContext";
 import { useState } from "react";
@@ -110,22 +109,6 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
     };
     return (
         <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
-            <Link to="/login" className="text-blue-500 hover:underline">
-                ← Voltar
-            </Link>
-            <img
-                src={logo}
-                alt="Logo"
-                className="mx-auto h-16 w-auto object-contain"
-            />
-            <h1 className="mb-2 text-center text-2xl font-bold text-gray-800">
-                Aticurando
-            </h1>
-
-            <p className="mb-6 text-center text-sm text-gray-500">
-                Faça seu cadastro
-            </p>
-
             <form
                 onSubmit={handleSubmit(handleCadastro, onError)}
                 className="space-y-4"
