@@ -1,104 +1,313 @@
 import { useEffect, useState } from "react";
-import type { DashboardData } from "../../types/dashboard/dashboard-types";
+import {
+    BookOpen,
+    CalendarDays,
+    ClipboardList,
+    GraduationCap,
+    ShieldCheck,
+} from "lucide-react";
+
+import { useAuth } from "../../contexts/AuthContext";
 import { getDashboardData } from "../../services/dashboardService";
+import type { DashboardData } from "../../types/dashboard/dashboard-types";
+
+import { ProfessorStatCard } from "../../components/professor/ProfessorStatCard";
 import { CardDashboard } from "../../components/CardDashboard";
 import { Tabs } from "../../components/Tabs";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+
+type TabType = "geral" | "matriculas" | "inativos";
 
 
 
 
 export function HomePage() {
 
-    const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-    const [error, setError] = useState("");
+    const { user } = useAuth();
+
+    const primeiroNome =
+        user?.name?.trim().split(/\s+/)[0] || "Administrador";
+
+    const dataAtual = new Intl.DateTimeFormat("pt-BR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(new Date());
+
+    const [dashboardData, setDashboardData] =
+        useState<DashboardData | null>(null);
+
     const [loading, setLoading] = useState(true);
-    const [tab, setTab] = useState<"geral" | "matriculas" | "inativos">("geral");
+    const [error, setError] = useState("");
+
+    const [tab, setTab] = useState<TabType>("geral");
 
     useEffect(() => {
+        let ativo = true;
+
         async function carregarDashboardData() {
             try {
+                setLoading(true);
+                setError("");
+
                 const data = await getDashboardData();
-                setDashboardData(data);
-            } catch (error) {
-                if (error instanceof Error) {
-                    setError(`Erro ao carregar os dados do curso: ${error.message}`);
-                } else {
-                    setError("Erro ao carregar os dados do curso");
+
+                if (ativo) {
+                    setDashboardData(data);
                 }
+            } catch (error) {
+                if (!ativo) return;
+
+                console.error(
+                    "Erro ao carregar dashboard:",
+                    error
+                );
+
+                setError(
+                    "Não foi possível carregar os indicadores administrativos."
+                );
             } finally {
-                setLoading(false);
+                if (ativo) {
+                    setLoading(false);
+                }
             }
         }
-        carregarDashboardData();
+
+        void carregarDashboardData();
+
+        return () => {
+            ativo = false;
+        };
     }, []);
 
-    if (loading) {
-        return (
-            <div className="p-8">
-                <p>Carregando dashboard...</p>
-            </div>
-        );
-    }
+    const valorIndicador = (valor: number) => {
+        if (loading) return "...";
+        if (error) return "—";
 
-    if (error) {
-        return (
-            <div className="p-8 text-red-600">
-                <p>{error}</p>
-            </div>
-        );
-    }
+        return valor;
+    };
+
+    const indicadores = [
+        {
+            titulo: "Cursos Ativos",
+            valor: valorIndicador(dashboardData?.totalCursos ?? 0),
+            icone: BookOpen,
+        },
+        {
+            titulo: "Turmas Ativas",
+            valor: valorIndicador(dashboardData?.totalTurmas ?? 0),
+            icone: GraduationCap,
+        },
+        {
+            titulo: "Matrículas Pendentes",
+            valor: valorIndicador(
+                dashboardData?.matriculasPendentes ?? 0
+            ),
+            icone: ClipboardList,
+        },
+    ];
+
+    const totalMatriculas = dashboardData
+        ? dashboardData.matriculasAtivas +
+        dashboardData.matriculasPendentes +
+        dashboardData.matriculasRecusadas +
+        dashboardData.matriculasCanceladas
+        : 0;
+
+    const totalCursos = dashboardData
+        ? dashboardData.totalCursos +
+        dashboardData.cursosInativos
+        : 0;
+
+    const totalTurmas = dashboardData
+        ? dashboardData.totalTurmas +
+        dashboardData.turmasInativas
+        : 0;
+
 
     return (
-        <div className="min-h-screen bg-slate-50 p-8">
-            <h1 className="text-3xl font-bold text-slate-800 mb-8">
-                Painel Administrativo
-            </h1>
-            <Tabs tab={tab} setTab={setTab} />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="rounded-2xl bg-white p-6 shadow-md border-l-4 border-blue-600">
-                    <p className="text-sm text-slate-500">Cursos Ativos</p>
-                    <h3 className="text-2xl font-bold">
-                        {dashboardData?.totalCursos}
-                    </h3>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+
+                <div className="relative z-10">
+                    <div className="mb-4 flex items-center gap-2 text-blue-200">
+                        <ShieldCheck size={20} />
+
+                        <span className="text-sm font-semibold tracking-wide">
+                            PAINEL ADMINISTRATIVO
+                        </span>
+                    </div>
+
+                    <h1 className="text-3xl font-bold md:text-4xl">
+                        Olá, {primeiroNome}!
+                    </h1>
+
+                    <p className="mt-3 max-w-xl text-blue-100">
+                        Acompanhe os indicadores do Aticurando
+                        e gerencie as atividades do projeto
+                        em um só lugar.
+                    </p>
+
+                    <div className="mt-6 flex items-center gap-2 text-sm text-blue-200">
+                        <CalendarDays size={18} />
+
+                        <span className="capitalize">
+                            {dataAtual}
+                        </span>
+                    </div>
                 </div>
 
-                <div className="rounded-2xl bg-white p-6 shadow-md border-l-4 border-blue-600">
-                    <p className="text-sm text-slate-500">Turmas Ativas</p>
-                    <h3 className="text-2xl font-bold">
-                        {dashboardData?.totalTurmas}
-                    </h3>
-                </div>
-            </div>
+                <ShieldCheck
+                    size={220}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-12 -bottom-16 hidden rotate-[-15deg] text-white/10 md:block"
+                />
+            </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {
-                    tab === "geral" && (
-                        <>
-                            <CardDashboard title="Total de Matrículas" className="border-blue-600" value={dashboardData?.totalMatriculas ?? "Carregando..."} />
-                            <CardDashboard title="Total de Cursos" className="border-blue-600" value={dashboardData?.totalCursos ?? "Carregando..."} />
-                            <CardDashboard title="Total de Turmas" className="border-blue-600" value={dashboardData?.totalTurmas ?? "Carregando..."} />
-                        </>
-                    )
-                }
-                {
-                    tab === "matriculas" && (
-                        <>
-                            <CardDashboard title="Matrículas Ativas" className="border-green-600" value={dashboardData?.matriculasAtivas ?? "Carregando..."} />
-                            <CardDashboard title="Matrículas Recusadas" className="border-red-600" value={dashboardData?.matriculasRecusadas ?? "Carregando..."} />
-                            <CardDashboard title="Matrículas Pendentes" className="border-yellow-600" value={dashboardData?.matriculasPendentes ?? "Carregando..."} />
-                        </>
-                    )
-                }
-                {
-                    tab === "inativos" && (
-                        <>
-                            <CardDashboard title="Matrículas Inativas" className="border-gray-600" value={dashboardData?.matriculasCanceladas ?? "Carregando..."} />
-                            <CardDashboard title="Turmas Inativas" className="border-gray-600" value={dashboardData?.turmasInativas ?? "Carregando..."} />
-                            <CardDashboard title="Cursos Inativos" className="border-gray-600" value={dashboardData?.cursosInativos ?? "Carregando..."} />
-                        </>
-                    )
-                }
-            </div>
+            <section
+                aria-label="Indicadores administrativos"
+                className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+            >
+                {indicadores.map((indicador) => (
+                    <ProfessorStatCard
+                        key={indicador.titulo}
+                        titulo={indicador.titulo}
+                        valor={indicador.valor}
+                        icone={indicador.icone}
+                    />
+                ))}
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+                <div className="mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">
+                        Indicadores do Projeto
+                    </h2>
+
+                    <p className="mt-2 text-sm text-slate-500">
+                        Visualize os dados gerais, as matrículas
+                        e os registros inativos do Aticurando.
+                    </p>
+                </div>
+
+                <Tabs tab={tab} setTab={setTab} />
+
+                {loading ? (
+                    <p className="text-slate-500">
+                        Carregando indicadores...
+                    </p>
+                ) : error ? (
+                    <p role="alert" className="text-red-600">
+                        {error}
+                    </p>
+                ) : dashboardData ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+                        {tab === "geral" && (
+                            <>
+                                <CardDashboard
+                                    title="Total de Matrículas"
+                                    value={totalMatriculas}
+                                    className="border-l-blue-600"
+                                />
+
+                                <CardDashboard
+                                    title="Total de Cursos"
+                                    value={totalCursos}
+                                    className="border-l-blue-600"
+                                />
+
+                                <CardDashboard
+                                    title="Total de Turmas"
+                                    value={totalTurmas}
+                                    className="border-l-blue-600"
+                                />
+                            </>
+                        )}
+
+                        {tab === "matriculas" && (
+                            <>
+                                <CardDashboard
+                                    title="Matrículas Aprovadas"
+                                    value={dashboardData.matriculasAtivas}
+                                    className="border-l-green-600"
+                                />
+
+                                <CardDashboard
+                                    title="Matrículas Recusadas"
+                                    value={dashboardData.matriculasRecusadas}
+                                    className="border-l-red-600"
+                                />
+
+                                <CardDashboard
+                                    title="Matrículas Pendentes"
+                                    value={dashboardData.matriculasPendentes}
+                                    className="border-l-amber-500"
+                                />
+                            </>
+                        )}
+
+                        {tab === "inativos" && (
+                            <>
+                                <CardDashboard
+                                    title="Matrículas Canceladas"
+                                    value={dashboardData.matriculasCanceladas}
+                                    className="border-l-slate-500"
+                                />
+
+                                <CardDashboard
+                                    title="Turmas Inativas"
+                                    value={dashboardData.turmasInativas}
+                                    className="border-l-slate-500"
+                                />
+
+                                <CardDashboard
+                                    title="Cursos Inativos"
+                                    value={dashboardData.cursosInativos}
+                                    className="border-l-slate-500"
+                                />
+                            </>
+                        )}
+                    </div>
+                ) : null}
+            </section>
+
+            {!loading && !error && dashboardData && (
+                <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+
+                    <div className="flex items-center gap-4">
+                        <div className="rounded-xl bg-amber-100 p-3 text-amber-600">
+                            <ClipboardList size={26} />
+                        </div>
+
+                        <div>
+                            <h2 className="text-lg font-bold text-slate-800">
+                                Matrículas pendentes
+                            </h2>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                {dashboardData.matriculasPendentes > 0
+                                    ? `Você possui ${dashboardData.matriculasPendentes} matrícula(s) aguardando análise.`
+                                    : "Nenhuma matrícula aguardando análise no momento."}
+                            </p>
+                        </div>
+                    </div>
+
+                    {dashboardData.matriculasPendentes > 0 && (
+                        <Link
+                            to="/app/matricula"
+                            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
+                        >
+                            Analisar matrículas
+                            <ArrowRight size={18} />
+                        </Link>
+                    )}
+
+                </section>
+            )}
         </div >
     );
 }

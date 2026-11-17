@@ -22,7 +22,7 @@ export function Modal({
                 <h1 className="text-xl font-semibold text-slate-900 mb-4 text-center">
                     {titulo}
                 </h1>
-                <p className="mb-6 whitespace-pre-line">
+                <p className="mb-6 whitespace-pre-line text-center text-slate-600">
                     {message}
                 </p>
                 <div className="flex gap-3 justify-center w-full">
