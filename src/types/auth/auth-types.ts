@@ -153,3 +153,16 @@ export interface AgendarAulaRequest {
     professor: string;
     status: "AGENDADA";
 }
+
+export interface RegisterProfessorRequest {
+    name: string;
+    cpf: number;
+    email: string;
+    senha: string;
+    confirmarSenha: string;
+    dt_nascimento: string;
+    estado_civil: string;
+    telefone_principal: string;
+    telefone_secundario?: string;
+    aceite_lgpd: boolean;
+}
