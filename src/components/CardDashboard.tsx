@@ -1,18 +1,25 @@
-
-
 type CardDashboardProps = {
     title: string;
     value: number | string;
     className?: string;
-}
+};
 
-export function CardDashboard({ title, value, className }: CardDashboardProps) {
+export function CardDashboard({
+    title,
+    value,
+    className = ""
+}: CardDashboardProps) {
     return (
-        <div className= {`rounded-2xl p-6 bg-white shadow-md border-l-4 ${className || ""}`}>
-            <div className="mb-2 flex items-center">
-                <h2 className="ml-2 text-2xl font-semibold text-gray-800">{title}</h2>
-            </div>
-            <p className="text-3xl font-bold text-gray-900">{value}</p>
-        </div>
-    )
+        <article
+            className={`rounded-xl border border-l-4 border-slate-200 bg-slate-50 p-5 transition-shadow hover:shadow-md ${className}`}
+        >
+            <p className="text-sm font-medium text-slate-500">
+                {title}
+            </p>
+
+            <h3 className="mt-3 text-3xl font-bold text-slate-800">
+                {value}
+            </h3>
+        </article>
+    );
 }
