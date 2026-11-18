@@ -16,18 +16,18 @@ export function FrequenciaAlunoCard({
     const percentual = frequencia.frequenciaPercentual;
 
     return (
-        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <article className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
-            <h3 className="mb-4 text-lg font-semibold text-slate-800">
+            <h3 className="mb-4 wrap-break-words text-base font-semibold text-slate-800 sm:text-lg">
                 {nomeCurso}
             </h3>
 
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="text-sm text-slate-500">
                     Frequência
                 </span>
 
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="shrink-0 text-xl font-bold text-blue-600 sm:text-2xl">
                     {percentual === null
                         ? "—"
                         : `${percentual}%`}
@@ -36,7 +36,7 @@ export function FrequenciaAlunoCard({
 
             {percentual !== null ? (
                 <div
-                    className="mb-5 h-3 overflow-hidden rounded-full bg-slate-200"
+                    className="mb-5 h-3 w-full overflow-hidden rounded-full bg-slate-200"
                     role="progressbar"
                     aria-label={`Frequência em ${nomeCurso}`}
                     aria-valuenow={percentual}
@@ -54,9 +54,9 @@ export function FrequenciaAlunoCard({
                 </p>
             )}
 
-            <div className="grid grid-cols-3 gap-3 border-t border-slate-100 pt-4 text-center">
-                <div>
-                    <p className="text-xl font-bold text-green-600">
+            <div className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center sm:gap-3">
+                <div className="min-w-0">
+                    <p className="text-lg font-bold text-green-600 sm:text-xl">
                         {frequencia.presentes}
                     </p>
                     <p className="text-xs text-slate-500">
@@ -64,8 +64,8 @@ export function FrequenciaAlunoCard({
                     </p>
                 </div>
 
-                <div>
-                    <p className="text-xl font-bold text-red-600">
+                <div className="min-w-0">
+                    <p className="text-lg font-bold text-red-600 sm:text-xl">
                         {frequencia.faltas}
                     </p>
                     <p className="text-xs text-slate-500">
@@ -73,8 +73,8 @@ export function FrequenciaAlunoCard({
                     </p>
                 </div>
 
-                <div>
-                    <p className="text-xl font-bold text-slate-800">
+                <div className="min-w-0">
+                    <p className="text-lg font-bold text-slate-800 sm:text-xl">
                         {frequencia.aulasContabilizadas}
                     </p>
                     <p className="text-xs text-slate-500">
