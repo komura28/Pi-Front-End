@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import {  Outlet } from "react-router-dom";
 import { SideBar } from "../SideBar";
 import { Header } from "../Header";
 import { FaCalendarAlt, FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
@@ -6,6 +6,7 @@ import { HiOutlineDocumentCheck } from 'react-icons/hi2';
 import { LucideBellRing } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getDashboardData } from "../../services/dashboardService";
+import { FaUserTie } from "react-icons/fa6";
 
 const adminNavItems = [
     {
@@ -51,6 +52,11 @@ const adminNavItems = [
         label: "Lista de Alunos",
         href: "/app/aluno",
         icon: <FaUsers />
+    },
+    {
+        label: "Cadastrar Professor",
+        href: "/app/register-professor",
+        icon: <FaUserTie />
     },
     {
         label: "Gerenciar Aulas",
