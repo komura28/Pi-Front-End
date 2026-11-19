@@ -1,5 +1,5 @@
-import {  useNavigate } from "react-router-dom";
-import { useForm, type FieldErrors } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { useForm, useWatch, type FieldErrors } from "react-hook-form";
 import { useAuth } from "../contexts/AuthContext";
 import { useState } from "react";
 import axios from "axios";
@@ -9,6 +9,7 @@ import { UploadFoto } from "./UploadFoto.tsx";
 import { Modal } from "./Modal";
 import { CampoSenha } from "./CampoSenha.tsx"
 import { cadastrarProfessor } from "../services/admService";
+import { SuccessDialog } from "./ui/SuccessDialog.tsx";
 
 interface CadastroFormDataProps {
     tipo?: "comum" | "professor"
@@ -33,7 +34,7 @@ interface CadastroFormData {
     photo?: FileList;
 }
 
-export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
+export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
     const navigate = useNavigate();
     const { cadastrar, login } = useAuth();
     const [serverError, setServerError] = useState("");
@@ -43,14 +44,15 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
     const {
         register,
         handleSubmit,
-        watch,
+        control,
         setValue,
         formState: { errors, isSubmitting },
     } = useForm<CadastroFormData>({ mode: "onBlur" });
 
-    const senhaUser = watch("senha");
-    const profissaoSelecionada = watch("profissao");
-    const temProblemaSaude = watch("tem_problema_saude");
+    const senhaUser = useWatch({ control, name: "senha" });
+    const profissaoSelecionada = useWatch({ control, name: "profissao" });
+    const temProblemaSaude = useWatch({ control, name: "tem_problema_saude" });
+    const fotoSelecionada = useWatch({ control, name: "photo" });
 
     async function handleCadastro(data: CadastroFormData) {
         try {
@@ -76,16 +78,16 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                 return;
             }
 
-            if(tipo === "professor") {
+            if (tipo === "professor") {
                 await cadastrarProfessor(payload, photo?.[0]);
-            } else{
+            } else {
 
-            await cadastrar(payload, photo?.[0]);
-            await login({
-                email: data.email,
-                senha: data.senha,
-            });
-        }
+                await cadastrar(payload, photo?.[0]);
+                await login({
+                    email: data.email,
+                    senha: data.senha,
+                });
+            }
             setModal(true);
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -108,7 +110,26 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
         console.log("Erros de validação do formulário:", errors);
     };
     return (
-        <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg">
+        <section
+            className={
+                tipo === "professor"
+                    ? "w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+                    : "w-full max-w-xl rounded-2xl bg-white p-8 shadow-lg"
+            }
+        >
+
+            {tipo === "professor" && (
+                <div className="mb-8 border-b border-slate-200 pb-5">
+                    <h2 className="text-xl font-bold text-slate-800">
+                        Informações do professor
+                    </h2>
+
+                    <p className="mt-2 text-sm text-slate-500">
+                        Preencha os dados pessoais, de contato e de acesso.
+                    </p>
+                </div>
+            )}
+
             <form
                 onSubmit={handleSubmit(handleCadastro, onError)}
                 className="space-y-4"
@@ -302,38 +323,38 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                     </div>
 
                     {tipo === "comum" && (
-                    <div>
-                        <label
-                            htmlFor="profissao"
-                            className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                            Profissão
-                        </label>
-                        <select
-                            id="profissao"
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
-                            {...register("profissao", {
-                                required: "Selecione a profissão",
-                            })}
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="Estudante">Estudante</option>
-                            <option value="Empregado">Empregado</option>
-                            <option value="Autônomo">Autônomo</option>
-                            <option value="Desempregado">Desempregado</option>
-                            <option value="Aposentado">Aposentado</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                        {errors.profissao && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.profissao.message}
-                            </p>
-                        )}
-                    </div>
+                        <div>
+                            <label
+                                htmlFor="profissao"
+                                className="mb-1 block text-sm font-medium text-gray-700"
+                            >
+                                Profissão
+                            </label>
+                            <select
+                                id="profissao"
+                                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                                {...register("profissao", {
+                                    required: "Selecione a profissão",
+                                })}
+                            >
+                                <option value="">Selecione...</option>
+                                <option value="Estudante">Estudante</option>
+                                <option value="Empregado">Empregado</option>
+                                <option value="Autônomo">Autônomo</option>
+                                <option value="Desempregado">Desempregado</option>
+                                <option value="Aposentado">Aposentado</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                            {errors.profissao && (
+                                <p className="mt-1 text-sm text-red-600">
+                                    {errors.profissao.message}
+                                </p>
+                            )}
+                        </div>
                     )}
                 </div>
 
-                
+
                 {tipo === "comum" && profissaoSelecionada === "Outro" && (
                     <div>
                         <label
@@ -361,85 +382,85 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
 
                 {tipo === "comum" && (
                     <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <label
-                            htmlFor="tem_problema_saude"
-                            className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                            Possui problema de saúde?
-                        </label>
-                        <select
-                            id="tem_problema_saude"
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
-                            {...register("tem_problema_saude", {
-                                required: "Selecione uma opção",
-                            })}
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="Sim">Sim</option>
-                            <option value="Não">Não</option>
-                        </select>
-                        {errors.tem_problema_saude && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.tem_problema_saude.message}
-                            </p>
-                        )}
-                    </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label
+                                    htmlFor="tem_problema_saude"
+                                    className="mb-1 block text-sm font-medium text-gray-700"
+                                >
+                                    Possui problema de saúde?
+                                </label>
+                                <select
+                                    id="tem_problema_saude"
+                                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                                    {...register("tem_problema_saude", {
+                                        required: "Selecione uma opção",
+                                    })}
+                                >
+                                    <option value="">Selecione...</option>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
+                                </select>
+                                {errors.tem_problema_saude && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.tem_problema_saude.message}
+                                    </p>
+                                )}
+                            </div>
 
-                    <div>
-                        <label
-                            htmlFor="participacao_anterior"
-                            className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                            Você já foi ou é palhaço voluntário?
-                        </label>
-                        <select
-                            id="participacao_anterior"
-                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
-                            {...register("participacao_anterior", {
-                                setValueAs: (v) => (v === "" ? undefined : v === "true"),
-                                validate: (val) =>
-                                    val !== undefined || "Selecione se já participou",
-                            })}
-                        >
-                            <option value="">Selecione...</option>
-                            <option value="true">Sim</option>
-                            <option value="false">Não</option>
-                        </select>
-                        {errors.participacao_anterior && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.participacao_anterior.message}
-                            </p>
-                        )}
-                    </div>
-                </div>
+                            <div>
+                                <label
+                                    htmlFor="participacao_anterior"
+                                    className="mb-1 block text-sm font-medium text-gray-700"
+                                >
+                                    Você já foi ou é palhaço voluntário?
+                                </label>
+                                <select
+                                    id="participacao_anterior"
+                                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 outline-none focus:border-blue-500"
+                                    {...register("participacao_anterior", {
+                                        setValueAs: (v) => (v === "" ? undefined : v === "true"),
+                                        validate: (val) =>
+                                            val !== undefined || "Selecione se já participou",
+                                    })}
+                                >
+                                    <option value="">Selecione...</option>
+                                    <option value="true">Sim</option>
+                                    <option value="false">Não</option>
+                                </select>
+                                {errors.participacao_anterior && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.participacao_anterior.message}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
 
-                {temProblemaSaude === "Sim" && (
-                    <div>
-                        <label
-                            htmlFor="problemas_saude_custom"
-                            className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                            Qual problema de saúde/doença você possui?
-                        </label>
-                        <input
-                            id="problemas_saude_custom"
-                            type="text"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite a doença ou condição de saúde"
-                            {...register("problemas_saude_custom", {
-                                required: "Descreva o problema de saúde",
-                            })}
-                        />
-                        {errors.problemas_saude_custom && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.problemas_saude_custom.message}
-                            </p>
+                        {temProblemaSaude === "Sim" && (
+                            <div>
+                                <label
+                                    htmlFor="problemas_saude_custom"
+                                    className="mb-1 block text-sm font-medium text-gray-700"
+                                >
+                                    Qual problema de saúde/doença você possui?
+                                </label>
+                                <input
+                                    id="problemas_saude_custom"
+                                    type="text"
+                                    className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                                    placeholder="Digite a doença ou condição de saúde"
+                                    {...register("problemas_saude_custom", {
+                                        required: "Descreva o problema de saúde",
+                                    })}
+                                />
+                                {errors.problemas_saude_custom && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {errors.problemas_saude_custom.message}
+                                    </p>
+                                )}
+                            </div>
                         )}
-                    </div>
-                )}
-                </>
+                    </>
                 )}
 
                 <CampoSenha
@@ -466,7 +487,7 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
 
 
                 <UploadFoto
-                    foto={watch("photo")?.[0]}
+                    foto={fotoSelecionada?.[0]}
                     onChange={(foto) => {
                         setValue(
                             "photo",
@@ -516,21 +537,37 @@ export function FormCadastro({tipo = "comum"}: CadastroFormDataProps) {
                     disabled={isSubmitting}
                     className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:bg-blue-300"
                 >
-                    {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                    {isSubmitting
+                        ? "Cadastrando..."
+                        : tipo === "professor"
+                            ? "Cadastrar professor"
+                            : "Cadastrar"}
                 </button>
             </form>
 
-            {modal && (
-                <Modal
-                    titulo="Cadastro"
-                    message="Usuário Cadastrado com Sucesso!"
-                    decisao={null}
-                    texto="Ok"
-                    opSim={() => {
+            {tipo === "professor" ? (
+                <SuccessDialog
+                    aberto={modal}
+                    aoFechar={() => {
                         setModal(false);
-                        navigate("/login");
+                        navigate("/app/user");
                     }}
+                    titulo="Professor cadastrado!"
+                    mensagem="O professor foi cadastrado com sucesso e já possui uma conta no Aticurando."
                 />
+            ) : (
+                modal && (
+                    <Modal
+                        titulo="Cadastro"
+                        message="Usuário cadastrado com sucesso!"
+                        decisao={null}
+                        texto="Ok"
+                        opSim={() => {
+                            setModal(false);
+                            navigate("/login");
+                        }}
+                    />
+                )
             )}
 
             {modalLgpdOpen && (
