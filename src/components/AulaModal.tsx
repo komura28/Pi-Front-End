@@ -1,5 +1,7 @@
 
 import { useForm } from "react-hook-form";
+import { BookOpen, Plus, Save } from "lucide-react";
+import { AppDialog } from "./ui/AppDialog";
 
 export interface AulaFormData {
     titulo: string;
@@ -13,15 +15,19 @@ interface AulaModalProps {
     onSave: (aula: AulaFormData) => void;
 }
 
+const inputClass =
+    "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100";
+
 export function AulaModal({
     aula,
     onClose,
     onSave
-}: AulaModalProps) {
+}: Readonly<AulaModalProps>) {
+
     const {
         register,
         handleSubmit,
-        formState: { errors }
+        formState: { errors, isSubmitting }
     } = useForm<AulaFormData>({
         defaultValues: aula ?? {
             titulo: "",
@@ -29,6 +35,8 @@ export function AulaModal({
             duracao: 60
         }
     });
+
+    const editando = Boolean(aula);
 
     function salvar(data: AulaFormData) {
         onSave({
@@ -38,124 +46,147 @@ export function AulaModal({
         });
     }
 
-    const inputClass =
-        "w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500";
-
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-6">
-            <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+        <AppDialog
+            aberto={true}
+            aoFechar={onClose}
+            titulo={editando ? "Editar aula" : "Adicionar aula"}
+            descricao={
+                editando
+                    ? "Atualize as informações da aula."
+                    : "Defina o conteúdo e a duração da nova aula."
+            }
+            icone={BookOpen}
+            salvando={isSubmitting}
+            rodape={
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={isSubmitting}
+                        className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                    >
+                        Cancelar
+                    </button>
 
-                <h2 className="mb-6 text-center text-2xl font-bold text-gray-800">
-                    {aula ? "Editar Aula" : "Adicionar Aula"}
-                </h2>
+                    <button
+                        type="submit"
+                        form="form-aula"
+                        disabled={isSubmitting}
+                        className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {editando
+                            ? <Save size={17} />
+                            : <Plus size={17} />
+                        }
 
-                <form
-                    onSubmit={handleSubmit(salvar)}
-                    className="space-y-4"
-                >
-                    <div>
-                        <label
-                            htmlFor="aula-titulo"
-                            className="mb-1 block text-sm font-bold text-gray-700"
+                        {editando
+                            ? "Salvar alterações"
+                            : "Adicionar aula"}
+                    </button>
+                </div>
+            }
+        >
+            <form
+                id="form-aula"
+                onSubmit={handleSubmit(salvar)}
+                className="space-y-5"
+            >
+                <div>
+                    <label
+                        htmlFor="aula-titulo"
+                        className="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                        Título da aula *
+                    </label>
+
+                    <input
+                        id="aula-titulo"
+                        type="text"
+                        className={inputClass}
+                        placeholder="Ex.: Introdução à Informática"
+                        {...register("titulo", {
+                            required: "O título é obrigatório",
+                            validate: (value) =>
+                                value.trim().length > 0 ||
+                                "Informe um título válido"
+                        })}
+                    />
+
+                    {errors.titulo && (
+                        <p
+                            role="alert"
+                            className="mt-2 text-sm text-red-600"
                         >
-                            Título
-                        </label>
+                            {errors.titulo.message}
+                        </p>
+                    )}
+                </div>
 
-                        <input
-                            id="aula-titulo"
-                            className={inputClass}
-                            placeholder="Ex: Introdução à Informática"
-                            {...register("titulo", {
-                                required: "O título é obrigatório",
-                                validate: value =>
-                                    value.trim().length > 0 ||
-                                    "Informe um título válido"
-                            })}
-                        />
+                <div>
+                    <label
+                        htmlFor="aula-descricao"
+                        className="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                        Descrição *
+                    </label>
 
-                        {errors.titulo && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.titulo.message}
-                            </p>
-                        )}
-                    </div>
+                    <textarea
+                        id="aula-descricao"
+                        rows={4}
+                        className={`${inputClass} resize-y`}
+                        placeholder="Descreva o conteúdo da aula"
+                        {...register("descricao", {
+                            required: "A descrição é obrigatória",
+                            validate: (value) =>
+                                value.trim().length > 0 ||
+                                "Informe uma descrição válida"
+                        })}
+                    />
 
-                    <div>
-                        <label
-                            htmlFor="aula-descricao"
-                            className="mb-1 block text-sm font-bold text-gray-700"
+                    {errors.descricao && (
+                        <p
+                            role="alert"
+                            className="mt-2 text-sm text-red-600"
                         >
-                            Descrição
-                        </label>
+                            {errors.descricao.message}
+                        </p>
+                    )}
+                </div>
 
-                        <textarea
-                            id="aula-descricao"
-                            rows={4}
-                            className={inputClass}
-                            placeholder="Descreva o conteúdo da aula"
-                            {...register("descricao", {
-                                required: "A descrição é obrigatória",
-                                validate: value =>
-                                    value.trim().length > 0 ||
-                                    "Informe uma descrição válida"
-                            })}
-                        />
+                <div>
+                    <label
+                        htmlFor="aula-duracao"
+                        className="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                        Duração (minutos) *
+                    </label>
 
-                        {errors.descricao && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.descricao.message}
-                            </p>
-                        )}
-                    </div>
+                    <input
+                        id="aula-duracao"
+                        type="number"
+                        min={1}
+                        step={1}
+                        className={inputClass}
+                        {...register("duracao", {
+                            valueAsNumber: true,
+                            required: "A duração é obrigatória",
+                            validate: (value) =>
+                                (Number.isInteger(value) && value > 0) ||
+                                "Informe um número inteiro maior que zero"
+                        })}
+                    />
 
-                    <div>
-                        <label
-                            htmlFor="aula-duracao"
-                            className="mb-1 block text-sm font-bold text-gray-700"
+                    {errors.duracao && (
+                        <p
+                            role="alert"
+                            className="mt-2 text-sm text-red-600"
                         >
-                            Duração (minutos)
-                        </label>
-
-                        <input
-                            id="aula-duracao"
-                            type="number"
-                            min={1}
-                            step={1}
-                            className={inputClass}
-                            {...register("duracao", {
-                                valueAsNumber: true,
-                                required: "A duração é obrigatória",
-                                validate: value =>
-                                    (Number.isInteger(value) && value > 0) ||
-                                    "Informe um número inteiro maior que zero"
-                            })}
-                        />
-
-                        {errors.duracao && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.duracao.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="flex justify-end gap-3 pt-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="cursor-pointer rounded-lg bg-gray-200 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-300"
-                        >
-                            Cancelar
-                        </button>
-
-                        <button
-                            type="submit"
-                            className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
-                        >
-                            {aula ? "Salvar Alterações" : "Adicionar Aula"}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                            {errors.duracao.message}
+                        </p>
+                    )}
+                </div>
+            </form>
+        </AppDialog>
     );
 }

@@ -1,7 +1,18 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { SuccessDialog } from "../../components/ui/SuccessDialog";
+import {
+    BookOpen,
+    ArrowLeft,
+    Plus,
+    Save,
+    Layers3,
+    Trash2,
+    Pencil
+} from "lucide-react";
 
 import type {
     RegisterCursoRequest,
@@ -17,8 +28,6 @@ import {
     AulaModal,
     type AulaFormData
 } from "../../components/AulaModal";
-
-import { Modal } from "../../components/Modal";
 
 interface MateriaForm {
     name: string;
@@ -38,7 +47,7 @@ interface ModalAulaState {
 }
 
 const inputClass =
-    "w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500";
+    "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100";
 
 export function CursoCadastroPage() {
     const navigate = useNavigate();
@@ -64,7 +73,6 @@ export function CursoCadastroPage() {
         control,
         getValues,
         setValue,
-        watch,
         formState: { errors, isSubmitting }
     } = useForm<CadastroCursoFormData>({
         defaultValues: {
@@ -79,7 +87,7 @@ export function CursoCadastroPage() {
         name: "materias"
     });
 
-    const materiasAtuais = watch("materias") ?? [];
+    const materiasAtuais = useWatch({ control, name: "materias" }) ?? [];
 
     function adicionarMateria() {
         const nome = materia.trim();
@@ -266,13 +274,38 @@ export function CursoCadastroPage() {
                 ?.aulas?.[modalAula.aulaIndex]
             : undefined;
 
-    return (
-        <main className="flex min-h-screen items-center justify-center bg-white px-4 py-8">
-            <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
 
-                <h1 className="mb-6 text-center text-3xl font-bold text-gray-800">
-                    Cadastro de Curso
-                </h1>
+    return (
+        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+
+            <PageHeader
+                titulo="Cadastrar curso"
+                descricao="Configure as informações do curso, suas matérias e aulas."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={BookOpen}
+                acao={
+                    <button
+                        type="button"
+                        onClick={() => navigate("/app/curso")}
+                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                    >
+                        <ArrowLeft size={18} />
+                        Voltar aos cursos
+                    </button>
+                }
+            />
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-slate-800">
+                        Informações do curso
+                    </h2>
+
+                    <p className="mt-2 text-sm text-slate-500">
+                        Preencha os dados e organize as matérias antes de cadastrar.
+                    </p>
+                </div>
 
                 {!cursoSalvo ? (
                     <form
@@ -328,37 +361,69 @@ export function CursoCadastroPage() {
                             )}
                         </div>
 
-                        <div className="border-t border-gray-200 pt-5">
-                            <h2 className="mb-4 text-xl font-bold text-gray-800">
-                                Matérias do Curso
-                            </h2>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 md:p-6">
 
-                            <div className="space-y-3">
-                                <input
-                                    value={materia}
-                                    onChange={e => setMateria(e.target.value)}
-                                    className={inputClass}
-                                    placeholder="Nome da matéria"
-                                />
-
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        value={materiaDesc}
-                                        onChange={e => setMateriaDesc(e.target.value)}
-                                        className={`${inputClass} flex-1 min-w-0`}
-                                        placeholder="Descrição da matéria"
-                                    />
-
-                                    <button
-                                        type="button"
-                                        onClick={adicionarMateria}
-                                        title="Adicionar matéria"
-                                        aria-label="Adicionar matéria"
-                                        className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold leading-none text-white transition hover:bg-blue-700"
-                                    >
-                                        +
-                                    </button>
+                            <div className="mb-5 flex items-center gap-3">
+                                <div className="rounded-xl bg-blue-100 p-3 text-blue-600">
+                                    <Layers3 size={22} />
                                 </div>
+
+                                <div>
+                                    <h2 className="text-lg font-bold text-slate-800">
+                                        Matérias do curso
+                                    </h2>
+
+                                    <p className="text-sm text-slate-500">
+                                        Adicione as matérias que compõem o curso.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label
+                                        htmlFor="nova-materia-nome"
+                                        className="mb-2 block text-sm font-semibold text-slate-700"
+                                    >
+                                        Nome da matéria
+                                    </label>
+
+                                    <input
+                                        id="nova-materia-nome"
+                                        type="text"
+                                        value={materia}
+                                        onChange={(e) => setMateria(e.target.value)}
+                                        className={inputClass}
+                                        placeholder="Ex.: Introdução à Informática"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="nova-materia-descricao"
+                                        className="mb-2 block text-sm font-semibold text-slate-700"
+                                    >
+                                        Descrição
+                                    </label>
+
+                                    <input
+                                        id="nova-materia-descricao"
+                                        type="text"
+                                        value={materiaDesc}
+                                        onChange={(e) => setMateriaDesc(e.target.value)}
+                                        className={inputClass}
+                                        placeholder="Descreva o conteúdo da matéria"
+                                    />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={adicionarMateria}
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                >
+                                    <Plus size={18} />
+                                    Adicionar matéria
+                                </button>
                             </div>
                         </div>
 
@@ -370,11 +435,11 @@ export function CursoCadastroPage() {
                                 return (
                                     <div
                                         key={field.id}
-                                        className="rounded-xl border border-gray-200 bg-gray-50 p-4"
+                                        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200"
                                     >
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
-                                                <h3 className="font-bold text-gray-800">
+                                                <h3 className="text-base font-bold text-slate-800">
                                                     {field.name}
                                                 </h3>
 
@@ -386,8 +451,9 @@ export function CursoCadastroPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => remove(index)}
-                                                className="cursor-pointer text-sm font-semibold text-red-600 hover:text-red-800"
+                                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                                             >
+                                                <Trash2 size={16} />
                                                 Remover
                                             </button>
                                         </div>
@@ -419,11 +485,10 @@ export function CursoCadastroPage() {
                                                             materiaIndex: index
                                                         })
                                                     }
-                                                    title="Adicionar aula"
-                                                    aria-label="Adicionar aula"
-                                                    className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold leading-none text-white transition hover:bg-blue-700"
+                                                    className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
                                                 >
-                                                    +
+                                                    <Plus size={16} />
+                                                    Adicionar aula
                                                 </button>
                                             </div>
 
@@ -444,7 +509,8 @@ export function CursoCadastroPage() {
                                                                 </p>
                                                             </div>
 
-                                                            <div className="flex shrink-0 gap-2">
+
+                                                            <div className="flex shrink-0 items-center gap-2">
                                                                 <button
                                                                     type="button"
                                                                     onClick={() =>
@@ -453,24 +519,24 @@ export function CursoCadastroPage() {
                                                                             aulaIndex
                                                                         })
                                                                     }
-                                                                    className="cursor-pointer text-sm font-semibold text-blue-600"
+                                                                    className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
+                                                                    title="Editar aula"
+                                                                    aria-label={`Editar aula ${aula.titulo}`}
                                                                 >
-                                                                    Editar
+                                                                    <Pencil size={17} />
                                                                 </button>
 
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() =>
-                                                                        removerAula(
-                                                                            index,
-                                                                            aulaIndex
-                                                                        )
-                                                                    }
-                                                                    className="cursor-pointer text-sm font-semibold text-red-600"
+                                                                    onClick={() => removerAula(index, aulaIndex)}
+                                                                    className="rounded-lg p-2 text-red-600 transition hover:bg-red-50"
+                                                                    title="Remover aula"
+                                                                    aria-label={`Remover aula ${aula.titulo}`}
                                                                 >
-                                                                    Remover
+                                                                    <Trash2 size={17} />
                                                                 </button>
                                                             </div>
+
                                                         </div>
                                                     ))}
                                                 </div>
@@ -487,15 +553,28 @@ export function CursoCadastroPage() {
                             </div>
                         )}
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting || enviandoAulas}
-                            className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-                        >
-                            {isSubmitting || enviandoAulas
-                                ? "Cadastrando..."
-                                : "Cadastrar Curso"}
-                        </button>
+
+                        <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-end">
+                            <button
+                                type="button"
+                                onClick={() => navigate("/app/curso")}
+                                className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                type="submit"
+                                disabled={isSubmitting || enviandoAulas}
+                                className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <Save size={18} />
+                                {isSubmitting || enviandoAulas
+                                    ? "Cadastrando..."
+                                    : "Cadastrar curso"}
+                            </button>
+                        </div>
+
                     </form>
                 ) : (
                     <div className="space-y-4">
@@ -535,18 +614,15 @@ export function CursoCadastroPage() {
                     />
                 )}
 
-                {modalSucesso && (
-                    <Modal
-                        titulo="Cadastro"
-                        message="Curso, matérias e aulas cadastrados com sucesso!"
-                        decisao={null}
-                        texto="Ok"
-                        opSim={() => {
-                            setModalSucesso(false);
-                            navigate("/app/curso");
-                        }}
-                    />
-                )}
+                <SuccessDialog
+                    aberto={modalSucesso}
+                    aoFechar={() => {
+                        setModalSucesso(false);
+                        navigate("/app/curso");
+                    }}
+                    titulo="Curso cadastrado!"
+                    mensagem="O curso, suas matérias e aulas foram cadastrados com sucesso."
+                />
             </section>
         </main>
     );
