@@ -32,7 +32,7 @@ export function SideBar({
       {!mobileOpen && (
         <button
           onClick={() => setMobileOpen(true)}
-          className="fixed left-4 top-4 z-50 rounded-lg bg-slate-900 p-3 text-white shadow-lg md:hidden"
+          className="fixed left-4 top-[5.5rem] z-[70] rounded-lg bg-slate-900 p-3 text-white shadow-lg md:hidden"
         >
           <FaBars size={20} />
         </button>
@@ -46,8 +46,8 @@ export function SideBar({
       )}
       <aside
         className={`
-    fixed inset-y-0 left-0 z-40
-    flex w-64 flex-col
+fixed inset-y-0 left-0 z-[60] md:right-auto
+flex w-64 flex-col
     border-r bg-[#0F172A]
     transition-transform duration-300
     md:translate-x-0
@@ -67,8 +67,8 @@ export function SideBar({
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 p-3">
-          {navigationItems.map((item, index) => {
+<nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3">          
+    {navigationItems.map((item, index) => {
             if (item.isSelect) {
               return (
                 <div key={index} className="w-full">

@@ -92,11 +92,11 @@ export function AppAdminLayout() {
 
     return (
         <>
-            <div className="min-h-screen bg-muted/40">
+            <div className="flex min-h-screen flex-col">
                 <SideBar navigationItems={adminNavItems} link="/app/home"
                     matriculasPendentes={matriculasPendentes}
                 />
-                <div className="flex min-h-screen flex-col pl-64">
+                <div className="flex min-h-screen flex-col md:ml-64">
                     <Header mode="ADM" />
                     <main className="flex-1 p-6">
                         <Outlet
