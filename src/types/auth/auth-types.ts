@@ -61,6 +61,7 @@ export interface authCurso {
     name: string,
     description: string,
     materias: authCursoMateria[]
+    active?: boolean;
 }
 
 export interface RegisterCursoRequest {

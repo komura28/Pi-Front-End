@@ -5,6 +5,20 @@ import type { authCurso, authMateria } from "../../types/auth/auth-types";
 import { deletarCursoAPI, getCurso, editarCursoAPI, editarMateriaAPI, adicionarMateriaCursoAPI, removerMateriaCursoAPI } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { Pagination } from "../../components/ui/Pagination";
+import {
+    DataTable,
+    type TableColumn
+} from "../../components/ui/DataTable";
+
+import {
+    BookOpen,
+    Plus,
+    Pencil,
+    Trash2,
+    Layers3
+} from "lucide-react";
 
 export function CursoPage() {
     const navigate = useNavigate();
@@ -53,8 +67,6 @@ export function CursoPage() {
         indicePrimeiroItem,
         indiceUltimoItem
     );
-
-    const totalPaginas = Math.max(1, Math.ceil(cursos.length / itensPorPagina));
 
     useEffect(() => {
         async function carregarCursos() {
@@ -120,6 +132,58 @@ export function CursoPage() {
             fecharModal();
         }
     }
+
+
+    const colunas: TableColumn<authCurso>[] = [
+        {
+            id: "nome",
+            titulo: "Curso",
+            renderizar: (curso) => (
+                <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600">
+                        <BookOpen size={20} />
+                    </div>
+
+                    <span className="font-semibold text-slate-800">
+                        {curso.name}
+                    </span>
+                </div>
+            )
+        },
+        {
+            id: "descricao",
+            titulo: "Descrição",
+            renderizar: (curso) => (
+                <p className="max-w-md text-sm text-slate-500">
+                    {curso.description || "Sem descrição"}
+                </p>
+            )
+        },
+        {
+            id: "materias",
+            titulo: "Matérias",
+            renderizar: (curso) => (
+                <span className="inline-flex whitespace-nowrap rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    {curso.materias?.length ?? 0} matérias
+                </span>
+            )
+        },
+        {
+            id: "situacao",
+            titulo: "Situação",
+            renderizar: (curso) => (
+                <span
+                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${curso.active
+                        ? "bg-green-50 text-green-700"
+                        : "bg-slate-100 text-slate-600"
+                        }`}
+                >
+                    {curso.active ? "Ativo" : "Inativo"}
+                </span>
+            )
+        }
+    ];
+
 
     function abrirModalEdicao(curso: authCurso) {
         setCursoToEditId(curso._id);
@@ -340,84 +404,73 @@ export function CursoPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
+
     return (
-        <div>
-            <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                    Lista de Cursos
-                </h1>
-                <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Curso
-                            </th>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Descrição
-                            </th>
-                            <th className="text-slate-800 font-medium p-2 border-b">
-                                Ações
-                            </th>
-                        </tr>
-                    </thead>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-                    <tbody className="border-b">
-                        {cursosPaginados.map((curso) => (
-                            <tr key={curso._id} className="border-b">
-                                <td className="text-slate-600 p-2">
-                                    {curso.name}
-                                </td>
-
-                                <td className="text-slate-600 p-2">
-                                    {curso.description}
-                                </td>
-
-                                <td className="p-2">
-                                    <div className="flex justify-center items-center gap-2">
-                                        <Button
-                                            isSubmitting={false}
-                                            label={<FaPencilAlt />}
-                                            loadingLabel="salvando"
-                                            className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => abrirModalEdicao(curso)}
-                                        />
-
-                                        <Button
-                                            isSubmitting={isDeleting}
-                                            label={<FaTrash />}
-                                            loadingLabel="Excluindo..."
-                                            className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => confirmarExclusao(curso._id)}
-                                        />
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                <div className="flex justify-center items-center gap-2 mt-4">
+            <PageHeader
+                titulo="Gerenciamento de Cursos"
+                descricao="Organize os cursos e suas matérias no Aticurando."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={BookOpen}
+                acao={
                     <button
-                        onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
-                        disabled={paginaAtual === 1}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        type="button"
+                        onClick={() => navigate("/app/register-curso")}
+                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
                     >
-                        Anterior
+                        <Plus size={18} />
+                        Novo Curso
                     </button>
+                }
+            />
 
-                    <span className="text-slate-600">
-                        Página {paginaAtual} de {totalPaginas}
-                    </span>
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-6">
+                    <h2 className="text-xl font-bold text-slate-800">
+                        Cursos cadastrados
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-500">
+                        Consulte e gerencie os cursos disponíveis no sistema.
+                    </p>
+                </div>
 
-                    <button
-                        onClick={() =>
-                            setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
+                <DataTable
+                    dados={cursosPaginados}
+                    colunas={colunas}
+                    chave={(curso) => curso._id}
+                    mensagemVazia="Nenhum curso cadastrado."
+                    rotuloAcoes={(curso) =>
+                        `Ações do curso ${curso.name}`
+                    }
+                    acoes={(curso) => [
+                        {
+                            texto: "Editar curso",
+                            icone: Pencil,
+                            executar: () => abrirModalEdicao(curso)
+                        },
+                        {
+                            texto: "Gerenciar matérias",
+                            icone: Layers3,
+                            executar: () => abrirModalMaterias(curso)
+                        },
+                        {
+                            texto: "Excluir curso",
+                            icone: Trash2,
+                            perigosa: true,
+                            disabled: isDeleting,
+                            executar: () => confirmarExclusao(curso._id)
                         }
-                        disabled={paginaAtual === totalPaginas}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                        Próxima
-                    </button>
+                    ]}
+                />
+
+                <div className="mt-5">
+                    <Pagination
+                        paginaAtual={paginaAtual}
+                        totalItens={cursos.length}
+                        itensPorPagina={itensPorPagina}
+                        onPageChange={setPaginaAtual}
+                    />
                 </div>
             </section>
 
