@@ -37,7 +37,7 @@ export function TableActionMenu({
                     align="end"
                     sideOffset={6}
                     collisionPadding={8}
-                    className="z-[100] min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl outline-none"
+                    className="z-[5100] min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl outline-none"
                 >
                     {acoes.map((acao) => {
                         const Icone = acao.icone;
