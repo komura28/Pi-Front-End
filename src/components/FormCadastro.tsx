@@ -10,6 +10,8 @@ import { Modal } from "./Modal";
 import { CampoSenha } from "./CampoSenha.tsx"
 import { cadastrarProfessor } from "../services/admService";
 import { SuccessDialog } from "./ui/SuccessDialog.tsx";
+import { ShieldCheck, UserPlus } from "lucide-react";
+import { AppDialog } from "./ui/AppDialog.tsx";
 
 interface CadastroFormDataProps {
     tipo?: "comum" | "professor"
@@ -532,17 +534,41 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
                     </p>
                 )}
 
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:bg-blue-300"
-                >
-                    {isSubmitting
-                        ? "Cadastrando..."
-                        : tipo === "professor"
-                            ? "Cadastrar professor"
-                            : "Cadastrar"}
-                </button>
+
+                {tipo === "professor" ? (
+                    <div className="flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-end">
+
+                        <button
+                            type="button"
+                            onClick={() => navigate("/app/user")}
+                            disabled={isSubmitting}
+                            className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <UserPlus size={18} />
+
+                            {isSubmitting
+                                ? "Cadastrando..."
+                                : "Cadastrar professor"}
+                        </button>
+
+                    </div>
+                ) : (
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                    </button>
+                )}
             </form>
 
             {tipo === "professor" ? (
@@ -570,90 +596,93 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
                 )
             )}
 
-            {modalLgpdOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-                    <div className="w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-xl bg-white p-6 sm:p-8 shadow-2xl">
-                        <h2 className="mb-4 text-xl font-bold text-gray-800 border-b pb-2">
-                            Termos de Privacidade e Proteção de Dados (LGPD)
-                        </h2>
+            <AppDialog
+                aberto={modalLgpdOpen}
+                aoFechar={() => setModalLgpdOpen(false)}
+                titulo="Termos de Privacidade e Proteção de Dados"
+                descricao="Leia as informações sobre o tratamento dos dados pessoais."
+                icone={ShieldCheck}
+                tamanho="lg"
+                rodape={
+                    <div className="flex justify-end">
+                        <button
+                            type="button"
+                            onClick={() => setModalLgpdOpen(false)}
+                            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                        >
+                            Entendi e fechar
+                        </button>
+                    </div>
+                }
+            >
+                <div className="space-y-4 text-sm text-slate-600">
 
-                        <div className="space-y-4 text-sm text-gray-600">
-                            <p>
-                                Para fins de transparência e em cumprimento à Lei Geral de
-                                Proteção de Dados (Lei nº 13.709/2018), informamos
-                                detalhadamente quais dados são coletados e qual a sua
-                                finalidade:
-                            </p>
+                    <div className="space-y-4 text-sm text-gray-600">
+                        <p>
+                            Para fins de transparência e em cumprimento à Lei Geral de
+                            Proteção de Dados (Lei nº 13.709/2018), informamos
+                            detalhadamente quais dados são coletados e qual a sua
+                            finalidade:
+                        </p>
 
-                            <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
-                                <h3 className="font-semibold text-gray-800 mb-2">
-                                    1. Dados Pessoais Identificáveis:
-                                </h3>
-                                <ul className="list-disc pl-5 space-y-1">
-                                    <li>
-                                        <strong>Nome completo:</strong> Para identificação do
-                                        usuário na plataforma.
-                                    </li>
-                                    <li>
-                                        <strong>CPF:</strong> Para validação única e autenticidade
-                                        da conta.
-                                    </li>
-                                    <li>
-                                        <strong>Data de Nascimento:</strong> Para validação de
-                                        faixa etária.
-                                    </li>
-                                    <li>
-                                        <strong>E-mail:</strong> Para login, comunicações e
-                                        recuperação de senha.
-                                    </li>
-                                    <li>
-                                        <strong>Telefones (Principal e Secundário):</strong> Para
-                                        contato e avisos organizacionais.
-                                    </li>
-                                    <li>
-                                        <strong>Estado Civil e Profissão:</strong> Para mapeamento
-                                        de perfil dos integrantes.
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
-                                <h3 className="font-semibold text-gray-800 mb-2">
-                                    2. Dados Sensíveis (Saúde):
-                                </h3>
-                                <ul className="list-disc pl-5 space-y-1">
-                                    <li>
-                                        <strong>Problemas de Saúde e Condições Médicas:</strong>{" "}
-                                        Utilizados exclusivamente para segurança do participante
-                                        em atividades presenciais ou eventos da instituição.
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
-                                <h3 className="font-semibold text-gray-800 mb-2">
-                                    3. Finalidade e Armazenamento:
-                                </h3>
-                                <p>
-                                    Os dados são armazenados em ambiente seguro com controle de
-                                    acesso estrito e não são compartilhados com terceiros para
-                                    fins comerciais.
-                                </p>
-                            </div>
+                        <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                            <h3 className="font-semibold text-gray-800 mb-2">
+                                1. Dados Pessoais Identificáveis:
+                            </h3>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>
+                                    <strong>Nome completo:</strong> Para identificação do
+                                    usuário na plataforma.
+                                </li>
+                                <li>
+                                    <strong>CPF:</strong> Para validação única e autenticidade
+                                    da conta.
+                                </li>
+                                <li>
+                                    <strong>Data de Nascimento:</strong> Para validação de
+                                    faixa etária.
+                                </li>
+                                <li>
+                                    <strong>E-mail:</strong> Para login, comunicações e
+                                    recuperação de senha.
+                                </li>
+                                <li>
+                                    <strong>Telefones (Principal e Secundário):</strong> Para
+                                    contato e avisos organizacionais.
+                                </li>
+                                <li>
+                                    <strong>Estado Civil e Profissão:</strong> Para mapeamento
+                                    de perfil dos integrantes.
+                                </li>
+                            </ul>
                         </div>
 
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                type="button"
-                                onClick={() => setModalLgpdOpen(false)}
-                                className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 cursor-pointer"
-                            >
-                                Entendi e Fechar
-                            </button>
+                        <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                            <h3 className="font-semibold text-gray-800 mb-2">
+                                2. Dados Sensíveis (Saúde):
+                            </h3>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>
+                                    <strong>Problemas de Saúde e Condições Médicas:</strong>{" "}
+                                    Utilizados exclusivamente para segurança do participante
+                                    em atividades presenciais ou eventos da instituição.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                            <h3 className="font-semibold text-gray-800 mb-2">
+                                3. Finalidade e Armazenamento:
+                            </h3>
+                            <p>
+                                Os dados são armazenados em ambiente seguro com controle de
+                                acesso estrito e não são compartilhados com terceiros para
+                                fins comerciais.
+                            </p>
                         </div>
                     </div>
                 </div>
-            )}
-        </section>
+            </AppDialog>
+        </section >
     )
 }
