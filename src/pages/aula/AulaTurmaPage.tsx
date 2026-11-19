@@ -1,11 +1,4 @@
-import { useEffect, useState, useId } from "react";
-import {
-    FaCalendarAlt,
-    FaClock,
-    FaPencilAlt,
-    FaArrowLeft,
-    FaBookOpen
-} from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
 
 import { getTurma, getCurso } from "../../services/authService";
 
@@ -22,16 +15,15 @@ import type {
     TurmaMatricula
 } from "../../types/auth/auth-types";
 
+import { CalendarDays } from "lucide-react";
+
+import { PageHeader } from "../../components/ui/PageHeader";
+import { Pagination } from "../../components/ui/Pagination";
+import { TurmaSelector } from "../../components/turmas/TurmaSelector";
+import { AgendaTurmaPanel } from "../../components/aulas/AgendaTurmaPanel";
+import { AgendarAulaDialog } from "../../components/aulas/AgendarAulaDialog";
+
 const ITENS_POR_PAGINA = 5;
-
-function formatarData(data?: string | null) {
-    if (!data) return "Não definida";
-
-    return new Date(data).toLocaleString("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short"
-    });
-}
 
 function calcularTerminoPrevisto(
     inicio: string,
@@ -65,10 +57,6 @@ function calcularTerminoPrevisto(
         dateStyle: "short",
         timeStyle: "short"
     });
-}
-
-function formatarDia(data: string) {
-    return data.slice(0, 10).split("-").reverse().join("/");
 }
 
 function dataLocal(data: Date) {
@@ -126,10 +114,13 @@ export function AulaTurmaPage() {
     const [carregandoAgenda, setCarregandoAgenda] = useState(false);
     const [salvando, setSalvando] = useState(false);
 
+    const [erroAgenda, setErroAgenda] = useState("");
+    const requisicaoAgendaId = useRef(0);
+
     const [busca, setBusca] = useState("");
     const [paginaAtual, setPaginaAtual] = useState(1);
 
-    const [turmaSelecionada, setTurmaSelecionada] =
+    const [turmaEmFoco, setTurmaEmFoco] =
         useState<TurmaMatricula | null>(null);
 
     const [aulas, setAulas] = useState<AulaTurma[]>([]);
@@ -144,36 +135,29 @@ export function AulaTurmaPage() {
     const [erroModal, setErroModal] = useState("");
     const [sucesso, setSucesso] = useState("");
 
-    const inicioId = useId();
-    const professorCampoId = useId();
-
     const [cursos, setCursos] = useState<authCurso[]>([]);
+
 
     useEffect(() => {
         async function carregarDados() {
+            try {
+                setLoading(true);
+                setErro("");
 
-            const [listaTurmas, listaProfessores, listaCursos] =
-                await Promise.all([
+                const [
+                    listaTurmas,
+                    listaProfessores,
+                    listaCursos
+                ] = await Promise.all([
                     getTurma(),
                     getProfessores(),
                     getCurso()
                 ]);
 
-            setTurmas(listaTurmas);
-            setProfessores(listaProfessores);
-            setCursos(listaCursos);
-            try {
-                setLoading(true);
-                setErro("");
-
-                const [listaTurmas, listaProfessores] =
-                    await Promise.all([
-                        getTurma(),
-                        getProfessores()
-                    ]);
-
                 setTurmas(listaTurmas);
                 setProfessores(listaProfessores);
+                setCursos(listaCursos);
+
             } catch (error) {
                 setErro(mensagemErro(error));
             } finally {
@@ -183,6 +167,7 @@ export function AulaTurmaPage() {
 
         void carregarDados();
     }, []);
+
 
     const turmasFiltradas = turmas.filter(item => {
         const termo = busca.toLowerCase().trim();
@@ -196,53 +181,14 @@ export function AulaTurmaPage() {
         return curso.includes(termo) || turno.includes(termo);
     });
 
-    const totalPaginas = Math.max(
-        1,
-        Math.ceil(turmasFiltradas.length / ITENS_POR_PAGINA)
-    );
-
     const turmasPaginadas = turmasFiltradas.slice(
         (paginaAtual - 1) * ITENS_POR_PAGINA,
         paginaAtual * ITENS_POR_PAGINA
     );
 
-    const aulasOrdenadas = [...aulas].sort(
-        (a, b) => (a.aula?.ordem ?? 0) - (b.aula?.ordem ?? 0)
-    );
-
-    const aulasAgendadas = aulas.filter(
-        item =>
-            item.status === "AGENDADA" ||
-            item.status === "REALIZADA"
-    ).length;
-
-    const progresso = aulas.length
-        ? (aulasAgendadas / aulas.length) * 100
-        : 0;
-
-    async function abrirTurma(turma: TurmaMatricula) {
-        try {
-            setCarregandoAgenda(true);
-            setErro("");
-            setErroModal("");
-            setSucesso("");
-
-            const agenda = await getAgendaTurma(turma.turma._id);
-
-            setAulas(agenda);
-            setTurmaSelecionada(turma);
-            setAulaSelecionada(null);
-        } catch (error) {
-            setErro(mensagemErro(error));
-        } finally {
-            setCarregandoAgenda(false);
-        }
-    }
-
-    function fecharModal() {
+    function fecharAgendamento() {
         if (salvando) return;
 
-        setTurmaSelecionada(null);
         setAulaSelecionada(null);
         setErroModal("");
     }
@@ -253,13 +199,6 @@ export function AulaTurmaPage() {
         setProfessorId(aula.professor?._id ?? "");
         setErroModal("");
         setSucesso("");
-    }
-
-    function voltarParaLista() {
-        if (salvando) return;
-
-        setAulaSelecionada(null);
-        setErroModal("");
     }
 
     function obterNomeMateria(materiaId?: string): string {
@@ -281,13 +220,13 @@ export function AulaTurmaPage() {
     }
 
     async function salvarAgendamento() {
-        if (!aulaSelecionada || !turmaSelecionada || salvando) {
+        if (!aulaSelecionada || !turmaEmFoco || salvando) {
             return;
         }
 
         setErroModal("");
 
-        const turma = turmaSelecionada.turma;
+        const turma = turmaEmFoco.turma;
         const duracao = aulaSelecionada.aula?.duracao ?? 0;
 
         if (!inicio || !professorId) {
@@ -449,397 +388,141 @@ export function AulaTurmaPage() {
         }
     }
 
+
+    async function selecionarTurma(turma: TurmaMatricula) {
+        const requisicaoAtual = ++requisicaoAgendaId.current;
+
+        setTurmaEmFoco(turma);
+        setAulas([]);
+        setErroAgenda("");
+        setSucesso("");
+        setCarregandoAgenda(true);
+
+        try {
+            const agenda = await getAgendaTurma(turma.turma._id);
+
+            if (requisicaoAtual !== requisicaoAgendaId.current) {
+                return;
+            }
+
+            setAulas(agenda);
+
+        } catch (error) {
+            if (requisicaoAtual !== requisicaoAgendaId.current) {
+                return;
+            }
+
+            setErroAgenda(mensagemErro(error));
+
+        } finally {
+            if (requisicaoAtual === requisicaoAgendaId.current) {
+                setCarregandoAgenda(false);
+            }
+        }
+    }
+
     if (loading) {
         return <p className="p-8">Carregando turmas...</p>;
     }
 
     return (
-        <main className="mx-auto mt-8 w-full max-w-6xl rounded-2xl border border-slate-300 bg-white p-8 shadow-md">
-            <h1 className="mb-2 text-3xl font-bold text-slate-900">
-                Gerenciamento de Aulas
-            </h1>
-
-            <p className="mb-6 text-gray-500">
-                Gerencie os horários e professores das aulas das turmas.
-            </p>
-
-            <input
-                type="search"
-                aria-label="Pesquisar turmas"
-                placeholder="Pesquisar curso ou turno..."
-                value={busca}
-                onChange={e => {
-                    setBusca(e.target.value);
-                    setPaginaAtual(1);
-                }}
-                className="mb-6 w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
+        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+            <PageHeader
+                titulo="Gerenciamento de Aulas"
+                descricao="Organize o planejamento, os horários e os professores responsáveis pelas aulas."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={CalendarDays}
             />
 
             {erro && (
-                <p role="alert" className="mb-4 rounded-lg bg-red-100 p-3 text-red-700">
+                <p
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+                >
                     {erro}
                 </p>
             )}
 
-            {sucesso && !turmaSelecionada && (
-                <p className="mb-4 rounded-lg bg-green-100 p-3 text-green-700">
-                    {sucesso}
-                </p>
-            )}
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
 
-            <div className="overflow-x-auto">
-                <table className="w-full min-w-[650px]">
-                    <thead>
-                        <tr className="border-b border-gray-200">
-                            <th className="p-3 text-left">Curso</th>
-                            <th className="p-3 text-left">Turno</th>
-                            <th className="p-3 text-left">Início</th>
-                            <th className="p-3 text-left">Fim</th>
-                            <th className="p-3 text-center">Ações</th>
-                        </tr>
-                    </thead>
+                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <TurmaSelector
+                        turmas={turmasPaginadas}
+                        selecionadaId={turmaEmFoco?.turma._id ?? null}
+                        busca={busca}
+                        onBuscaChange={(valor) => {
+                            setBusca(valor);
+                            setPaginaAtual(1);
+                            setTurmaEmFoco(null);
+                        }}
+                        onSelecionar={(turma) => {
+                            void selecionarTurma(turma);
+                        }}
+                    />
 
-                    <tbody>
-                        {turmasPaginadas.map(item => (
-                            <tr
-                                key={item.turma._id}
-                                className="border-b border-gray-100 hover:bg-gray-50"
-                            >
-                                <td className="p-3 text-gray-700">
-                                    {item.turma.curso?.name ?? "Sem curso"}
-                                </td>
+                    <div className="mt-5">
+                        <Pagination
+                            paginaAtual={paginaAtual}
+                            totalItens={turmasFiltradas.length}
+                            itensPorPagina={ITENS_POR_PAGINA}
+                            onPageChange={setPaginaAtual}
+                        />
+                    </div>
+                </section>
 
-                                <td className="p-3 text-gray-700">
-                                    {item.turma.turno}
-                                </td>
-
-                                <td className="p-3 text-gray-700">
-                                    {formatarDia(item.turma.dataInicio)}
-                                </td>
-
-                                <td className="p-3 text-gray-700">
-                                    {formatarDia(item.turma.dataFim)}
-                                </td>
-
-                                <td className="p-3 text-center">
-                                    <button
-                                        type="button"
-                                        onClick={() => void abrirTurma(item)}
-                                        disabled={carregandoAgenda}
-                                        className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-                                    >
-                                        <FaCalendarAlt />
-                                        Gerenciar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {turmasPaginadas.length === 0 && (
-                    <p className="py-8 text-center text-gray-500">
-                        Nenhuma turma encontrada.
-                    </p>
-                )}
+                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <AgendaTurmaPanel
+                        key={turmaEmFoco?.turma._id ?? "sem-turma"}
+                        turma={turmaEmFoco}
+                        aulas={aulas}
+                        carregando={carregandoAgenda}
+                        erro={erroAgenda}
+                        sucesso={sucesso}
+                        obterNomeMateria={obterNomeMateria}
+                        onAgendar={abrirAgendamento}
+                        onTentarNovamente={() => {
+                            if (turmaEmFoco) {
+                                void selecionarTurma(turmaEmFoco);
+                            }
+                        }}
+                    />
+                </section>
             </div>
 
-            <div className="mt-6 flex items-center justify-center gap-3">
-                <button
-                    type="button"
-                    disabled={paginaAtual === 1}
-                    onClick={() => setPaginaAtual(p => Math.max(1, p - 1))}
-                    className="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                    Anterior
-                </button>
-
-                <span className="text-sm text-gray-600">
-                    Página {paginaAtual} de {totalPaginas}
-                </span>
-
-                <button
-                    type="button"
-                    disabled={paginaAtual >= totalPaginas}
-                    onClick={() =>
-                        setPaginaAtual(p => Math.min(totalPaginas, p + 1))
-                    }
-                    className="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                    Próxima
-                </button>
-            </div>
-
-            {turmaSelecionada && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4 py-6 backdrop-blur-sm">
-                    <section
-                        role="dialog"
-                        aria-modal="true"
-                        aria-label="Gerenciamento de aulas da turma"
-                        className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
-                    >
-                        <header className="border-b border-gray-200 p-6">
-                            <div className="flex items-center justify-between gap-3">
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-800">
-                                        {aulaSelecionada
-                                            ? "Agendamento de Aula"
-                                            : `Aulas — ${turmaSelecionada.turma.curso?.name ?? "Turma"}`}
-                                    </h2>
-
-                                    <p className="mt-1 text-sm text-gray-500">
-                                        Turma {turmaSelecionada.turma.turno}
-                                    </p>
-                                </div>
-                            </div>
-                        </header>
-
-                        <div className="overflow-y-auto p-6">
-                            {!aulaSelecionada ? (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="rounded-lg bg-blue-50 p-4">
-                                            <p className="text-sm text-gray-600">
-                                                Agendadas
-                                            </p>
-                                            <p className="text-2xl font-bold text-blue-700">
-                                                {aulasAgendadas}/{aulas.length}
-                                            </p>
-                                        </div>
-
-                                        <div className="rounded-lg bg-yellow-50 p-4">
-                                            <p className="text-sm text-gray-600">
-                                                Pendentes
-                                            </p>
-                                            <p className="text-2xl font-bold text-yellow-700">
-                                                {aulas.filter(a => a.status === "PENDENTE").length}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="h-2 overflow-hidden rounded-full bg-gray-200">
-                                        <div
-                                            className="h-full rounded-full bg-blue-600"
-                                            style={{ width: `${progresso}%` }}
-                                        />
-                                    </div>
-
-                                    {sucesso && (
-                                        <p className="rounded-lg bg-green-100 p-3 text-sm text-green-700">
-                                            {sucesso}
-                                        </p>
-                                    )}
-
-                                    {aulasOrdenadas.length === 0 && (
-                                        <p className="py-6 text-center text-gray-500">
-                                            Esta turma não possui aulas cadastradas.
-                                        </p>
-                                    )}
-
-                                    {aulasOrdenadas.map(item => {
-                                        const agendada = item.status === "AGENDADA";
-                                        const bloqueada =
-                                            !item.aula ||
-                                            item.status === "REALIZADA" ||
-                                            item.status === "CANCELADA";
-
-                                        return (
-                                            <article
-                                                key={item._id}
-                                                className="rounded-xl border border-gray-200 bg-gray-50 p-4"
-                                            >
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <div>
-                                                        <h3 className="font-bold text-gray-800">
-                                                            {item.aula?.ordem ?? "—"}.{" "}
-                                                            {item.aula?.titulo ?? "Aula não encontrada"}
-                                                        </h3>
-
-                                                        <p className="mt-1 flex items-center gap-2 text-sm text-gray-600">
-                                                            <FaBookOpen className="text-blue-600" />
-                                                            <span>
-                                                                Matéria: {obterNomeMateria(item.aula?.materiaId)}
-                                                            </span>
-                                                        </p>
-
-                                                        <p className="mt-1 flex items-center gap-2 text-sm text-gray-500">
-                                                            <FaClock />
-                                                            {item.aula?.duracao ?? 0} minutos
-                                                        </p>
-                                                    </div>
-
-                                                    <span
-                                                        className={`rounded-full px-3 py-1 text-xs font-semibold ${item.status === "AGENDADA"
-                                                            ? "bg-green-100 text-green-700"
-                                                            : item.status === "PENDENTE"
-                                                                ? "bg-yellow-100 text-yellow-700"
-                                                                : "bg-gray-200 text-gray-700"
-                                                            }`}
-                                                    >
-                                                        {item.status}
-                                                    </span>
-                                                </div>
-
-                                                {item.dataInicio && (
-                                                    <div className="mt-3 space-y-1 text-sm text-gray-600">
-                                                        <p>
-                                                            Início: {formatarData(item.dataInicio)}
-                                                        </p>
-
-                                                        <p>
-                                                            Professor: {item.professor?.name ?? "Não atribuído"}
-                                                        </p>
-                                                    </div>
-                                                )}
-
-                                                <div className="mt-3 flex justify-end">
-                                                    <button
-                                                        type="button"
-                                                        disabled={bloqueada}
-                                                        onClick={() => abrirAgendamento(item)}
-                                                        className="flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                                                    >
-                                                        {agendada ? <FaPencilAlt /> : <FaCalendarAlt />}
-                                                        {agendada ? "Editar" : "Agendar"}
-                                                    </button>
-                                                </div>
-                                            </article>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className="space-y-5">
-                                    <button
-                                        type="button"
-                                        onClick={voltarParaLista}
-                                        disabled={salvando}
-                                        className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800"
-                                    >
-                                        <FaArrowLeft />
-                                        Voltar para as aulas
-                                    </button>
-
-                                    <div>
-                                        <h3 className="text-xl font-bold text-gray-800">
-                                            {aulaSelecionada.aula?.titulo}
-                                        </h3>
-
-                                        <p className="mt-1 text-sm text-gray-600">
-                                            Matéria: {obterNomeMateria(aulaSelecionada.aula?.materiaId)}
-                                        </p>
-
-                                        <p className="text-sm text-gray-500">
-                                            Duração: {aulaSelecionada.aula?.duracao} minutos
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={inicioId}
-                                            className="mb-1 block text-sm font-semibold text-gray-700"
-                                        >
-                                            Data e horário de início
-                                        </label>
-
-                                        <input
-                                            id={inicioId}
-                                            type="datetime-local"
-                                            min="1900-01-01T00:00"
-                                            max="2100-12-31T23:59"
-                                            value={inicio}
-                                            onChange={e => setInicio(e.target.value)}
-                                            className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-blue-500"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor={professorCampoId}
-                                            className="mb-1 block text-sm font-semibold text-gray-700"
-                                        >
-                                            Professor responsável
-                                        </label>
-
-                                        <select
-                                            id={professorCampoId}
-                                            value={professorId}
-                                            onChange={e => setProfessorId(e.target.value)}
-                                            className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-blue-500"
-                                        >
-                                            <option value="">Selecione um professor</option>
-
-                                            {professores.map(professor => (
-                                                <option
-                                                    key={professor._id}
-                                                    value={professor._id}
-                                                >
-                                                    {professor.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {aulaSelecionada.aula && (
-                                        <div className="rounded-lg bg-blue-50 p-4">
-                                            <p className="text-sm text-gray-600">
-                                                Término previsto
-                                            </p>
-
-                                            <p className="font-semibold text-blue-700">
-                                                {calcularTerminoPrevisto(
-                                                    inicio,
-                                                    aulaSelecionada.aula.duracao
-                                                ) ?? "Informe uma data e horário válidos"}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {erroModal && (
-                                        <p
-                                            role="alert"
-                                            className="rounded-lg bg-red-100 p-3 text-sm text-red-700"
-                                        >
-                                            {erroModal}
-                                        </p>
-                                    )}
-
-                                    <div className="flex justify-end gap-3 pt-3">
-                                        <button
-                                            type="button"
-                                            onClick={voltarParaLista}
-                                            disabled={salvando}
-                                            className="cursor-pointer rounded-lg bg-gray-200 px-4 py-2 font-semibold text-gray-700"
-                                        >
-                                            Cancelar
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => void salvarAgendamento()}
-                                            disabled={salvando || !inicio || !professorId}
-                                            className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                                        >
-                                            {salvando ? "Salvando..." : "Salvar Agendamento"}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {!aulaSelecionada && (
-                            <footer className="border-t border-gray-200 p-4 text-right">
-                                <button
-                                    type="button"
-                                    onClick={fecharModal}
-                                    className="cursor-pointer rounded-lg bg-gray-200 px-5 py-2 font-semibold text-gray-700 hover:bg-gray-300"
-                                >
-                                    Fechar
-                                </button>
-                            </footer>
-                        )}
-                    </section>
-                </div>
-            )}
+            <AgendarAulaDialog
+                aula={aulaSelecionada}
+                curso={
+                    turmaEmFoco?.turma.curso?.name ??
+                    "Curso não informado"
+                }
+                turno={turmaEmFoco?.turma.turno ?? ""}
+                materia={
+                    aulaSelecionada
+                        ? obterNomeMateria(
+                            aulaSelecionada.aula?.materiaId
+                        )
+                        : ""
+                }
+                professores={professores}
+                inicio={inicio}
+                professorId={professorId}
+                terminoPrevisto={
+                    aulaSelecionada?.aula
+                        ? calcularTerminoPrevisto(
+                            inicio,
+                            aulaSelecionada.aula.duracao
+                        )
+                        : null
+                }
+                salvando={salvando}
+                erro={erroModal}
+                onInicioChange={setInicio}
+                onProfessorChange={setProfessorId}
+                onCancelar={fecharAgendamento}
+                onSalvar={() => {
+                    void salvarAgendamento();
+                }}
+            />
         </main>
     );
 }
