@@ -1,132 +1,159 @@
 import { useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { FaChevronDown } from "react-icons/fa6";
+import { FaBars, FaChevronDown, FaXmark } from "react-icons/fa6";
 import logo from "../assets/logo.png";
 import { FaWhatsapp } from "react-icons/fa";
 
-
 interface NavigationItem {
-    label: string;
-    href?: string;
-    icon?: ReactNode;
-    iconContador?: ReactNode;
-    isSelect?: boolean;
-    options?: { label: string; href: string; iconF?: ReactNode }[];
+  label: string;
+  href?: string;
+  icon?: ReactNode;
+  iconContador?: ReactNode;
+  isSelect?: boolean;
+  options?: { label: string; href: string; iconF?: ReactNode }[];
 }
 
 interface SideBarProps {
-    navigationItems: NavigationItem[];
-    link: string;
-    matriculasPendentes: number;
+  navigationItems: NavigationItem[];
+  link: string;
+  matriculasPendentes: number;
 }
 
-export function SideBar({ navigationItems, link, matriculasPendentes }: SideBarProps) {
-    const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
-    
-    return (
-        <>
-            <aside className="fixed inset-y-0 left-0 z-10 flex w-64 flex-col border-r bg-background bg-[#0F172A]">
-                <div className="flex h-24 items-center justify-center border-b">
-                    <Link to={link}>
-                        <img
-                            src={logo}
-                            alt="Logo"
-                            className="h-20 w-auto object-contain"
-                        />
-                    </Link>
-                </div>
+export function SideBar({
+  navigationItems,
+  link,
+  matriculasPendentes,
+}: SideBarProps) {
+  const [openMenus, setOpenMenus] = useState<Record<number, boolean>>({});
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-                <nav className="flex-1 space-y-1 p-3">
-                    {navigationItems.map((item, index) => {
-                        if (item.isSelect) {
-                            return (
-                                <div
-                                    key={index}
-                                    className="w-full"
-                                >
-                                    <button
-                                        onClick={() =>
-                                            setOpenMenus((prev) => ({
-                                                ...prev,
-                                                [index]: !prev[index],
-                                            }))
-                                        }
-                                        className="flex w-full items-center justify-between
+  return (
+    <>
+      {!mobileOpen && (
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="fixed left-4 top-4 z-50 rounded-lg bg-slate-900 p-3 text-white shadow-lg md:hidden"
+        >
+          <FaBars size={20} />
+        </button>
+      )}
+
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+        />
+      )}
+      <aside
+        className={`
+    fixed inset-y-0 left-0 z-40
+    flex w-64 flex-col
+    border-r bg-[#0F172A]
+    transition-transform duration-300
+    md:translate-x-0
+    ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+  `}
+      >
+        <div className="relative flex h-24 items-center justify-center border-b">
+          <Link to={link}>
+            <img src={logo} alt="Logo" className="h-20 w-auto object-contain" />
+          </Link>
+
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="absolute right-4 top-4 text-white md:hidden"
+          >
+            <FaXmark size={22} />
+          </button>
+        </div>
+
+        <nav className="flex-1 space-y-1 p-3">
+          {navigationItems.map((item, index) => {
+            if (item.isSelect) {
+              return (
+                <div key={index} className="w-full">
+                  <button
+                    onClick={() =>
+                      setOpenMenus((prev) => ({
+                        ...prev,
+                        [index]: !prev[index],
+                      }))
+                    }
+                    className="flex w-full items-center justify-between
 rounded-lg px-3 py-2
 text-sm font-medium text-slate-300
 transition-all duration-200
 hover:bg-blue-500/20
 hover:text-white
                                                 "
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            {item.icon && <span className="text-base">{item.icon}</span>}
-                                            <span>{item.label}</span>
-                                        </div>
+                  >
+                    <div className="flex items-center gap-2">
+                      {item.icon && (
+                        <span className="text-base">{item.icon}</span>
+                      )}
+                      <span>{item.label}</span>
+                    </div>
 
-                                        <FaChevronDown
-                                            size={15}
-                                            className={`transition-transform duration-300 ${openMenus[index] ? "rotate-180" : ""
-                                                }`}
-                                        />
-                                    </button>
+                    <FaChevronDown
+                      size={15}
+                      className={`transition-transform duration-300 ${
+                        openMenus[index] ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
 
+                  {openMenus[index] && (
+                    <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">
+                      {item.options?.map((opt, i) => (
+                        <NavLink
+                          key={i}
+                          onClick={() => setMobileOpen(false)}
+                          className={({ isActive }) =>
+                            `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
+                                    ${isActive ? "bg-blue-600 text-white" : "text-slate-300"}`
+                          }
+                          to={opt.href!}
+                        >
+                          {opt.iconF && (
+                            <span className="text-base">{opt.iconF}</span>
+                          )}
+                          <span>{opt.label}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <NavLink
+                key={item.href}
+                to={item.href!}
+                onClick={() => setMobileOpen(false)}
+                end={item.href === "/"}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
+                                    ${isActive ? "bg-blue-600 text-white shadow-md" : "text-slate-300"}`
+                }
+              >
+                {item.icon && <span className="text-base">{item.icon}</span>}
+                <span>{item.label}</span>
+                {matriculasPendentes > 0 && item.iconContador && (
+                  <span className="ml-auto text-yellow-500">
+                    {item.iconContador}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
 
-                                    {openMenus[index] && (
-
-                                        <div className="ml-2 mt-1 border-l-2 border-emerald-400 pl-3">
-                                            {item.options?.map((opt, i) => (
-
-                                                <NavLink key={i}
-
-
-                                                    className={({ isActive }) =>
-
-
-                                                        `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
-                                    ${isActive ? 'bg-blue-600 text-white' : 'text-slate-300'}`}
-
-
-                                                    to={opt.href!}
-                                                >
-                                                    {opt.iconF && <span className="text-base">{opt.iconF}</span>}
-                                                    <span>{opt.label}</span>
-
-                                                </NavLink>
-                                            ))}
-                                        </div>
-                                    )}
-
-
-                                </div>
-                            );
-                        }
-                        return (
-                            < NavLink
-                                key={item.href}
-                                to={item.href!}
-                                end={item.href === "/"}
-                                className={({ isActive }) =>
-
-                                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground
-                                    ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300'}`
-
-                                }
-                            >
-                                {item.icon && <span className="text-base">{item.icon}</span>}
-                                <span>{item.label}</span>
-                                {matriculasPendentes > 0 && item.iconContador && (<span className="ml-auto text-yellow-500">{item.iconContador}</span>)}
-                            </NavLink>
-                        );
-                    })}
-                </nav>
-
-                <div className="border-t p-4">
-                    <a
-                        href="https://wa.me/5511962865972"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="
+        <div className="border-t p-4">
+          <a
+            href="https://wa.me/5511962865972"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="
             flex items-center justify-center gap-2
             rounded-lg bg-green-500 px-3 py-3
             text-sm font-semibold text-white
@@ -134,12 +161,12 @@ hover:text-white
             hover:bg-green-600 hover:shadow-lg
             active:scale-95
         "
-                    >
-                        <FaWhatsapp className="h-[1em] w-[1em] shrink-0" />
-                        Suporte via WhatsApp
-                    </a>
-                </div>
-            </aside >
-        </>
-    );
+          >
+            <FaWhatsapp className="h-[1em] w-[1em] shrink-0" />
+            Suporte via WhatsApp
+          </a>
+        </div>
+      </aside>
+    </>
+  );
 }
