@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso, authTurma, TurmaMatricula } from "../../types/auth/auth-types";
 import { deletarTurmaAPI, editarTurmaAPI, getCurso, getTurma } from "../../services/authService";
 import { Modal } from "../../components/Modal";
 import { formatDate } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
-
-
-const isSubmitting = false;
+import { PageHeader } from "../../components/ui/PageHeader";
+import { Pagination } from "../../components/ui/Pagination";
+import { Pencil, Plus, Trash2, Users } from "lucide-react";
+import { DataTable, type TableColumn } from "../../components/ui/DataTable";
 
 export function TurmaPage() {
     const navigate = useNavigate();
@@ -19,8 +18,11 @@ export function TurmaPage() {
     const [idSelecionado, setIdSelecionado] = useState<string | null>(null);
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 5;
-    const indiceUltimoItem = paginaAtual * itensPorPagina;
-    const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
+    const indicePrimeiroItem = (paginaAtual - 1) * itensPorPagina;
+    const turmasPaginadas = turmas.slice(
+        indicePrimeiroItem,
+        indicePrimeiroItem + itensPorPagina
+    );
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [turmaToEditId, setTurmaToEditId] = useState<string | null>(null);
     const [editCurso, setEditCurso] = useState("");
@@ -33,19 +35,10 @@ export function TurmaPage() {
         (curso) => curso._id === editCurso
     );
     const dataFimInvalida = Boolean(
-    editDataInicio && editDataFim && new Date(editDataFim) <= new Date(editDataInicio)
+        editDataInicio && editDataFim && new Date(editDataFim) <= new Date(editDataInicio)
     );
     const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
     const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
-
-
-    const turmasPaginadas = turmas.slice(
-        indicePrimeiroItem,
-        indiceUltimoItem
-    );
-
-    const totalPaginas = Math.ceil(turmas.length / itensPorPagina);
-    // const [mostrarModal, setMostrarModal] = useState(false);
 
     async function handleExclusao() {
         try {
@@ -55,13 +48,15 @@ export function TurmaPage() {
             );
             setMostrarModalExclusao(true);
             setTurmas(novaLista);
-            const novasPaginas = Math.ceil(
-                novaLista.length / itensPorPagina
+            setPaginaAtual((atual) =>
+                Math.min(
+                    atual,
+                    Math.max(
+                        1,
+                        Math.ceil(novaLista.length / itensPorPagina)
+                    )
+                )
             );
-
-            if (paginaAtual > novasPaginas && novasPaginas > 0) {
-                setPaginaAtual(novasPaginas);
-            }
         } catch (error) {
             console.log(error);
             alert("Erro ao excluir a turma.");
@@ -70,36 +65,36 @@ export function TurmaPage() {
     }
 
     useEffect(() => {
-    async function carregarDados() {
-        try {
-            setLoading(true);
-            setError("");
+        async function carregarDados() {
+            try {
+                setLoading(true);
+                setError("");
 
-            const [turmasData, cursosData] =
-                await Promise.all([
-                    getTurma(),
-                    getCurso(),
-                ]);
+                const [turmasData, cursosData] =
+                    await Promise.all([
+                        getTurma(),
+                        getCurso(),
+                    ]);
 
-            setTurmas(turmasData);
-            setCursos(cursosData);
+                setTurmas(turmasData);
+                setCursos(cursosData);
 
-        } catch (error) {
-            console.error(
-                "Erro ao carregar turmas:",
-                error
-            );
+            } catch (error) {
+                console.error(
+                    "Erro ao carregar turmas:",
+                    error
+                );
 
-            setError(
-                "Erro ao carregar os dados das turmas"
-            );
-        } finally {
-            setLoading(false);
+                setError(
+                    "Erro ao carregar os dados das turmas"
+                );
+            } finally {
+                setLoading(false);
+            }
         }
-    }
 
-    carregarDados();
-}, []);
+        carregarDados();
+    }, []);
 
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
@@ -119,7 +114,6 @@ export function TurmaPage() {
         setIsEditModalOpen(true);
     }
 
-    // 2. Limpa os campos e fecha o modal
     function fecharModalEdicao() {
         setIsEditModalOpen(false);
         setTurmaToEditId(null);
@@ -134,13 +128,10 @@ export function TurmaPage() {
         if (!turmaToEditId) return;
 
         try {
-            // Chama a API passando o ID e os novos dados. 
-            // Ajuste os parâmetros de acordo com o que sua API espera receber.
             await editarTurmaAPI(turmaToEditId, { curso: editCurso, capacidade: Number.parseInt(editCapacidade), turno: editTurno, dataInicio: editDataInicio, dataFim: editDataFim });
 
             setMostrarModalEdicao(true);
 
-            // Atualiza a lista na tela (procura a turma pelo ID e altera apenas ela)
             setTurmas(
                 turmas.map((item) =>
                     item.turma._id === turmaToEditId
@@ -169,105 +160,108 @@ export function TurmaPage() {
         }
     }
 
+
+    const colunas: TableColumn<TurmaMatricula>[] = [
+        {
+            id: "curso",
+            titulo: "Curso",
+            renderizar: (item) => (
+                <span className="font-semibold text-slate-800">
+                    {item.turma.curso?.name ?? "Curso não definido"}
+                </span>
+            )
+        },
+        {
+            id: "turno",
+            titulo: "Turno",
+            renderizar: (item) => (
+                <span className="inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    {item.turma.turno}
+                </span>
+            )
+        },
+        {
+            id: "capacidade",
+            titulo: "Capacidade",
+            renderizar: (item) => (
+                <span>{item.turma.capacidade} vagas</span>
+            )
+        },
+        {
+            id: "inicio",
+            titulo: "Data de início",
+            renderizar: (item) =>
+                formatDate(item.turma.dataInicio)
+        },
+        {
+            id: "fim",
+            titulo: "Data de término",
+            renderizar: (item) =>
+                formatDate(item.turma.dataFim)
+        }
+    ];
+
     return (
-        <div>
-            <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                    Lista de Turmas
-                </h1>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-                <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Turno
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Curso
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Capacidade
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Data de Início
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Data de Fim
-                            </th>
-
-                            <th className=" text-slate-800 font-medium p-2 border-b">
-                                Ações
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="border-b">
-                        {turmasPaginadas.map((turma) => (
-                            <tr key={turma.turma._id} className="border-b">
-                                <td className="text-slate-600 p-2">
-                                    {turma.turma.turno}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {turma.turma.curso?.name || "Curso não definido"}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {turma.turma.capacidade}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {formatDate(turma.turma.dataInicio)}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {formatDate(turma.turma.dataFim)}
-                                </td>
-                                <td className="p-2 gap-2">
-                                    <div className="flex justify-center items-center gap-2">
-                                        <Button isSubmitting={isSubmitting}
-                                            label={<FaPencilAlt />}
-                                            loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => abrirModalEdicao(turma.turma)} />
-                                        <Button isSubmitting={isSubmitting}
-                                            label={<FaTrash />}
-                                            onClick={() => {
-                                                setIsModalOpen(true);
-                                                setIdSelecionado(turma.turma._id)
-                                            }}
-                                            loadingLabel="excluindo"
-                                            className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
-                                        />
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="flex justify-center items-center gap-2 mt-4">
+            <PageHeader
+                titulo="Gerenciamento de Turmas"
+                descricao="Visualize, cadastre e gerencie as turmas do Aticurando."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={Users}
+                acao={
                     <button
-                        onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
-                        disabled={paginaAtual === 1}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        type="button"
+                        onClick={() => navigate("/app/register-turma")}
+                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
                     >
-                        Anterior
+                        <Plus size={18} />
+                        Nova Turma
                     </button>
+                }
+            />
 
-                    <span className="text-slate-600">
-                        Página {paginaAtual} de {totalPaginas}
-                    </span>
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="mb-5 text-xl font-bold text-slate-800">
+                    Turmas cadastradas
+                </h2>
 
-                    <button
-                        onClick={() =>
-                            setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
+                <DataTable
+                    dados={turmasPaginadas}
+                    colunas={colunas}
+                    chave={(item) => item.turma._id}
+                    mensagemVazia="Nenhuma turma cadastrada."
+                    rotuloAcoes={(item) =>
+                        `Ações da turma ${item.turma.curso?.name ?? ""}`
+                    }
+                    acoes={(item) => [
+                        {
+                            texto: "Editar turma",
+                            icone: Pencil,
+                            executar: () => abrirModalEdicao(item.turma)
+                        },
+                        {
+                            texto: "Excluir turma",
+                            icone: Trash2,
+                            perigosa: true,
+                            executar: () => {
+                                setIdSelecionado(item.turma._id);
+                                setIsModalOpen(true);
+                            }
                         }
-                        disabled={paginaAtual === totalPaginas}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                        Próxima
-                    </button>
+                    ]}
+                />
+
+                <div className="mt-5">
+                    <Pagination
+                        paginaAtual={paginaAtual}
+                        totalItens={turmas.length}
+                        itensPorPagina={itensPorPagina}
+                        onPageChange={setPaginaAtual}
+                    />
                 </div>
             </section>
+
             {isModalOpen && (
                 <Modal
                     titulo={`Confirmar Exclusão de Turma`}
@@ -380,16 +374,15 @@ export function TurmaPage() {
                                     type="date"
                                     value={editDataFim}
                                     onChange={(e) => setEditDataFim(e.target.value)}
-                                     className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                    dataFimInvalida ? "border-red-500" : "border-slate-300"
-                                    }`}
-                                    />
-                                    {dataFimInvalida && (
+                                    className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${dataFimInvalida ? "border-red-500" : "border-slate-300"
+                                        }`}
+                                />
+                                {dataFimInvalida && (
                                     <p className="mt-1 text-sm text-red-600">
-                                    A data de fim deve ser posterior à data de início
+                                        A data de fim deve ser posterior à data de início
                                     </p>
-                                    )}
-                                </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex justify-end gap-3">

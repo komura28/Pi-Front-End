@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.2.1",
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.16.1",
     "cors": "^2.8.6",
@@ -43,6 +44,6 @@
     "vite": "^8.0.12"
   },
   "overrides": {
-  "minimatch": "^11.0.1"
-}
+    "minimatch": "^11.0.1"
+  }
 }
