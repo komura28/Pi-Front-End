@@ -4,7 +4,17 @@ import { useForm } from "react-hook-form";
 import type { authCurso, RegisterTurmaRequest } from "../../types/auth/auth-types";
 import { getCurso } from "../../services/authService";
 import { cadastrarTurma } from "../../services/admService";
-import { Modal } from "../../components/Modal";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { SuccessDialog } from "../../components/ui/SuccessDialog";
+import {
+    Users,
+    ArrowLeft,
+    BookOpen,
+    CalendarDays,
+    Save
+} from "lucide-react";
+
+import axios from "axios";
 
 interface CadastroTurmaFormData {
     curso: string;
@@ -42,11 +52,17 @@ export function TurmaCadastroPage() {
         carregarTurmas();
 
     }, [])
+
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting }
-    } = useForm<CadastroTurmaFormData>();
+    } = useForm<CadastroTurmaFormData>({
+        defaultValues: {
+            curso: "",
+            turno: ""
+        }
+    });
 
     if (loading) {
         return (
@@ -64,202 +80,314 @@ export function TurmaCadastroPage() {
         );
     }
 
+
     async function handleCadastro(data: CadastroTurmaFormData) {
         try {
-
-            console.log("Dados do formulário:", data);
             setServerError("");
+
             const dados: RegisterTurmaRequest = {
-                curso: cursos.find(curso => curso._id === data.curso)?._id || "",
+                curso: data.curso,
                 turno: data.turno,
                 capacidade: data.capacidade,
                 dataInicio: data.dataInicio,
-                dataFim: data.dataFim,
+                dataFim: data.dataFim
             };
+
             await cadastrarTurma(dados);
+
             setModal(true);
-        } catch (error: any) {
-            console.error("Erro pego no front-end:", error);
 
-            const mensagemDoBackend =
-                error?.response?.data?.message ||
-                (error instanceof Error ? error.message : "Erro na hora de realizar o cadastro");
+        } catch (error: unknown) {
+            console.error("Erro ao cadastrar turma:", error);
 
-            setServerError(mensagemDoBackend);
+            const mensagemBackend = axios.isAxiosError<{
+                message?: string
+            }>(error)
+                ? error.response?.data?.message
+                : undefined;
+
+            setServerError(
+                mensagemBackend ??
+                "Não foi possível cadastrar a turma. Tente novamente."
+            );
         }
-        console.log("objeto:", data);
-
     }
-
-    const onError = (errors: any) => {
-        console.log("Erros de validação do formulário:", errors);
-    }
-
-
-
-
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-white px-4">
-            <section className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
-                <h1 className="mb-2 text-center text-3xl font-bold text-gray-800">
-                    Cadastro de Turma
-                </h1>
+        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
+            <PageHeader
+                titulo="Cadastrar turma"
+                descricao="Configure o curso, as vagas e o período da nova turma."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={Users}
+                acao={
+                    <button
+                        type="button"
+                        onClick={() => navigate("/app/turma")}
+                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                    >
+                        <ArrowLeft size={18} />
+                        Voltar às turmas
+                    </button>
+                }
+            />
 
+            <form
+                onSubmit={handleSubmit(handleCadastro)}
+                className="space-y-6"
+            >
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
 
-                <form onSubmit={handleSubmit(handleCadastro, onError)} className="space-y-4">
-
-
-                    <div>
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Curso
-                        </label>
-
-                        <select
-                            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
-
-                            {...register("curso", {
-                                required: "O curso é obrigatório",
-                            })}
-                        >
-                            <option value="" disabled>Selecione o curso</option>
-                            {cursos.map((curso) => (
-                                <option key={curso._id} value={curso._id}>
-                                    {curso.name}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.curso && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.curso.message}
-                            </p>
-                        )}
-                    </div>
-
-
-                    <div>
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Capacidade
-                        </label>
-
-                        <input
-                            type="number"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite a capacidade"
-                            {...register("capacidade", {
-                                required: "A capacidade é obrigatória",
-                                min: {
-                                    value: 1,
-                                    message: "A capacidade deve ser um número positivo"
-                                }
-                            })}
-                        />
-                        {errors.capacidade && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.capacidade.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-sm font-bold text-gray-700">
-                            Turno
-                        </label>
-                        <select
-                            className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 mb-10"
-
-                            {...register("turno", {
-                                required: "O turno é obrigatório",
-                            })}
-                        >
-                            <option value="" disabled>Selecione o turno</option>
-                            <option value="MANHA">Manhã</option>
-                            <option value="TARDE">Tarde</option>
-                            <option value="NOITE">Noite</option>
-                        </select>
-                        {errors.turno && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.turno.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Data de Início
-                        </label>
-
-                        <input
-                            type="date"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite a data de início"
-                            {...register("dataInicio", {
-                                required: "A data de início é obrigatória"
-                            })}
-                        />
-                        {errors.dataInicio && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.dataInicio.message}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="mb-1 block text-gray-700 font-bold text-sm">
-                            Data de Fim
-                        </label>
-
-                        <input
-                            type="date"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
-                            placeholder="Digite a data de fim"
-                            {...register("dataFim", {
-                                required: "A data de fim é obrigatória",
-                                validate: (value, formValues) => {
-                                    if (!formValues.dataInicio) return true;
-                                    const inicio = new Date(formValues.dataInicio);
-                                    const fim = new Date(value);
-                                    return fim > inicio || "A data de fim deve ser posterior à data de início";
-                                }
-                            })}
-                        />
-                        {errors.dataFim && (
-                            <p className="mt-1 text-sm text-red-600">
-                                {errors.dataFim.message}
-                            </p>
-                        )}
-                    </div>
-
-                    {serverError && (
-                        <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700 text-center font-semibold border border-red-200">
-                            {serverError}
+                    <div className="mb-6 flex items-center gap-3">
+                        <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+                            <BookOpen size={22} />
                         </div>
-                    )}
+
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-800">
+                                Informações da turma
+                            </h2>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                Selecione o curso e configure as vagas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-5">
+                        <div>
+                            <label
+                                htmlFor="turma-curso"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Curso *
+                            </label>
+
+                            <select
+                                id="turma-curso"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                {...register("curso", {
+                                    required: "O curso é obrigatório"
+                                })}
+                            >
+                                <option value="">
+                                    Selecione um curso
+                                </option>
+
+                                {cursos.map((curso) => (
+                                    <option
+                                        key={curso._id}
+                                        value={curso._id}
+                                    >
+                                        {curso.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {errors.curso && (
+                                <p role="alert" className="mt-2 text-sm text-red-600">
+                                    {errors.curso.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+                            <div>
+                                <label
+                                    htmlFor="turma-capacidade"
+                                    className="mb-2 block text-sm font-semibold text-slate-700"
+                                >
+                                    Capacidade *
+                                </label>
+
+                                <input
+                                    id="turma-capacidade"
+                                    type="number"
+                                    min={1}
+                                    step={1}
+                                    placeholder="Número de vagas"
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                    {...register("capacidade", {
+                                        valueAsNumber: true,
+                                        required: "A capacidade é obrigatória",
+                                        min: {
+                                            value: 1,
+                                            message: "A capacidade deve ser maior que zero"
+                                        },
+                                        validate: (value) =>
+                                            Number.isInteger(value) ||
+                                            "Informe um número inteiro"
+                                    })}
+                                />
+
+                                {errors.capacidade && (
+                                    <p role="alert" className="mt-2 text-sm text-red-600">
+                                        {errors.capacidade.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="turma-turno"
+                                    className="mb-2 block text-sm font-semibold text-slate-700"
+                                >
+                                    Turno *
+                                </label>
+
+                                <select
+                                    id="turma-turno"
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                    {...register("turno", {
+                                        required: "O turno é obrigatório"
+                                    })}
+                                >
+                                    <option value="">
+                                        Selecione um turno
+                                    </option>
+                                    <option value="MANHA">Manhã</option>
+                                    <option value="TARDE">Tarde</option>
+                                    <option value="NOITE">Noite</option>
+                                </select>
+
+                                {errors.turno && (
+                                    <p role="alert" className="mt-2 text-sm text-red-600">
+                                        {errors.turno.message}
+                                    </p>
+                                )}
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+
+                    <div className="mb-6 flex items-center gap-3">
+                        <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+                            <CalendarDays size={22} />
+                        </div>
+
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-800">
+                                Período da turma
+                            </h2>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                Defina as datas de início e término.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+                        <div>
+                            <label
+                                htmlFor="turma-inicio"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Data de início *
+                            </label>
+
+                            <input
+                                id="turma-inicio"
+                                type="date"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                {...register("dataInicio", {
+                                    valueAsDate: true,
+                                    required: "A data de início é obrigatória"
+                                })}
+                            />
+
+                            {errors.dataInicio && (
+                                <p role="alert" className="mt-2 text-sm text-red-600">
+                                    {errors.dataInicio.message}
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="turma-fim"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Data de término *
+                            </label>
+
+                            <input
+                                id="turma-fim"
+                                type="date"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                {...register("dataFim", {
+                                    valueAsDate: true,
+                                    required: "A data de término é obrigatória",
+                                    validate: (fim, valores) => {
+                                        const inicio = valores.dataInicio;
+
+                                        if (!inicio) return true;
+
+                                        return fim > inicio ||
+                                            "A data de término deve ser posterior à data de início";
+                                    }
+                                })}
+                            />
+
+                            {errors.dataFim && (
+                                <p role="alert" className="mt-2 text-sm text-red-600">
+                                    {errors.dataFim.message}
+                                </p>
+                            )}
+                        </div>
+
+                    </div>
+                </section>
+
+                {serverError && (
+                    <div
+                        role="alert"
+                        className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700"
+                    >
+                        {serverError}
+                    </div>
+                )}
+
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+                    <button
+                        type="button"
+                        onClick={() => navigate("/app/turma")}
+                        disabled={isSubmitting}
+                        className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                    >
+                        Cancelar
+                    </button>
 
                     <button
                         type="submit"
-                        disabled={isSubmitting}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700 cursor-pointer disabled:bg-blue-300"
+                        disabled={isSubmitting || cursos.length === 0}
+                        className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {isSubmitting ? "Cadastando..." : "Cadastrar"}
+                        <Save size={18} />
+                        {isSubmitting
+                            ? "Cadastrando..."
+                            : "Cadastrar turma"}
                     </button>
 
-                </form>
-                {modal && (
-                    <Modal
-                        titulo="Cadastro"
-                        message="Turma Cadastrada com Sucesso!"
-                        decisao={null}
-                        texto="Ok"
-                        opSim={() => {
-                            setModal(false);
-                            navigate("/app/turma");
+                </div>
+            </form>
 
-                        }}
-                    />)}
+            <SuccessDialog
+                aberto={modal}
+                aoFechar={() => {
+                    setModal(false);
+                    navigate("/app/turma");
+                }}
+                titulo="Turma cadastrada!"
+                mensagem="A turma foi cadastrada com sucesso e já está disponível na listagem."
+            />
 
-            </section>
         </main>
     );
 };

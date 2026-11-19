@@ -1,10 +1,25 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso, authMateria } from "../../types/auth/auth-types";
 import { deletarCursoAPI, getCurso, editarCursoAPI, editarMateriaAPI, adicionarMateriaCursoAPI, removerMateriaCursoAPI } from "../../services/authService";
-import { Modal } from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { Pagination } from "../../components/ui/Pagination";
+import {
+    DataTable,
+    type TableColumn
+} from "../../components/ui/DataTable";
+import {
+    BookOpen,
+    Plus,
+    Pencil,
+    Trash2,
+    Layers3
+} from "lucide-react";
+import { AppDialog } from "../../components/ui/AppDialog";
+import { Save } from "lucide-react";
+import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { TableActionMenu } from "../../components/ui/TableActionMenu";
+import { SuccessDialog } from "../../components/ui/SuccessDialog";
 
 export function CursoPage() {
     const navigate = useNavigate();
@@ -15,6 +30,11 @@ export function CursoPage() {
     const [cursos, setCursos] = useState<authCurso[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const [erroExclusao, setErroExclusao] = useState("");
+    const [erroAdicionarMateria, setErroAdicionarMateria] = useState("");
+    const [erroEdicaoMateria, setErroEdicaoMateria] = useState("");
+    const [erroRemoverMateria, setErroRemoverMateria] = useState("");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [cursoToDelete, setCursoToDelete] = useState<string | null>(null);
@@ -54,8 +74,6 @@ export function CursoPage() {
         indiceUltimoItem
     );
 
-    const totalPaginas = Math.max(1, Math.ceil(cursos.length / itensPorPagina));
-
     useEffect(() => {
         async function carregarCursos() {
             try {
@@ -78,6 +96,7 @@ export function CursoPage() {
 
     function confirmarExclusao(id: string) {
         setCursoToDelete(id);
+        setErroExclusao("");
         setIsModalOpen(true);
     }
 
@@ -87,39 +106,93 @@ export function CursoPage() {
     }
 
     async function handleConfirmarExclusao() {
-        if (!cursoToDelete) return;
+        if (!cursoToDelete || isDeleting) return;
 
         try {
             setIsDeleting(true);
+            setErroExclusao("");
 
             await deletarCursoAPI(cursoToDelete);
 
-            setCursos((prevCursos) => {
-                const novaLista = prevCursos.filter(
-                    (curso) => curso._id !== cursoToDelete
-                );
+            const novaLista = cursos.filter(
+                (curso) => curso._id !== cursoToDelete
+            );
 
-                const novasPaginas = Math.max(
-                    1,
-                    Math.ceil(novaLista.length / itensPorPagina)
-                );
+            setCursos(novaLista);
 
-                setPaginaAtual((pagina) =>
-                    pagina > novasPaginas ? novasPaginas : pagina
-                );
+            const novasPaginas = Math.max(
+                1,
+                Math.ceil(novaLista.length / itensPorPagina)
+            );
 
-                return novaLista;
-            });
+            setPaginaAtual((pagina) =>
+                Math.min(pagina, novasPaginas)
+            );
 
+            fecharModal();
             setMostrarModalExclusao(true);
+
         } catch (error) {
-            console.log(error);
-            alert("Erro ao excluir o curso.");
+            console.error("Erro ao excluir curso:", error);
+
+            setErroExclusao(
+                "Não foi possível excluir o curso. Verifique se ele possui vínculos com outras informações."
+            );
         } finally {
             setIsDeleting(false);
-            fecharModal();
         }
     }
+
+    const colunas: TableColumn<authCurso>[] = [
+        {
+            id: "nome",
+            titulo: "Curso",
+            renderizar: (curso) => (
+                <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-blue-50 p-2.5 text-blue-600">
+                        <BookOpen size={20} />
+                    </div>
+
+                    <span className="font-semibold text-slate-800">
+                        {curso.name}
+                    </span>
+                </div>
+            )
+        },
+        {
+            id: "descricao",
+            titulo: "Descrição",
+            renderizar: (curso) => (
+                <p className="max-w-md text-sm text-slate-500">
+                    {curso.description || "Sem descrição"}
+                </p>
+            )
+        },
+        {
+            id: "materias",
+            titulo: "Matérias",
+            renderizar: (curso) => (
+                <span className="inline-flex whitespace-nowrap rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    {curso.materias?.length ?? 0} matérias
+                </span>
+            )
+        },
+        {
+            id: "situacao",
+            titulo: "Situação",
+            renderizar: (curso) => (
+                <span
+                    className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${curso.active
+                        ? "bg-green-50 text-green-700"
+                        : "bg-slate-100 text-slate-600"
+                        }`}
+                >
+                    {curso.active ? "Ativo" : "Inativo"}
+                </span>
+            )
+        }
+    ];
+
 
     function abrirModalEdicao(curso: authCurso) {
         setCursoToEditId(curso._id);
@@ -175,12 +248,18 @@ export function CursoPage() {
 
     function abrirModalMaterias(curso: authCurso) {
         setCursoMateriasSelecionado(curso);
+        setErroAdicionarMateria("");
+        setMostrarModalEdicaoMateria(false);
         setIsMateriasModalOpen(true);
     }
 
     function fecharModalMaterias() {
         setIsMateriasModalOpen(false);
         setCursoMateriasSelecionado(null);
+        setNovaMateriaNome("");
+        setNovaMateriaDescricao("");
+        setErroAdicionarMateria("");
+        setMostrarModalEdicaoMateria(false);
     }
 
     function abrirModalEdicaoMateria(materia: authMateria) {
@@ -188,6 +267,8 @@ export function CursoPage() {
         setEditMateriaName(materia.name ?? "");
         setEditMateriaDescription(materia.description ?? "");
         setIsMateriasModalOpen(false);
+        setErroEdicaoMateria("");
+        setMostrarModalEdicaoMateria(false);
         setIsEditMateriaModalOpen(true);
     }
 
@@ -203,11 +284,12 @@ export function CursoPage() {
         if (!materiaToEditId) return;
 
         if (!editMateriaName.trim()) {
-            alert("O nome da matéria é obrigatório.");
+            setErroEdicaoMateria("O nome da matéria é obrigatório.");
             return;
         }
 
         try {
+            setErroEdicaoMateria("");
             setIsSavingMateriaEdit(true);
 
             await editarMateriaAPI(materiaToEditId, {
@@ -251,8 +333,8 @@ export function CursoPage() {
             setIsMateriasModalOpen(true);
             setMostrarModalEdicaoMateria(true);
         } catch (error) {
-            console.log(error);
-            alert("Erro ao atualizar a matéria.");
+            console.error("Erro ao atualizar matéria:", error);
+            setErroEdicaoMateria("Não foi possível atualizar a matéria.");
         } finally {
             setIsSavingMateriaEdit(false);
         }
@@ -262,11 +344,12 @@ export function CursoPage() {
         if (!cursoMateriasSelecionado) return;
 
         if (!novaMateriaNome.trim()) {
-            alert("O nome da matéria é obrigatório.");
+            setErroAdicionarMateria("O nome da matéria é obrigatório.");
             return;
         }
 
         try {
+            setErroAdicionarMateria("");
             setIsAddingMateria(true);
 
             const cursoAtualizado: authCurso = await adicionarMateriaCursoAPI(
@@ -288,8 +371,8 @@ export function CursoPage() {
             setNovaMateriaNome("");
             setNovaMateriaDescricao("");
         } catch (error) {
-            console.log(error);
-            alert("Erro ao adicionar a matéria.");
+            console.error("Erro ao adicionar matéria:", error);
+            setErroAdicionarMateria("Não foi possível adicionar a matéria.");
         } finally {
             setIsAddingMateria(false);
         }
@@ -297,6 +380,7 @@ export function CursoPage() {
 
     function confirmarExclusaoMateria(materiaId: string) {
         setMateriaToDeleteId(materiaId);
+        setErroRemoverMateria("");
         setIsDeleteMateriaModalOpen(true);
     }
 
@@ -305,30 +389,43 @@ export function CursoPage() {
         setMateriaToDeleteId(null);
     }
 
+
     async function handleConfirmarExclusaoMateria() {
-        if (!materiaToDeleteId || !cursoMateriasSelecionado) return;
+        if (
+            !materiaToDeleteId ||
+            !cursoMateriasSelecionado ||
+            isDeletingMateria
+        ) return;
 
         try {
             setIsDeletingMateria(true);
+            setErroRemoverMateria("");
 
-            const cursoAtualizado: authCurso = await removerMateriaCursoAPI(
-                cursoMateriasSelecionado._id,
-                materiaToDeleteId
-            );
+            const cursoAtualizado: authCurso =
+                await removerMateriaCursoAPI(
+                    cursoMateriasSelecionado._id,
+                    materiaToDeleteId
+                );
 
             setCursos((prevCursos) =>
                 prevCursos.map((curso) =>
-                    curso._id === cursoAtualizado._id ? cursoAtualizado : curso
+                    curso._id === cursoAtualizado._id
+                        ? cursoAtualizado
+                        : curso
                 )
             );
 
             setCursoMateriasSelecionado(cursoAtualizado);
+            fecharModalExclusaoMateria();
+
         } catch (error) {
-            console.log(error);
-            alert("Erro ao excluir a matéria.");
+            console.error("Erro ao remover matéria:", error);
+
+            setErroRemoverMateria(
+                "Não foi possível remover a matéria deste curso."
+            );
         } finally {
             setIsDeletingMateria(false);
-            fecharModalExclusaoMateria();
         }
     }
 
@@ -340,380 +437,462 @@ export function CursoPage() {
         return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
     }
 
+
     return (
-        <div>
-            <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                    Lista de Cursos
-                </h1>
-                <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Curso
-                            </th>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Descrição
-                            </th>
-                            <th className="text-slate-800 font-medium p-2 border-b">
-                                Ações
-                            </th>
-                        </tr>
-                    </thead>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-                    <tbody className="border-b">
-                        {cursosPaginados.map((curso) => (
-                            <tr key={curso._id} className="border-b">
-                                <td className="text-slate-600 p-2">
-                                    {curso.name}
-                                </td>
-
-                                <td className="text-slate-600 p-2">
-                                    {curso.description}
-                                </td>
-
-                                <td className="p-2">
-                                    <div className="flex justify-center items-center gap-2">
-                                        <Button
-                                            isSubmitting={false}
-                                            label={<FaPencilAlt />}
-                                            loadingLabel="salvando"
-                                            className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => abrirModalEdicao(curso)}
-                                        />
-
-                                        <Button
-                                            isSubmitting={isDeleting}
-                                            label={<FaTrash />}
-                                            loadingLabel="Excluindo..."
-                                            className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => confirmarExclusao(curso._id)}
-                                        />
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                <div className="flex justify-center items-center gap-2 mt-4">
+            <PageHeader
+                titulo="Gerenciamento de Cursos"
+                descricao="Organize os cursos e suas matérias no Aticurando."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={BookOpen}
+                acao={
                     <button
-                        onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
-                        disabled={paginaAtual === 1}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        type="button"
+                        onClick={() => navigate("/app/register-curso")}
+                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
                     >
-                        Anterior
+                        <Plus size={18} />
+                        Novo Curso
                     </button>
+                }
+            />
 
-                    <span className="text-slate-600">
-                        Página {paginaAtual} de {totalPaginas}
-                    </span>
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-6">
+                    <h2 className="text-xl font-bold text-slate-800">
+                        Cursos cadastrados
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-500">
+                        Consulte e gerencie os cursos disponíveis no sistema.
+                    </p>
+                </div>
 
-                    <button
-                        onClick={() =>
-                            setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
+                <DataTable
+                    dados={cursosPaginados}
+                    colunas={colunas}
+                    chave={(curso) => curso._id}
+                    mensagemVazia="Nenhum curso cadastrado."
+                    rotuloAcoes={(curso) =>
+                        `Ações do curso ${curso.name}`
+                    }
+                    acoes={(curso) => [
+                        {
+                            texto: "Editar curso",
+                            icone: Pencil,
+                            executar: () => abrirModalEdicao(curso)
+                        },
+                        {
+                            texto: "Gerenciar matérias",
+                            icone: Layers3,
+                            executar: () => abrirModalMaterias(curso)
+                        },
+                        {
+                            texto: "Excluir curso",
+                            icone: Trash2,
+                            perigosa: true,
+                            disabled: isDeleting,
+                            executar: () => confirmarExclusao(curso._id)
                         }
-                        disabled={paginaAtual === totalPaginas}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                        Próxima
-                    </button>
+                    ]}
+                />
+
+                <div className="mt-5">
+                    <Pagination
+                        paginaAtual={paginaAtual}
+                        totalItens={cursos.length}
+                        itensPorPagina={itensPorPagina}
+                        onPageChange={setPaginaAtual}
+                    />
                 </div>
             </section>
 
-            {isModalOpen && (
-                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">Confirmar Exclusão de Curso</h3>
-                        <p className="text-slate-600 mb-6 justify-center text-center">
-                            Tem certeza que deseja excluir este curso? Esta ação não poderá ser desfeita.
-                        </p>
+            <ConfirmDialog
+                aberto={isModalOpen}
+                aoFechar={fecharModal}
+                aoConfirmar={() => {
+                    void handleConfirmarExclusao();
+                }}
+                titulo="Excluir curso"
+                descricao="Confirme a exclusão do curso selecionado."
+                nomeRegistro={
+                    cursos.find((curso) => curso._id === cursoToDelete)?.name
+                }
+                textoConfirmar="Excluir curso"
+                carregando={isDeleting}
+                erro={erroExclusao}
+            />
 
-                        <div className="flex justify-center gap-3">
+            <AppDialog
+                aberto={isEditModalOpen}
+                aoFechar={fecharModalEdicao}
+                titulo="Editar curso"
+                descricao="Atualize as informações do curso selecionado."
+                icone={Pencil}
+                rodape={
+                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <button
+                            type="button"
+                            onClick={fecharModalEdicao}
+                            disabled={isSavingEdit}
+                            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                        >
+                            Cancelar
+                        </button>
 
-                            <button
-                                onClick={handleConfirmarExclusao}
-                                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                Sim
-                            </button>
-
-                            <button
-                                onClick={fecharModal}
-                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
-                            >
-                                Não
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            form="form-editar-curso"
+                            disabled={isSavingEdit || !editName.trim()}
+                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            <Save size={17} />
+                            {isSavingEdit ? "Salvando..." : "Salvar alterações"}
+                        </button>
                     </div>
-                </div>
-            )}
+                }
+                salvando={isSavingEdit}
+            >
+                <form
+                    onSubmit={(evento) => {
+                        evento.preventDefault();
+                        void handleSalvarEdicao();
+                    }}
+                    className="space-y-5"
+                    id="form-editar-curso"
+                >
+                    <div>
+                        <label
+                            htmlFor="edit-nome-curso"
+                            className="mb-2 block text-sm font-semibold text-slate-700"
+                        >
+                            Nome do curso *
+                        </label>
 
-            {isEditModalOpen && (
-                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Curso</h3>
-
-                        <div className="flex flex-col gap-4 mb-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Nome do Curso
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editName}
-                                    onChange={(e) => setEditName(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Descrição
-                                </label>
-                                <textarea
-                                    value={editDescription}
-                                    onChange={(e) => setEditDescription(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => {
-                                    const cursoAtual = cursos.find(c => c._id === cursoToEditId);
-                                    if (cursoAtual) {
-                                        setIsEditModalOpen(false);
-                                        abrirModalMaterias(cursoAtual);
-                                    }
-                                }}
-                                className="mr-auto px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-colors"
-                            >
-                                Gerenciar Matérias
-                            </button>
-
-                            <button
-                                onClick={fecharModalEdicao}
-                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                        </div>
+                        <input
+                            id="edit-nome-curso"
+                            type="text"
+                            required
+                            value={editName}
+                            onChange={(evento) =>
+                                setEditName(evento.target.value)
+                            }
+                            placeholder="Digite o nome do curso"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                        />
                     </div>
-                </div>
-            )}
 
-            {isMateriasModalOpen && cursoMateriasSelecionado && (
-                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
-                        <h3 className="text-xl font-semibold text-slate-900 mb-4">
-                            Matérias de {cursoMateriasSelecionado.name}
-                        </h3>
+                    <div>
+                        <label
+                            htmlFor="edit-descricao-curso"
+                            className="mb-2 block text-sm font-semibold text-slate-700"
+                        >
+                            Descrição
+                        </label>
 
-                        <div className="max-h-80 overflow-y-auto space-y-2 mb-6">
-                            {cursoMateriasSelecionado.materias.length === 0 ? (
-                                <p className="text-slate-500 text-sm">
-                                    Este curso ainda não possui matérias cadastradas.
-                                </p>
-                            ) : (
-                                cursoMateriasSelecionado.materias.map((item) => (
-                                    <div
-                                        key={item.materia._id}
-                                        className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-3 py-2 border border-gray-200"
-                                    >
-                                        <div className="min-w-0">
-                                            <p className="font-medium text-slate-800 truncate">{item.materia.name}</p>
-                                            <p className="text-sm text-slate-500 truncate">{item.materia.description}</p>
-                                        </div>
+                        <textarea
+                            id="edit-descricao-curso"
+                            rows={4}
+                            value={editDescription}
+                            onChange={(evento) =>
+                                setEditDescription(evento.target.value)
+                            }
+                            placeholder="Descreva o objetivo do curso"
+                            className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                        />
+                    </div>
+                </form>
+            </AppDialog>
 
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <Button
-                                                isSubmitting={false}
-                                                label={<FaPencilAlt />}
-                                                className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-2"
-                                                onClick={() => abrirModalEdicaoMateria(item.materia)}
-                                            />
+            <AppDialog
+                aberto={isMateriasModalOpen && !isDeleteMateriaModalOpen}
+                aoFechar={fecharModalMaterias}
+                titulo="Gerenciar matérias"
+                descricao={`Matérias do curso ${cursoMateriasSelecionado?.name ?? ""}`}
+                icone={Layers3}
+                tamanho="lg"
+                salvando={isAddingMateria}
+                rodape={
+                    <div className="flex justify-end">
+                        <button
+                            type="button"
+                            onClick={fecharModalMaterias}
+                            disabled={isAddingMateria}
+                            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                }
+            >
+                {cursoMateriasSelecionado && (
+                    <div className="space-y-6">
 
-                                            <Button
-                                                isSubmitting={false}
-                                                label={<FaTrash />}
-                                                className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-2"
-                                                onClick={() => confirmarExclusaoMateria(item.materia._id)}
-                                            />
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-
-                        <div className="border-t border-gray-200 pt-4 mt-2">
-                            <p className="text-sm font-medium text-slate-700 mb-2">
-                                Adicionar nova matéria
+                        {mostrarModalEdicaoMateria && (
+                            <p
+                                role="status"
+                                className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+                            >
+                                Matéria atualizada com sucesso!
                             </p>
+                        )}
 
-                            <div className="flex flex-col gap-2 mb-3">
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="font-bold text-slate-800">
+                                    Matérias vinculadas
+                                </h3>
+
+                                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                                    {cursoMateriasSelecionado.materias.length} matérias
+                                </span>
+                            </div>
+
+                            {cursoMateriasSelecionado.materias.length === 0 ? (
+                                <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+                                    Nenhuma matéria vinculada a este curso.
+                                </div>
+                            ) : (
+                                <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+                                    {cursoMateriasSelecionado.materias.map((item) => (
+                                        <div
+                                            key={item.materia._id}
+                                            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 transition hover:border-blue-200 hover:bg-blue-50/40"
+                                        >
+                                            <div className="flex min-w-0 items-center gap-3">
+                                                <div className="shrink-0 rounded-lg bg-blue-50 p-2.5 text-blue-600">
+                                                    <BookOpen size={19} />
+                                                </div>
+
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-sm font-semibold text-slate-800">
+                                                        {item.materia.name}
+                                                    </p>
+
+                                                    <p className="truncate text-xs text-slate-500">
+                                                        {item.materia.description || "Sem descrição"}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <TableActionMenu
+                                                rotulo={`Ações da matéria ${item.materia.name}`}
+                                                acoes={[
+                                                    {
+                                                        texto: "Editar matéria",
+                                                        icone: Pencil,
+                                                        executar: () =>
+                                                            abrirModalEdicaoMateria(item.materia)
+                                                    },
+                                                    {
+                                                        texto: "Remover matéria",
+                                                        icone: Trash2,
+                                                        perigosa: true,
+                                                        executar: () =>
+                                                            confirmarExclusaoMateria(item.materia._id)
+                                                    }
+                                                ]}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+
+                        <form
+                            onSubmit={(evento) => {
+                                evento.preventDefault();
+                                void handleAdicionarMateria();
+                            }}
+                            className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-5"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Plus size={19} className="text-blue-600" />
+                                <h3 className="font-bold text-slate-800">
+                                    Adicionar nova matéria
+                                </h3>
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="nova-materia-nome"
+                                    className="mb-2 block text-sm font-semibold text-slate-700"
+                                >
+                                    Nome da matéria *
+                                </label>
+
                                 <input
+                                    id="nova-materia-nome"
                                     type="text"
+                                    required
+                                    disabled={isAddingMateria}
                                     value={novaMateriaNome}
                                     onChange={(e) => setNovaMateriaNome(e.target.value)}
                                     placeholder="Nome da matéria"
-                                    className="w-full border border-slate-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                <input
-                                    type="text"
-                                    value={novaMateriaDescricao}
-                                    onChange={(e) => setNovaMateriaDescricao(e.target.value)}
-                                    placeholder="Descrição"
-                                    className="w-full border border-slate-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleAdicionarMateria}
-                                disabled={isAddingMateria}
-                                className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                            >
-                                {isAddingMateria ? "Adicionando..." : "+ Adicionar Matéria"}
-                            </button>
-                        </div>
-
-                        <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-                            <button
-                                onClick={async () => {
-                                    await handleSalvarEdicao();
-                                    fecharModalMaterias();
-                                }}
-                                disabled={isSavingEdit}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                            >
-                                {isSavingEdit ? "Salvando..." : "Salvar Alterações"}
-                            </button>
-
-                            <button
-                                onClick={fecharModalMaterias}
-                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
-                            >
-                                Fechar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {isDeleteMateriaModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl text-center font-semibold text-slate-900 mb-2">
-                            Confirmar Exclusão de Matéria
-                        </h3>
-                        <p className="text-slate-600 mb-6 justify-center text-center">
-                            Tem certeza que deseja excluir esta matéria do curso? Esta ação não poderá ser desfeita.
-                        </p>
-
-                        <div className="flex justify-center gap-3">
-                            <button
-                                onClick={handleConfirmarExclusaoMateria}
-                                disabled={isDeletingMateria}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                            >
-                                {isDeletingMateria ? "Excluindo..." : "Sim"}
-                            </button>
-
-                            <button
-                                onClick={fecharModalExclusaoMateria}
-                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
-                            >
-                                Não
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {isEditMateriaModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Matéria</h3>
-
-                        <div className="flex flex-col gap-4 mb-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Nome da Matéria:
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editMateriaName}
-                                    onChange={(e) => setEditMateriaName(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                <label
+                                    htmlFor="nova-materia-descricao"
+                                    className="mb-2 block text-sm font-semibold text-slate-700"
+                                >
                                     Descrição
                                 </label>
+
                                 <textarea
-                                    value={editMateriaDescription}
-                                    onChange={(e) => setEditMateriaDescription(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                                    id="nova-materia-descricao"
+                                    rows={3}
+                                    disabled={isAddingMateria}
+                                    value={novaMateriaDescricao}
+                                    onChange={(e) => setNovaMateriaDescricao(e.target.value)}
+                                    placeholder="Descreva a matéria"
+                                    className="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                                 />
                             </div>
-                        </div>
 
-                        <div className="flex justify-end gap-3">
+                            {erroAdicionarMateria && (
+                                <p role="alert" className="text-sm text-red-600">
+                                    {erroAdicionarMateria}
+                                </p>
+                            )}
+
                             <button
-                                onClick={fecharModalEdicaoMateria}
-                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                                type="submit"
+                                disabled={isAddingMateria || !novaMateriaNome.trim()}
+                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                Cancelar
+                                <Plus size={18} />
+                                {isAddingMateria ? "Adicionando..." : "Adicionar matéria"}
                             </button>
-                            <button
-                                onClick={handleSalvarEdicaoMateria}
-                                disabled={isSavingMateriaEdit}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                            >
-                                {isSavingMateriaEdit ? "Salvando..." : "Salvar Alterações"}
-                            </button>
-                        </div>
+                        </form>
                     </div>
-                </div>
-            )}
+                )}
+            </AppDialog>
 
-            {mostrarModalEdicaoMateria && (
-                <Modal
-                    titulo="Atualização"
-                    message="Matéria atualizada com sucesso!"
-                    decisao={null}
-                    texto="Ok"
-                    opSim={() => setMostrarModalEdicaoMateria(false)}
-                />
-            )}
+            <ConfirmDialog
+                aberto={isDeleteMateriaModalOpen}
+                aoFechar={fecharModalExclusaoMateria}
+                aoConfirmar={() => {
+                    void handleConfirmarExclusaoMateria();
+                }}
+                titulo="Remover matéria"
+                descricao="Remova a matéria vinculada ao curso."
+                nomeRegistro={
+                    cursoMateriasSelecionado?.materias.find(
+                        (item) => item.materia._id === materiaToDeleteId
+                    )?.materia.name
+                }
+                textoConfirmar="Remover matéria"
+                carregando={isDeletingMateria}
+                erro={erroRemoverMateria}
+            />
 
-            {mostrarModalExclusao && (
-                <Modal
-                    titulo="Exclusão"
-                    message="Curso Excluído com Sucesso!"
-                    decisao={null}
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalExclusao(false);
-                        navigate("/app/curso");
+            <AppDialog
+                aberto={isEditMateriaModalOpen}
+                aoFechar={fecharModalEdicaoMateria}
+                titulo="Editar matéria"
+                descricao="Atualize o nome e a descrição da matéria."
+                icone={Pencil}
+                salvando={isSavingMateriaEdit}
+                rodape={
+                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <button
+                            type="button"
+                            onClick={fecharModalEdicaoMateria}
+                            disabled={isSavingMateriaEdit}
+                            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            form="form-editar-materia"
+                            disabled={isSavingMateriaEdit || !editMateriaName.trim()}
+                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            <Save size={17} />
+                            {isSavingMateriaEdit
+                                ? "Salvando..."
+                                : "Salvar alterações"}
+                        </button>
+                    </div>
+                }
+            >
+                <form
+                    id="form-editar-materia"
+                    onSubmit={(evento) => {
+                        evento.preventDefault();
+                        void handleSalvarEdicaoMateria();
                     }}
-                />)}
+                    className="space-y-5"
+                >
+                    <div>
+                        <label
+                            htmlFor="edit-materia-nome"
+                            className="mb-2 block text-sm font-semibold text-slate-700"
+                        >
+                            Nome da matéria *
+                        </label>
 
-            {mostrarModalEdicao && (
-                <Modal
-                    titulo="Atualização"
-                    message="Curso atualizado com sucesso!"
-                    decisao={null}
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalEdicao(false);
-                        navigate("/app/curso");
-                    }}
-                />
-            )}
+                        <input
+                            id="edit-materia-nome"
+                            type="text"
+                            required
+                            value={editMateriaName}
+                            onChange={(e) => setEditMateriaName(e.target.value)}
+                            placeholder="Digite o nome da matéria"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="edit-materia-descricao"
+                            className="mb-2 block text-sm font-semibold text-slate-700"
+                        >
+                            Descrição
+                        </label>
+
+                        <textarea
+                            id="edit-materia-descricao"
+                            rows={4}
+                            value={editMateriaDescription}
+                            onChange={(e) =>
+                                setEditMateriaDescription(e.target.value)
+                            }
+                            placeholder="Descreva a matéria"
+                            className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                        />
+                    </div>
+
+                    {erroEdicaoMateria && (
+                        <p
+                            role="alert"
+                            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                        >
+                            {erroEdicaoMateria}
+                        </p>
+                    )}
+                </form>
+            </AppDialog>
+
+            <SuccessDialog
+                aberto={mostrarModalExclusao}
+                aoFechar={() => setMostrarModalExclusao(false)}
+                titulo="Curso desativado!"
+                mensagem="O curso foi desativado com sucesso e removido da listagem de cursos ativos."
+            />
+
+            <SuccessDialog
+                aberto={mostrarModalEdicao}
+                aoFechar={() => setMostrarModalEdicao(false)}
+                titulo="Curso atualizado!"
+                mensagem="As informações do curso foram atualizadas com sucesso."
+            />
+
         </div>
     )
 }

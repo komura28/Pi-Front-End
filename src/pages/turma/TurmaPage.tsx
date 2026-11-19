@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import type { authCurso, authTurma, TurmaMatricula } from "../../types/auth/auth-types";
 import { deletarTurmaAPI, editarTurmaAPI, getCurso, getTurma } from "../../services/authService";
-import { Modal } from "../../components/Modal";
 import { formatDate } from "../../utils/formatters";
 import { useNavigate } from "react-router-dom";
-
-
-const isSubmitting = false;
+import { PageHeader } from "../../components/ui/PageHeader";
+import { Pagination } from "../../components/ui/Pagination";
+import { Pencil, Plus, Save, Trash2, Users } from "lucide-react";
+import { DataTable, type TableColumn } from "../../components/ui/DataTable";
+import { AppDialog } from "../../components/ui/AppDialog";
+import { ConfirmDialog } from "../../components/ui/ConfirmDialog";
+import { SuccessDialog } from "../../components/ui/SuccessDialog";
 
 export function TurmaPage() {
     const navigate = useNavigate();
@@ -17,10 +18,15 @@ export function TurmaPage() {
     const [error, setError] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [idSelecionado, setIdSelecionado] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [erroExclusao, setErroExclusao] = useState("");
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 5;
-    const indiceUltimoItem = paginaAtual * itensPorPagina;
-    const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
+    const indicePrimeiroItem = (paginaAtual - 1) * itensPorPagina;
+    const turmasPaginadas = turmas.slice(
+        indicePrimeiroItem,
+        indicePrimeiroItem + itensPorPagina
+    );
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [turmaToEditId, setTurmaToEditId] = useState<string | null>(null);
     const [editCurso, setEditCurso] = useState("");
@@ -33,73 +39,84 @@ export function TurmaPage() {
         (curso) => curso._id === editCurso
     );
     const dataFimInvalida = Boolean(
-    editDataInicio && editDataFim && new Date(editDataFim) <= new Date(editDataInicio)
+        editDataInicio && editDataFim && new Date(editDataFim) <= new Date(editDataInicio)
     );
     const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
     const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false);
+    const [isSavingEdit, setIsSavingEdit] = useState(false);
+    const [erroEdicao, setErroEdicao] = useState("");
 
-
-    const turmasPaginadas = turmas.slice(
-        indicePrimeiroItem,
-        indiceUltimoItem
-    );
-
-    const totalPaginas = Math.ceil(turmas.length / itensPorPagina);
-    // const [mostrarModal, setMostrarModal] = useState(false);
 
     async function handleExclusao() {
+        if (!idSelecionado || isDeleting) return;
+
         try {
-            await deletarTurmaAPI(idSelecionado!);
+            setIsDeleting(true);
+            setErroExclusao("");
+
+            await deletarTurmaAPI(idSelecionado);
+
             const novaLista = turmas.filter(
-                (turma) => turma.turma._id !== idSelecionado
+                (item) => item.turma._id !== idSelecionado
             );
-            setMostrarModalExclusao(true);
+
             setTurmas(novaLista);
-            const novasPaginas = Math.ceil(
-                novaLista.length / itensPorPagina
+
+            const totalPaginas = Math.max(
+                1,
+                Math.ceil(novaLista.length / itensPorPagina)
             );
 
-            if (paginaAtual > novasPaginas && novasPaginas > 0) {
-                setPaginaAtual(novasPaginas);
-            }
-        } catch (error) {
-            console.log(error);
-            alert("Erro ao excluir a turma.");
-        }
+            setPaginaAtual((pagina) =>
+                Math.min(pagina, totalPaginas)
+            );
 
+            setIsModalOpen(false);
+            setIdSelecionado(null);
+            setMostrarModalExclusao(true);
+
+        } catch (error) {
+            console.error("Erro ao desativar turma:", error);
+
+            setErroExclusao(
+                "Não foi possível desativar a turma. Verifique se existem alunos com matrícula aprovada."
+            );
+        } finally {
+            setIsDeleting(false);
+        }
     }
 
     useEffect(() => {
-    async function carregarDados() {
-        try {
-            setLoading(true);
-            setError("");
+        async function carregarDados() {
+            try {
+                setLoading(true);
+                setError("");
 
-            const [turmasData, cursosData] =
-                await Promise.all([
-                    getTurma(),
-                    getCurso(),
-                ]);
+                const [turmasData, cursosData] =
+                    await Promise.all([
+                        getTurma(),
+                        getCurso(),
+                    ]);
 
-            setTurmas(turmasData);
-            setCursos(cursosData);
+                setTurmas(turmasData);
+                setCursos(cursosData);
 
-        } catch (error) {
-            console.error(
-                "Erro ao carregar turmas:",
-                error
-            );
+            } catch (error) {
+                console.error(
+                    "Erro ao carregar turmas:",
+                    error
+                );
 
-            setError(
-                "Erro ao carregar os dados das turmas"
-            );
-        } finally {
-            setLoading(false);
+                setError(
+                    "Erro ao carregar os dados das turmas"
+                );
+            } finally {
+                setLoading(false);
+            }
         }
-    }
 
-    carregarDados();
-}, []);
+        carregarDados();
+    }, []);
 
     if (loading) {
         return <div className="p-8"><p>Carregando...</p></div>;
@@ -119,7 +136,6 @@ export function TurmaPage() {
         setIsEditModalOpen(true);
     }
 
-    // 2. Limpa os campos e fecha o modal
     function fecharModalEdicao() {
         setIsEditModalOpen(false);
         setTurmaToEditId(null);
@@ -130,286 +146,381 @@ export function TurmaPage() {
         setEditDataFim("");
     }
 
+    function confirmarExclusaoTurma(id: string) {
+        setIdSelecionado(id);
+        setErroExclusao("");
+        setIsModalOpen(true);
+    }
+
+    function fecharModalExclusaoTurma() {
+        if (isDeleting) return;
+
+        setIsModalOpen(false);
+        setIdSelecionado(null);
+        setErroExclusao("");
+    }
+
     async function handleSalvarEdicao() {
-        if (!turmaToEditId) return;
+        if (!turmaToEditId || isSavingEdit) return;
+
+        const capacidade = Number(editCapacidade);
+
+        if (!editCurso || !editTurno) {
+            setErroEdicao("Selecione o curso e o turno.");
+            return;
+        }
+
+        if (!Number.isInteger(capacidade) || capacidade < 1) {
+            setErroEdicao("A capacidade deve ser um número maior que zero.");
+            return;
+        }
+
+        if (!editDataInicio || !editDataFim || dataFimInvalida) {
+            setErroEdicao("Informe um período válido para a turma.");
+            return;
+        }
 
         try {
-            // Chama a API passando o ID e os novos dados. 
-            // Ajuste os parâmetros de acordo com o que sua API espera receber.
-            await editarTurmaAPI(turmaToEditId, { curso: editCurso, capacidade: Number.parseInt(editCapacidade), turno: editTurno, dataInicio: editDataInicio, dataFim: editDataFim });
+            setIsSavingEdit(true);
+            setErroEdicao("");
 
-            setMostrarModalEdicao(true);
+            await editarTurmaAPI(turmaToEditId, {
+                curso: editCurso,
+                capacidade,
+                turno: editTurno,
+                dataInicio: editDataInicio,
+                dataFim: editDataFim
+            });
 
-            // Atualiza a lista na tela (procura a turma pelo ID e altera apenas ela)
-            setTurmas(
-                turmas.map((item) =>
+            setTurmas((anteriores) =>
+                anteriores.map((item) =>
                     item.turma._id === turmaToEditId
                         ? {
                             ...item,
                             turma: {
                                 ...item.turma,
                                 curso: cursoSelecionado || item.turma.curso,
-                                capacidade: Number.parseInt(editCapacidade),
+                                capacidade,
                                 turno: editTurno,
                                 dataInicio: editDataInicio,
-                                dataFim: editDataFim,
+                                dataFim: editDataFim
                             }
                         }
                         : item
                 )
             );
+
             fecharModalEdicao();
             setMostrarModalEdicao(true);
 
         } catch (error) {
-            console.log(error);
-            alert("Erro ao atualizar a turma.");
+            console.error("Erro ao atualizar turma:", error);
+            setErroEdicao(
+                "Não foi possível salvar as alterações da turma."
+            );
         } finally {
-            fecharModalEdicao();
+            setIsSavingEdit(false);
         }
     }
 
+    const colunas: TableColumn<TurmaMatricula>[] = [
+        {
+            id: "curso",
+            titulo: "Curso",
+            renderizar: (item) => (
+                <span className="font-semibold text-slate-800">
+                    {item.turma.curso?.name ?? "Curso não definido"}
+                </span>
+            )
+        },
+        {
+            id: "turno",
+            titulo: "Turno",
+            renderizar: (item) => (
+                <span className="inline-flex rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    {item.turma.turno}
+                </span>
+            )
+        },
+        {
+            id: "capacidade",
+            titulo: "Capacidade",
+            renderizar: (item) => (
+                <span>{item.turma.capacidade} vagas</span>
+            )
+        },
+        {
+            id: "inicio",
+            titulo: "Data de início",
+            renderizar: (item) =>
+                formatDate(item.turma.dataInicio)
+        },
+        {
+            id: "fim",
+            titulo: "Data de término",
+            renderizar: (item) =>
+                formatDate(item.turma.dataFim)
+        }
+    ];
+
     return (
-        <div>
-            <section className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8 border border-slate-300 justify-center items-center mx-auto mt-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                    Lista de Turmas
-                </h1>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-                <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Turno
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Curso
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Capacidade
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Data de Início
-                            </th>
-
-                            <th className="text-left text-slate-800 font-medium p-2 border-b">
-                                Data de Fim
-                            </th>
-
-                            <th className=" text-slate-800 font-medium p-2 border-b">
-                                Ações
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody className="border-b">
-                        {turmasPaginadas.map((turma) => (
-                            <tr key={turma.turma._id} className="border-b">
-                                <td className="text-slate-600 p-2">
-                                    {turma.turma.turno}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {turma.turma.curso?.name || "Curso não definido"}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {turma.turma.capacidade}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {formatDate(turma.turma.dataInicio)}
-                                </td>
-                                <td className="text-slate-600 p-2">
-                                    {formatDate(turma.turma.dataFim)}
-                                </td>
-                                <td className="p-2 gap-2">
-                                    <div className="flex justify-center items-center gap-2">
-                                        <Button isSubmitting={isSubmitting}
-                                            label={<FaPencilAlt />}
-                                            loadingLabel="aprovando" className="bg-gray-500 hover:bg-gray-600 rounded-md text-white py-1 px-1"
-                                            onClick={() => abrirModalEdicao(turma.turma)} />
-                                        <Button isSubmitting={isSubmitting}
-                                            label={<FaTrash />}
-                                            onClick={() => {
-                                                setIsModalOpen(true);
-                                                setIdSelecionado(turma.turma._id)
-                                            }}
-                                            loadingLabel="excluindo"
-                                            className="bg-red-500 hover:bg-red-600 rounded-md text-white py-1 px-1"
-                                        />
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <div className="flex justify-center items-center gap-2 mt-4">
+            <PageHeader
+                titulo="Gerenciamento de Turmas"
+                descricao="Visualize, cadastre e gerencie as turmas do Aticurando."
+                categoria="PAINEL ADMINISTRATIVO"
+                icone={Users}
+                acao={
                     <button
-                        onClick={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
-                        disabled={paginaAtual === 1}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        type="button"
+                        onClick={() => navigate("/app/register-turma")}
+                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
                     >
-                        Anterior
+                        <Plus size={18} />
+                        Nova Turma
                     </button>
+                }
+            />
 
-                    <span className="text-slate-600">
-                        Página {paginaAtual} de {totalPaginas}
-                    </span>
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="mb-5 text-xl font-bold text-slate-800">
+                    Turmas cadastradas
+                </h2>
 
-                    <button
-                        onClick={() =>
-                            setPaginaAtual((p) => Math.min(p + 1, totalPaginas))
+                <DataTable
+                    dados={turmasPaginadas}
+                    colunas={colunas}
+                    chave={(item) => item.turma._id}
+                    mensagemVazia="Nenhuma turma cadastrada."
+                    rotuloAcoes={(item) =>
+                        `Ações da turma ${item.turma.curso?.name ?? ""}`
+                    }
+                    acoes={(item) => [
+                        {
+                            texto: "Editar turma",
+                            icone: Pencil,
+                            executar: () => abrirModalEdicao(item.turma)
+                        },
+                        {
+                            texto: "Desativar turma",
+                            icone: Trash2,
+                            perigosa: true,
+                            disabled: isDeleting,
+                            executar: () => confirmarExclusaoTurma(item.turma._id)
                         }
-                        disabled={paginaAtual === totalPaginas}
-                        className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                        Próxima
-                    </button>
+                    ]}
+                />
+
+                <div className="mt-5">
+                    <Pagination
+                        paginaAtual={paginaAtual}
+                        totalItens={turmas.length}
+                        itensPorPagina={itensPorPagina}
+                        onPageChange={setPaginaAtual}
+                    />
                 </div>
             </section>
-            {isModalOpen && (
-                <Modal
-                    titulo={`Confirmar Exclusão de Turma`}
-                    decisao={null}
-                    message={`Tem certeza que deseja excluir esta turma?`}
-                    texto="Sim"
-                    opSim={() => {
-                        setIsModalOpen(false);
-                        handleExclusao()
+
+            <ConfirmDialog
+                aberto={isModalOpen}
+                aoFechar={fecharModalExclusaoTurma}
+                aoConfirmar={() => {
+                    void handleExclusao();
+                }}
+                titulo="Desativar turma"
+                descricao="Confirme a desativação da turma selecionada."
+                nomeRegistro={
+                    turmas.find(
+                        (item) => item.turma._id === idSelecionado
+                    )?.turma.curso?.name ?? "Turma selecionada"
+                }
+                textoConfirmar="Desativar turma"
+                carregando={isDeleting}
+                erro={erroExclusao}
+            />
+
+            <SuccessDialog
+                aberto={mostrarModalExclusao}
+                aoFechar={() => setMostrarModalExclusao(false)}
+                titulo="Turma desativada!"
+                mensagem="A turma foi desativada com sucesso e removida da listagem de turmas ativas."
+            />
+
+            <SuccessDialog
+                aberto={mostrarModalEdicao}
+                aoFechar={() => setMostrarModalEdicao(false)}
+                titulo="Turma atualizada!"
+                mensagem="As informações da turma foram atualizadas com sucesso."
+            />
+
+            <AppDialog
+                aberto={isEditModalOpen}
+                aoFechar={fecharModalEdicao}
+                titulo="Editar turma"
+                descricao="Atualize as informações da turma selecionada."
+                icone={Pencil}
+                tamanho="lg"
+                salvando={isSavingEdit}
+                rodape={
+                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <button
+                            type="button"
+                            onClick={fecharModalEdicao}
+                            disabled={isSavingEdit}
+                            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            form="form-editar-turma"
+                            disabled={isSavingEdit || dataFimInvalida}
+                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+                        >
+                            <Save size={17} />
+                            {isSavingEdit ? "Salvando..." : "Salvar alterações"}
+                        </button>
+                    </div>
+                }
+            >
+                <form
+                    id="form-editar-turma"
+                    onSubmit={(evento) => {
+                        evento.preventDefault();
+                        void handleSalvarEdicao();
                     }}
-                    opNao={() => {
-                        setIsModalOpen(false);
-                        setIdSelecionado(null)
-                    }}
-                />)}
-            {mostrarModalExclusao && (
-                <Modal
-                    titulo="Exclusão"
-                    decisao={null}
-                    message="Turma Excluída com Sucesso!"
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalExclusao(false);
-                        navigate("/app/turma");
-                    }}
-                />)}
+                    className="space-y-5"
+                >
+                    <div>
+                        <label
+                            htmlFor="edit-turma-curso"
+                            className="mb-2 block text-sm font-semibold text-slate-700"
+                        >
+                            Curso *
+                        </label>
 
-            {mostrarModalEdicao && (
-                <Modal
-                    titulo="Atualização"
-                    decisao={null}
-                    message="Turma Atualizada com Sucesso!"
-                    texto="Ok"
-                    opSim={() => {
-                        setMostrarModalEdicao(false);
-                        navigate("/app/turma");
-                    }}
-                />
-            )}
-            {isEditModalOpen && (
-                <div className="fixed inset-0 z-5000 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-                        <h3 className="text-xl font-semibold text-slate-900 mb-4">Editar Turma</h3>
+                        <select
+                            id="edit-turma-curso"
+                            required
+                            value={editCurso}
+                            onChange={(e) => setEditCurso(e.target.value)}
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        >
+                            <option value="">Selecione um curso</option>
 
-                        <div className="flex flex-col gap-4 mb-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Curso
-                                </label>
-                                <select
-                                    value={editCurso}
-                                    onChange={(e) => setEditCurso(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2"
-                                >
-                                    <option value="">Selecione um curso</option>
+                            {cursos.map((curso) => (
+                                <option key={curso._id} value={curso._id}>
+                                    {curso.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                                    {cursos.map((curso) => (
-                                        <option key={curso._id} value={curso._id}>
-                                            {curso.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label
+                                htmlFor="edit-turma-capacidade"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Capacidade *
+                            </label>
 
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Capacidade
-                                </label>
-                                <input
-                                    type="number"
-                                    value={editCapacidade}
-                                    onChange={(e) => setEditCapacidade(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Turno
-                                </label>
-                                <select
-                                    value={editTurno}
-                                    onChange={(e) => setEditTurno(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">Selecione um turno</option>
-                                    <option value="MANHA">Manhã</option>
-                                    <option value="TARDE">Tarde</option>
-                                    <option value="NOITE">Noite</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Data de Início
-                                </label>
-                                <input
-                                    type="date"
-                                    value={editDataInicio}
-                                    onChange={(e) => setEditDataInicio(e.target.value)}
-                                    className="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">
-                                    Data de Fim
-                                </label>
-                                <input
-                                    type="date"
-                                    value={editDataFim}
-                                    onChange={(e) => setEditDataFim(e.target.value)}
-                                     className={`w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                    dataFimInvalida ? "border-red-500" : "border-slate-300"
-                                    }`}
-                                    />
-                                    {dataFimInvalida && (
-                                    <p className="mt-1 text-sm text-red-600">
-                                    A data de fim deve ser posterior à data de início
-                                    </p>
-                                    )}
-                                </div>
+                            <input
+                                id="edit-turma-capacidade"
+                                type="number"
+                                min={1}
+                                step={1}
+                                required
+                                value={editCapacidade}
+                                onChange={(e) => setEditCapacidade(e.target.value)}
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
                         </div>
 
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={fecharModalEdicao}
-                                className="px-4 py-2 bg-slate-200 text-slate-800 font-medium rounded-md hover:bg-slate-300 transition-colors"
+                        <div>
+                            <label
+                                htmlFor="edit-turma-turno"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
                             >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSalvarEdicao}
-                                disabled={dataFimInvalida}
-                                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                                Turno *
+                            </label>
+
+                            <select
+                                id="edit-turma-turno"
+                                required
+                                value={editTurno}
+                                onChange={(e) => setEditTurno(e.target.value)}
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                             >
-                                Salvar Alterações
-                            </button>
+                                <option value="">Selecione um turno</option>
+                                <option value="MANHA">Manhã</option>
+                                <option value="TARDE">Tarde</option>
+                                <option value="NOITE">Noite</option>
+                            </select>
                         </div>
                     </div>
-                </div>
-            )}
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label
+                                htmlFor="edit-turma-inicio"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Data de início *
+                            </label>
+
+                            <input
+                                id="edit-turma-inicio"
+                                type="date"
+                                required
+                                value={editDataInicio}
+                                onChange={(e) => setEditDataInicio(e.target.value)}
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="edit-turma-fim"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Data de término *
+                            </label>
+
+                            <input
+                                id="edit-turma-fim"
+                                type="date"
+                                required
+                                min={editDataInicio || undefined}
+                                value={editDataFim}
+                                onChange={(e) => setEditDataFim(e.target.value)}
+                                className={`w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm outline-none focus:ring-2 ${dataFimInvalida
+                                    ? "border-red-400 focus:ring-red-100"
+                                    : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                                    }`}
+                            />
+                        </div>
+                    </div>
+
+                    {dataFimInvalida && (
+                        <p className="text-sm text-red-600" role="alert">
+                            A data de término deve ser posterior à data de início.
+                        </p>
+                    )}
+
+                    {erroEdicao && (
+                        <p
+                            role="alert"
+                            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                        >
+                            {erroEdicao}
+                        </p>
+                    )}
+                </form>
+            </AppDialog>
+
         </div>
     );
 }

@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaChevronUp, FaUserGraduate } from "react-icons/fa";
+import {
+  GraduationCap,
+  Users,
+  UserRound,
+  ChevronDown,
+  Search
+} from "lucide-react";
+
 import { getTurma } from "../../services/authService";
 import { getMatriculas } from "../../services/matriculaService";
+
 import type { TurmaMatricula } from "../../types/auth/auth-types";
 import type { MatriculaDTO } from "../../types/matricula/matricula-types";
+
+import { PageHeader } from "../../components/ui/PageHeader";
+import { DataTable, type TableColumn } from "../../components/ui/DataTable";
+import { Pagination } from "../../components/ui/Pagination";
+import { formatDate } from "../../utils/formatters";
 
 export function AlunoPage() {
   const [turmas, setTurmas] = useState<TurmaMatricula[]>([]);
   const [matriculas, setMatriculas] = useState<MatriculaDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [busca, setBusca] = useState("");
 
   const [openTurmaIds, setOpenTurmaIds] = useState<string[]>([]);
-  
-  // Paginação dos alunos por turma
+
   const [pageByTurma, setPageByTurma] = useState<Record<string, number>>({});
   const itensPorPaginaAlunos = 5;
 
-  // Paginação principal dos cards de turmas
   const [paginaTurmas, setPaginaTurmas] = useState(1);
   const turmasPorPagina = 5;
 
@@ -60,204 +72,280 @@ export function AlunoPage() {
     }));
   }
 
-  // Lógica de Paginação das Turmas
-  const totalPaginasTurmas = Math.ceil(turmas.length / turmasPorPagina);
+  const termoBusca = busca.trim().toLowerCase();
+
+  const matriculasAprovadas = matriculas.filter(
+    (matricula) => matricula.status === "APROVADA"
+  );
+
+  const turmasFiltradas = turmas.filter(({ turma }) => {
+    const identificacaoTurma =
+      `${turma.curso?.name ?? ""} ${turma.turno}`.toLowerCase();
+
+    const encontrouTurma = identificacaoTurma.includes(termoBusca);
+
+    const encontrouAluno = matriculasAprovadas.some(
+      (matricula) =>
+        matricula.turma._id === turma._id &&
+        (
+          matricula.user?.name
+            ?.toLowerCase()
+            .includes(termoBusca) ||
+          matricula.user?.email
+            ?.toLowerCase()
+            .includes(termoBusca)
+        )
+    );
+
+    return encontrouTurma || encontrouAluno;
+  });
+
   const inicioTurmas = (paginaTurmas - 1) * turmasPorPagina;
-  const turmasPaginadas = turmas.slice(inicioTurmas, inicioTurmas + turmasPorPagina);
+
+  const turmasPaginadas = turmasFiltradas.slice(
+    inicioTurmas,
+    inicioTurmas + turmasPorPagina
+  );
+
+
+  const colunasAlunos: TableColumn<MatriculaDTO>[] = [
+    {
+      id: "aluno",
+      titulo: "Aluno",
+      renderizar: (matricula) => (
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-blue-50 p-2 text-blue-600">
+            <UserRound size={19} />
+          </div>
+
+          <span className="font-semibold text-slate-800">
+            {matricula.user?.name || "Nome não informado"}
+          </span>
+        </div>
+      )
+    },
+    {
+      id: "email",
+      titulo: "E-mail",
+      renderizar: (matricula) => (
+        <span className="text-slate-600">
+          {matricula.user?.email || "Não informado"}
+        </span>
+      )
+    },
+    {
+      id: "status",
+      titulo: "Matrícula",
+      renderizar: () => (
+        <span className="inline-flex rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+          Aprovada
+        </span>
+      )
+    },
+    {
+      id: "data",
+      titulo: "Data da matrícula",
+      renderizar: (matricula) =>
+        matricula.dataHora
+          ? formatDate(matricula.dataHora)
+          : "Não informada"
+    }
+  ];
+
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-slate-900 mb-6">
-        Lista de Alunos por Turma
-      </h1>
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-      {loading && (
-        <div className="p-8 text-slate-600 font-medium">
-          Carregando turmas e alunos...
+      <PageHeader
+        titulo="Alunos por turma"
+        descricao="Consulte os alunos matriculados e organize a visualização por turma."
+        categoria="PAINEL ADMINISTRATIVO"
+        icone={GraduationCap}
+      />
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-slate-800">
+            Turmas e alunos
+          </h2>
+
+          <p className="mt-2 text-sm text-slate-500">
+            Expanda uma turma para visualizar seus alunos com matrícula aprovada.
+          </p>
         </div>
-      )}
 
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 mb-6">
-          {error}
+        <div className="relative mb-6">
+          <Search
+            size={18}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+
+          <input
+            type="search"
+            value={busca}
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setPaginaTurmas(1);
+              setPageByTurma({});
+            }}
+            placeholder="Buscar curso, turno ou aluno..."
+            aria-label="Buscar turmas e alunos"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
         </div>
-      )}
 
-      {!loading && turmas.length === 0 && (
-        <div className="p-8 bg-white rounded-xl shadow-sm border border-slate-200 text-center text-slate-500">
-          Nenhuma turma encontrada.
-        </div>
-      )}
+        {loading ? (
+          <p className="py-10 text-center text-slate-500">
+            Carregando turmas e alunos...
+          </p>
+        ) : error ? (
+          <p
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+          >
+            {error}
+          </p>
+        ) : turmasFiltradas.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-slate-200 p-10 text-center text-sm text-slate-500">
+            Nenhuma turma ou aluno encontrado.
+          </p>
+        ) : (
+          <div className="space-y-4">
 
-      <div className="flex flex-col gap-3 w-full">
-        {turmasPaginadas.map((item, index) => {
-          const turma = item.turma;
-          const keyTurma = turma._id || `turma-${inicioTurmas + index}`;
-          const isOpen = openTurmaIds.includes(keyTurma);
+            {turmasPaginadas.map((item) => {
+              const turma = item.turma;
+              const turmaId = turma._id;
+              const aberta = openTurmaIds.includes(turmaId);
 
-          const matriculasDaTurma = matriculas.filter(
-            (matricula) =>
-              matricula.status === "APROVADA" &&
-              matricula.turma._id === turma._id
-          );
+              const alunosDaTurma = matriculasAprovadas.filter(
+                (matricula) =>
+                  matricula.turma._id === turmaId
+              );
 
-          const nomeTurma = `${turma.curso?.name || "Curso"} - ${turma.turno}`;
-          const quantidadeAlunos = matriculasDaTurma.length;
+              const nomeTurma = `${turma.curso?.name ?? "Curso não definido"} ${turma.turno}`.toLowerCase();
 
-          // Paginação interna dos alunos da turma
-          const paginaAtualAluno = pageByTurma[keyTurma] || 1;
-          const totalPaginasAlunos = Math.ceil(quantidadeAlunos / itensPorPaginaAlunos);
-          const inicioAluno = (paginaAtualAluno - 1) * itensPorPaginaAlunos;
-          const matriculasPaginadas = matriculasDaTurma.slice(
-            inicioAluno,
-            inicioAluno + itensPorPaginaAlunos
-          );
+              const correspondeTurma =
+                nomeTurma.includes(termoBusca);
 
-          return (
-            <div
-              key={keyTurma}
-              className="w-full bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden transition-all duration-200"
-            >
-              <button
-                type="button"
-                onClick={() => toggleTurma(keyTurma)}
-                className="w-full px-6 py-3.5 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors cursor-pointer text-left focus:outline-none"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-slate-800 text-base">
-                    {nomeTurma}
-                  </span>
-                  <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-medium border border-slate-200">
-                    {quantidadeAlunos} aluno(s)
-                  </span>
-                </div>
+              const alunosVisiveis =
+                termoBusca && !correspondeTurma
+                  ? alunosDaTurma.filter(
+                    (matricula) =>
+                      matricula.user?.name
+                        ?.toLowerCase()
+                        .includes(termoBusca) ||
+                      matricula.user?.email
+                        ?.toLowerCase()
+                        .includes(termoBusca)
+                  )
+                  : alunosDaTurma;
 
-                <div className="text-slate-500">
-                  {isOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
-                </div>
-              </button>
+              const totalPaginasAlunos = Math.max(
+                1,
+                Math.ceil(
+                  alunosVisiveis.length / itensPorPaginaAlunos
+                )
+              );
 
-              {isOpen && (
-                <div className="border-t border-slate-200 bg-slate-50/50 p-4">
-                  {matriculasDaTurma.length > 0 ? (
-                    <div className="flex flex-col gap-4">
-                      <table className="w-full bg-white rounded-lg border border-slate-200 overflow-hidden text-sm">
-                        <thead>
-                          <tr className="bg-slate-100 border-b border-slate-200 text-slate-700">
-                            <th className="text-left font-medium p-3">
-                              Nome do Aluno
-                            </th>
-                            <th className="text-left font-medium p-3">
-                              Status da Matrícula
-                            </th>
-                            <th className="text-left font-medium p-3">
-                              E-mail
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200">
-                          {matriculasPaginadas.map((itemMatricula, idx) => {
-                            const aluno = itemMatricula.user;
-                            const itemKey = itemMatricula._id || `matricula-${idx}`;
+              const paginaAluno = Math.min(
+                pageByTurma[turmaId] ?? 1,
+                totalPaginasAlunos
+              );
 
-                            return (
-                              <tr
-                                key={itemKey}
-                                className="hover:bg-slate-50 transition-colors"
-                              >
-                                <td className="p-3 text-slate-800 font-medium flex items-center gap-2">
-                                  <FaUserGraduate className="text-slate-400 shrink-0" />
-                                  {aluno?.name || (aluno as any)?.nome || "Sem nome"}
-                                </td>
-                                <td className="p-3 text-slate-600">
-                                  <span className="px-2.5 py-1 text-xs rounded-full font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                    {itemMatricula.status}
-                                  </span>
-                                </td>
-                                <td className="p-3 text-slate-600">
-                                  {aluno?.email || "-"}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+              const alunosPaginados = alunosVisiveis.slice(
+                (paginaAluno - 1) * itensPorPaginaAlunos,
+                paginaAluno * itensPorPaginaAlunos
+              );
 
-                      {totalPaginasAlunos > 1 && (
-                        <div className="flex items-center justify-between px-2 text-sm text-slate-600">
-                          <span>
-                            Mostrando {inicioAluno + 1} a{" "}
-                            {Math.min(inicioAluno + itensPorPaginaAlunos, quantidadeAlunos)}{" "}
-                            de {quantidadeAlunos} alunos
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                mudarPaginaAluno(keyTurma, paginaAtualAluno - 1)
-                              }
-                              disabled={paginaAtualAluno === 1}
-                              className="px-3 py-1 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            >
-                              Anterior
-                            </button>
-                            <span className="px-3 py-1 font-medium text-slate-700">
-                              {paginaAtualAluno} / {totalPaginasAlunos}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                mudarPaginaAluno(keyTurma, paginaAtualAluno + 1)
-                              }
-                              disabled={paginaAtualAluno === totalPaginasAlunos}
-                              className="px-3 py-1 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            >
-                              Próxima
-                            </button>
-                          </div>
+              return (
+                <article
+                  key={turmaId}
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-blue-200"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleTurma(turmaId)}
+                    aria-expanded={aberta}
+                    aria-controls={`alunos-${turmaId}`}
+                    className="flex w-full items-center justify-between gap-4 p-5 text-left transition hover:bg-slate-50"
+                  >
+                    <div className="flex min-w-0 items-center gap-4">
+                      <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
+                        <Users size={22} />
+                      </div>
+
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-slate-800">
+                          {turma.curso?.name ?? "Curso não definido"}
+                        </h3>
+
+                        <p className="mt-1 text-xs text-slate-500">
+                          {turma.turno} · {turma.capacidade} vagas
+                        </p>
+
+                        <p className="mt-1 text-xs text-slate-400">
+                          {formatDate(turma.dataInicio)}
+                          {" até "}
+                          {formatDate(turma.dataFim)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                        {alunosDaTurma.length} alunos
+                      </span>
+
+                      <ChevronDown
+                        size={20}
+                        className={`text-slate-500 transition-transform ${aberta ? "rotate-180" : ""
+                          }`}
+                      />
+                    </div>
+                  </button>
+
+                  {aberta && (
+                    <div
+                      id={`alunos-${turmaId}`}
+                      className="border-t border-slate-200 bg-slate-50/50 p-4"
+                    >
+                      <DataTable
+                        dados={alunosPaginados}
+                        colunas={colunasAlunos}
+                        chave={(matricula) => matricula._id}
+                        mensagemVazia="Nenhum aluno com matrícula aprovada nesta turma."
+                      />
+
+                      {alunosVisiveis.length > itensPorPaginaAlunos && (
+                        <div className="mt-5">
+                          <Pagination
+                            paginaAtual={paginaAluno}
+                            totalItens={alunosVisiveis.length}
+                            itensPorPagina={itensPorPaginaAlunos}
+                            onPageChange={(pagina) =>
+                              mudarPaginaAluno(turmaId, pagina)
+                            }
+                          />
                         </div>
                       )}
                     </div>
-                  ) : (
-                    <p className="text-sm text-slate-500 text-center py-3">
-                      Nenhum aluno matriculado nesta turma.
-                    </p>
                   )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                </article>
+              );
+            })}
 
-      {/* Controles de Paginação dos Cards de Turmas (Limpo e sem texto duplicado) */}
-      {!loading && totalPaginasTurmas > 1 && (
-        <div className="flex items-center justify-between mt-6 px-2 text-sm text-slate-600">
-          <span className="text-slate-600">
-            Página {paginaTurmas} de {totalPaginasTurmas}
-          </span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setPaginaTurmas((prev) => Math.max(prev - 1, 1))}
-              disabled={paginaTurmas === 1}
-              className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              Anterior
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setPaginaTurmas((prev) => Math.min(prev + 1, totalPaginasTurmas))
-              }
-              disabled={paginaTurmas === totalPaginasTurmas}
-              className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              Próxima
-            </button>
+            <div className="pt-3">
+              <Pagination
+                paginaAtual={paginaTurmas}
+                totalItens={turmasFiltradas.length}
+                itensPorPagina={turmasPorPagina}
+                onPageChange={setPaginaTurmas}
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </section>
+    </main>
   );
 }
