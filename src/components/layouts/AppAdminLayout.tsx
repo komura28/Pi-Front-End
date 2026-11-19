@@ -1,74 +1,104 @@
-import {  Outlet } from "react-router-dom";
-import { SideBar } from "../SideBar";
-import { Header } from "../Header";
-import { FaCalendarAlt, FaChalkboardTeacher, FaGraduationCap, FaHome, FaList, FaPlus, FaUsers } from "react-icons/fa"
-import { HiOutlineDocumentCheck } from 'react-icons/hi2';
-import { LucideBellRing } from "lucide-react";
+
 import { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
+
+import {
+    BookOpen,
+    CalendarDays,
+    ClipboardCheck,
+    GraduationCap,
+    LayoutDashboard,
+    List,
+    Plus,
+    UserRoundPlus,
+    UsersRound
+} from "lucide-react";
+
+import {
+    SideBar,
+    type NavigationItem
+} from "../SideBar";
+
+import { Header } from "../Header";
 import { getDashboardData } from "../../services/dashboardService";
-import { FaUserTie } from "react-icons/fa6";
 
-const adminNavItems = [
+const adminNavItems: NavigationItem[] = [
     {
-        label: "Home",
+        label: "Visão geral",
         href: "/app/home",
-        icon: <FaHome />
-
+        icon: <LayoutDashboard size={19} />
     },
     {
         label: "Cursos",
-        isSelect: true,
-        icon: <FaGraduationCap />,
+        icon: <GraduationCap size={19} />,
         options: [
-            { label: "Cadastrar Curso", href: "/app/register-curso", iconF: <FaPlus /> },
-            { label: "Listar Cursos", href: "/app/curso", iconF: <FaList /> },
+            {
+                label: "Listar cursos",
+                href: "/app/curso",
+                iconF: <List size={16} />
+            },
+            {
+                label: "Cadastrar curso",
+                href: "/app/register-curso",
+                iconF: <Plus size={16} />
+            }
         ]
-
-
     },
     {
         label: "Turmas",
-        isSelect: true,
-        icon: <FaChalkboardTeacher />,
+        icon: <UsersRound size={19} />,
         options: [
-            { label: "Cadastrar Turma", href: "/app/register-turma", iconF: <FaPlus /> },
-            { label: "Listar Turmas", href: "/app/turma", iconF: <FaList /> },
+            {
+                label: "Listar turmas",
+                href: "/app/turma",
+                iconF: <List size={16} />
+            },
+            {
+                label: "Planejamento de aulas",
+                href: "/app/gerenciar-aulas",
+                iconF: <CalendarDays size={16} />
+            },
+            {
+                label: "Alunos por turma",
+                href: "/app/aluno",
+                iconF: <BookOpen size={16} />
+            },
+            {
+                label: "Matrículas",
+                href: "/app/matricula",
+                iconF: <ClipboardCheck size={16} />
+            },
+            {
+                label: "Cadastrar turma",
+                href: "/app/register-turma",
+                iconF: <Plus size={16} />
+            }
         ]
-
     },
     {
-        label: "Matrículas",
-        href: "/app/matricula",
-        icon: <HiOutlineDocumentCheck />,
-        iconContador: <LucideBellRing />
-
-    },
-    {
-        label: "Lista de Usuários",
-        href: "/app/user",
-        icon: <FaUsers />
-    },
-    {
-        label: "Lista de Alunos",
-        href: "/app/aluno",
-        icon: <FaUsers />
-    },
-    {
-        label: "Cadastrar Professor",
-        href: "/app/register-professor",
-        icon: <FaUserTie />
-    },
-    {
-        label: "Gerenciar Aulas",
-        href: "/app/gerenciar-aulas",
-        icon: <FaCalendarAlt />
-    },
-
-]
+        label: "Pessoas",
+        icon: <UserRoundPlus size={19} />,
+        options: [
+            {
+                label: "Gerenciar usuários",
+                href: "/app/user",
+                iconF: <List size={16} />
+            },
+            {
+                label: "Cadastrar professor",
+                href: "/app/register-professor",
+                iconF: <Plus size={16} />
+            }
+        ]
+    }
+];
 
 export function AppAdminLayout() {
+    const [matriculasPendentes, setMatriculasPendentes] =
+        useState(0);
 
-    const [matriculasPendentes, setMatriculasPendentes] = useState(0);
+    const [menuMobileAberto, setMenuMobileAberto] =
+        useState(false);
 
     async function atualizarMatriculasPendentes() {
         const data = await getDashboardData();
@@ -76,7 +106,7 @@ export function AppAdminLayout() {
     }
 
     useEffect(() => {
-        async function carregarMatriculasPendentes() {
+        async function carregarPendencias() {
             try {
                 await atualizarMatriculasPendentes();
             } catch (error) {
@@ -87,26 +117,34 @@ export function AppAdminLayout() {
             }
         }
 
-        void carregarMatriculasPendentes();
+        void carregarPendencias();
     }, []);
 
     return (
-        <>
-            <div className="min-h-screen bg-muted/40">
-                <SideBar navigationItems={adminNavItems} link="/app/home"
-                    matriculasPendentes={matriculasPendentes}
+        <div className="min-h-screen bg-slate-50">
+            <SideBar
+                navigationItems={adminNavItems}
+                link="/app/home"
+                matriculasPendentes={matriculasPendentes}
+                abertaMobile={menuMobileAberto}
+                aoFecharMobile={() => setMenuMobileAberto(false)}
+            />
+
+            <div className="flex min-h-screen flex-col lg:pl-72">
+                <Header
+                    mode="ADM"
+                    navigationItems={adminNavItems}
+                    onAbrirMenu={() => setMenuMobileAberto(true)}
                 />
-                <div className="flex min-h-screen flex-col pl-64">
-                    <Header mode="ADM" />
-                    <main className="flex-1 p-6">
-                        <Outlet
-                            context={{
-                                atualizarMatriculasPendentes,
-                            }}
-                        />
-                    </main>
-                </div>
+
+                <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                    <Outlet
+                        context={{
+                            atualizarMatriculasPendentes
+                        }}
+                    />
+                </main>
             </div>
-        </>
+        </div>
     );
 }

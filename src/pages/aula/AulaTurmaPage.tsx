@@ -474,6 +474,12 @@ export function AulaTurmaPage() {
                     <AgendaTurmaPanel
                         key={turmaEmFoco?.turma._id ?? "sem-turma"}
                         turma={turmaEmFoco}
+                        materiasDoCurso={
+                            cursos.find(
+                                (curso) =>
+                                    curso._id === turmaEmFoco?.turma.curso?._id
+                            )?.materias ?? []
+                        }
                         aulas={aulas}
                         carregando={carregandoAgenda}
                         erro={erroAgenda}
