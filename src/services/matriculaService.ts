@@ -41,3 +41,13 @@ export async function getMinhaFrequencia():
 
     return response.data;
 }
+
+export async function aprovarMatricula(id: string) {
+    const response = await api.patch(`/matricula/${id}/aprovar`);
+    return response.data;
+}
+
+export async function recusarMatricula(id: string) {
+    const response = await api.patch(`/matricula/${id}/recusar`);
+    return response.data;
+}
