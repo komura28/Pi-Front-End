@@ -43,18 +43,6 @@ export function LoginPage() {
         }
     }
 
-    {
-        serverError && (
-            <p
-                role="alert"
-                className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
-            >
-                {serverError}
-            </p>
-        )
-    }
-
-
 
     return (
         <main className="flex min-h-dvh items-center justify-center bg-[#0F172A] px-4 py-6 sm:px-6 sm:py-8">
@@ -164,11 +152,15 @@ export function LoginPage() {
 
                     {
                         serverError && (
-                            <p className="rounded-lg bg-red-50 px-3 py-2 text-red-600">
-                                Usuario ou senha inválidos. Verifique os dados informados e tente novamente.
+                            <p
+                                role="alert"
+                                className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+                            >
+                                {serverError}
                             </p>
                         )
                     }
+
                     <button
                         type="submit"
                         disabled={isSubmitting}
