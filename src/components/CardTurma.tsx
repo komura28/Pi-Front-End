@@ -4,7 +4,13 @@ import type { TurmaMatricula } from "../types/auth/auth-types";
 import { formatDate } from "../utils/formatters";
 import type { MatriculaDTO } from "../types/matricula/matricula-types";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
+import {
+    CheckCircle2,
+    Sunrise,
+    Sun,
+    Moon,
+    Clock3
+} from "lucide-react";
 
 const OPCOES_INTERESSE_SERVICOS = [
     "Aulas de teatro/palhaçaria",
@@ -24,12 +30,45 @@ const OPCOES_COMO_SOUBE = [
 
 type CardProps = {
     turma: TurmaMatricula;
+    mostrarIconeTurno?: boolean;
 }
 
-export function CardTurma({ turma }: CardProps) {
+export function CardTurma({ turma, mostrarIconeTurno = false }: CardProps) {
 
     const dataInicio = formatDate(turma.turma.dataInicio);
     const dataFim = formatDate(turma.turma.dataFim);
+    const turnoNormalizado = (turma.turma.turno ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
+
+    const IconeTurno =
+        turnoNormalizado === "manha"
+            ? Sunrise
+            : turnoNormalizado === "tarde"
+                ? Sun
+                : turnoNormalizado === "noite"
+                    ? Moon
+                    : Clock3;
+
+    const corTurno =
+        turnoNormalizado === "manha"
+            ? "bg-blue-50 text-blue-700"
+            : turnoNormalizado === "tarde"
+                ? "bg-amber-50 text-amber-700"
+                : turnoNormalizado === "noite"
+                    ? "bg-violet-50 text-violet-700"
+                    : "bg-slate-100 text-slate-700";
+
+    const nomeTurno =
+        turnoNormalizado === "manha"
+            ? "Manhã"
+            : turnoNormalizado === "tarde"
+                ? "Tarde"
+                : turnoNormalizado === "noite"
+                    ? "Noite"
+                    : turma.turma.turno || "Não informado";
     const [candidaturas, setCandidaturas] = useState<MatriculaDTO[]>([]);
     const [, setError] = useState("");
     const jaCandidatado = candidaturas.some(
@@ -113,9 +152,19 @@ export function CardTurma({ turma }: CardProps) {
     }, []);
 
     return (
-        <div className="max-w-md">
-            <div className="rounded-xl bg-white p-6 shadow-md transition">
-                <h2 className="mb-2 text-2xl font-semibold text-gray-800">
+        <div className="w-full min-w-0">
+            <div className="h-full rounded-xl bg-white p-4 shadow-md transition sm:p-6">
+
+                {mostrarIconeTurno && (
+                    <div
+                        className={`mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${corTurno}`}
+                    >
+                        <IconeTurno size={18} aria-hidden="true" />
+                        {nomeTurno}
+                    </div>
+                )}
+
+                <h2 className="mb-2 break-words text-xl font-semibold text-gray-800 sm:text-2xl">
                     Turma {formatDate(turma.turma.dataInicio)}
                 </h2>
 
@@ -130,10 +179,12 @@ export function CardTurma({ turma }: CardProps) {
                         {dataInicio} - {dataFim}
                     </p>
 
-                    <p>
-                        <span className="font-medium">Turno:</span>{" "}
-                        {turma.turma.turno}
-                    </p>
+                    {!mostrarIconeTurno && (
+                        <p>
+                            <span className="font-medium">Turno:</span>{" "}
+                            {turma.turma.turno}
+                        </p>
+                    )}
 
                     <p>
                         <span className="font-medium">Vagas:</span>{" "}
