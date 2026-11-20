@@ -204,7 +204,7 @@ export function AgendaTurmaPanel({
                     Planejamento da turma
                 </p>
 
-                <h2 className="mt-2 text-2xl font-bold text-slate-800">
+                <h2 className="mt-2 break-words text-xl font-bold text-slate-800 sm:text-2xl">
                     {turma.turma.curso?.name ?? "Curso não informado"}
                 </h2>
 
@@ -391,13 +391,13 @@ export function AgendaTurmaPanel({
                                                 aria-controls={`aulas-materia-${grupo.id}`}
                                                 className="w-full p-5 text-left transition hover:bg-slate-100"
                                             >
-                                                <div className="flex items-start justify-between gap-4">
+                                                <div className="flex items-start justify-between gap-2 sm:gap-4">
                                                     <div className="min-w-0">
                                                         <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
                                                             Matéria do curso
                                                         </p>
 
-                                                        <h4 className="mt-1 text-lg font-bold text-slate-800">
+                                                        <h4 className="mt-1 break-words text-base font-bold text-slate-800 sm:text-lg">
                                                             {grupo.nome}
                                                         </h4>
 
