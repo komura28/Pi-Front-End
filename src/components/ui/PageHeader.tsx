@@ -17,9 +17,9 @@ export function PageHeader({
     acao
 }: Readonly<PageHeaderProps>) {
     return (
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-6 text-white shadow-lg md:p-8">
-            <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+        <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-4 text-white shadow-lg sm:p-6 md:p-8">
+            <div className="relative z-10 flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
                     <div className="mb-3 flex items-center gap-2 text-blue-200">
                         <Icone size={20} aria-hidden="true" />
 
@@ -28,11 +28,11 @@ export function PageHeader({
                         </span>
                     </div>
 
-                    <h1 className="text-3xl font-bold">
+                    <h1 className="break-words text-2xl font-bold sm:text-3xl">
                         {titulo}
                     </h1>
 
-                    <p className="mt-3 max-w-xl text-blue-100">
+                    <p className="mt-3 max-w-xl break-words text-sm text-blue-100 sm:text-base">
                         {descricao}
                     </p>
                 </div>

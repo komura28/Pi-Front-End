@@ -26,7 +26,7 @@ export function TableActionMenu({
                     type="button"
                     aria-label={rotulo}
                     title={rotulo}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 >
                     <HiEllipsisHorizontal size={19} />
                 </button>
@@ -37,7 +37,7 @@ export function TableActionMenu({
                     align="end"
                     sideOffset={6}
                     collisionPadding={8}
-                    className="z-[5100] min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl outline-none"
+                    className="z-[5100] min-w-48 max-w-[calc(100vw-1rem)] rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl outline-none"
                 >
                     {acoes.map((acao) => {
                         const Icone = acao.icone;

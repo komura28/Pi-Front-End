@@ -19,7 +19,7 @@ export function ProximaAulaCard({
 
     if (!aula) {
         return (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                 <h2 className="text-xl font-bold text-slate-800">
                     Próxima aula
                 </h2>
@@ -42,27 +42,27 @@ export function ProximaAulaCard({
         });
 
     return (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
-            <h2 className="mb-5 text-xl font-bold text-slate-800">
+            <h2 className="mb-5 text-lg font-bold text-slate-800 sm:text-xl">
                 Próxima aula
             </h2>
 
-            <div className="rounded-xl bg-[#0F172A] p-6 text-white">
+            <div className="min-w-0 rounded-xl bg-[#0F172A] p-4 text-white sm:p-6">
 
                 <div className="mb-5">
-                    <div className="mb-2 flex items-center gap-2 text-blue-300">
+                    <div className="mb-2 flex min-w-0 items-center gap-2 text-blue-300">
                         <BookOpen size={18} />
-                        <span className="text-sm font-medium">
+                        <span className="break-words text-sm font-medium">
                             {aula.curso}
                         </span>
                     </div>
 
-                    <h3 className="text-2xl font-bold">
+                    <h3 className="break-words text-xl font-bold sm:text-2xl">
                         {aula.titulo}
                     </h3>
 
-                    <p className="mt-2 text-slate-300">
+                    <p className="mt-2 break-words text-sm text-slate-300 sm:text-base">
                         {aula.turma}
                     </p>
                 </div>
@@ -79,7 +79,7 @@ export function ProximaAulaCard({
                             <p className="text-xs text-slate-400">
                                 Data
                             </p>
-                            <p className="font-medium">
+                            <p className="break-words font-medium">
                                 {dataFormatada}
                             </p>
                         </div>
@@ -91,11 +91,11 @@ export function ProximaAulaCard({
                             className="text-blue-300"
                         />
 
-                        <div>
+                        <div className="min-w-0">
                             <p className="text-xs text-slate-400">
                                 Horário
                             </p>
-                            <p className="font-medium">
+                            <p className="break-words font-medium">
                                 {formatarHorario(aula.dataInicio)}
                                 {" às "}
                                 {formatarHorario(aula.dataFim)}

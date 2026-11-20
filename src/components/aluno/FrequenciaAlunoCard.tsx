@@ -54,7 +54,7 @@ export function FrequenciaAlunoCard({
                 </p>
             )}
 
-            <div className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center sm:gap-3">
+            <div className="grid grid-cols-3 gap-1 border-t border-slate-100 pt-4 text-center sm:gap-3">
                 <div className="min-w-0">
                     <p className="text-lg font-bold text-green-600 sm:text-xl">
                         {frequencia.presentes}

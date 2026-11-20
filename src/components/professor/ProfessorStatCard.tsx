@@ -13,19 +13,19 @@ export function ProfessorStatCard({
 }: ProfessorStatCardProps) {
 
     return (
-        <article className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+        <article className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-6">
 
-            <div>
-                <p className="text-sm font-medium text-slate-500">
+            <div className="min-w-0">
+                <p className="break-words text-xs font-medium text-slate-500 sm:text-sm">
                     {titulo}
                 </p>
 
-                <h2 className="mt-2 text-3xl font-bold text-slate-800">
+                <h2 className="mt-2 break-words text-2xl font-bold text-slate-800 sm:text-3xl">
                     {valor}
                 </h2>
             </div>
 
-            <div className="rounded-xl bg-blue-100 p-4 text-blue-600">
+            <div className="shrink-0 rounded-xl bg-blue-100 p-3 text-blue-600 sm:p-4">
                 <Icone size={26} aria-hidden="true" />
             </div>
 

@@ -96,26 +96,26 @@ export function TurmaAulasModal({
                 onClose();
             }}
             aria-labelledby="titulo-aulas-turma"
-            className="m-auto w-[calc(100%-2rem)] max-w-2xl max-h-[calc(100dvh-2rem)] overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 open:flex open:flex-col"
+            className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-2xl overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 open:flex open:flex-col"
         >
 
-            <header className="shrink-0 bg-gradient-to-r from-[#0F172A] to-blue-800 p-6 text-white">
+            <header className="shrink-0 bg-gradient-to-r from-[#0F172A] to-blue-800 p-4 text-white sm:p-6">
 
                 <div className="flex items-start justify-between gap-4">
 
-                    <div>
+                    <div className="min-w-0">
                         <span className="text-sm font-semibold text-blue-200">
                             MINHAS TURMAS
                         </span>
 
                         <h2
                             id="titulo-aulas-turma"
-                            className="mt-2 text-2xl font-bold"
+                            className="mt-2 break-words text-xl font-bold sm:text-2xl"
                         >
                             Aulas da Turma
                         </h2>
 
-                        <p className="mt-2 text-sm text-blue-100">
+                        <p className="mt-2 break-words text-sm text-blue-100">
                             {turma.curso} — {turma.turno}
                         </p>
                     </div>
@@ -123,7 +123,7 @@ export function TurmaAulasModal({
                 </div>
             </header>
 
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-6">
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:p-6">
 
                 <h3 className="mb-4 font-semibold text-slate-800">
                     {aulasDaTurma.length} aulas vinculadas
@@ -132,7 +132,7 @@ export function TurmaAulasModal({
                 {aulasDaTurma.map((item) => (
                     <article
                         key={item._id}
-                        className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition-colors hover:bg-blue-50"
+                        className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4 transition-colors hover:bg-blue-50"
                     >
 
                         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
@@ -145,12 +145,12 @@ export function TurmaAulasModal({
                                         className="shrink-0 text-blue-600"
                                     />
 
-                                    <h4 className="font-bold text-slate-800">
+                                    <h4 className="min-w-0 break-words font-bold text-slate-800">
                                         {item.aula?.titulo ?? "Aula sem título"}
                                     </h4>
                                 </div>
 
-                                <p className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                                <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-500">
                                     <CalendarDays size={16} />
 
                                     {formatarData(item.dataInicio)}
@@ -164,12 +164,12 @@ export function TurmaAulasModal({
 
                             </div>
 
-                            <div className="flex shrink-0 flex-col gap-2">
+                            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto">
 
                                 <button
                                     type="button"
                                     onClick={() => onVerDetalhes(item)}
-                                    className="cursor-pointer rounded-xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-100"
+                                    className="w-full cursor-pointer rounded-xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-100 sm:w-auto"
                                 >
                                     Ver detalhes
                                 </button>
@@ -178,14 +178,14 @@ export function TurmaAulasModal({
                                     <button
                                         type="button"
                                         onClick={() => onRealizarChamada(item)}
-                                        className="cursor-pointer rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                        className="w-full cursor-pointer rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
                                     >
                                         {item.status === "REALIZADA"
                                             ? "Consultar chamada"
                                             : "Realizar chamada"}
                                     </button>
                                 ) : item.status === "AGENDADA" ? (
-                                    <p className="max-w-56 text-sm text-amber-700">
+                                    <p className="max-w-full break-words text-sm text-amber-700 sm:max-w-56">
                                         {mensagemDisponibilidadeChamada(item)}
                                     </p>
                                 ) : null}
@@ -203,7 +203,7 @@ export function TurmaAulasModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="cursor-pointer rounded-xl bg-blue-600 px-6 py-2.5 font-semibold text-white hover:bg-blue-700"
+                        className="w-full cursor-pointer rounded-xl bg-blue-600 px-6 py-2.5 font-semibold text-white hover:bg-blue-700 sm:w-auto"
                     >
                         Fechar
                     </button>

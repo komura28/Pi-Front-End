@@ -1,23 +1,30 @@
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 
 
 
- interface IButton {
+ interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
     isSubmitting: boolean;
     label: ReactNode;
     loadingLabel?: string;
     className?: string;
-    onClick?: () => void;
 }
 
-export function Button({isSubmitting, label, loadingLabel="Enviando...", className, onClick, ...props}: IButton) {
+export function Button({
+    isSubmitting,
+    label,
+    loadingLabel = "Enviando...",
+    className = "",
+    disabled,
+    ...props
+}: IButton) {
     return (
         <button
-                        disabled={isSubmitting} className={className} {...props} onClick={onClick}
-                        //className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition houver:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
-                    >
-                        {isSubmitting ? loadingLabel : label}
-                    </button>
-    )
+            disabled={isSubmitting || disabled}
+            className={`max-w-full ${className}`}
+            {...props}
+        >
+            {isSubmitting ? loadingLabel : label}
+        </button>
+    );
 }
