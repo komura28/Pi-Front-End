@@ -22,11 +22,11 @@ export function SuccessDialog({
             descricao="Operação concluída com sucesso."
             icone={CheckCircle2}
             rodape={
-                <div className="flex justify-end">
+                <div className="flex w-full justify-end">
                     <button
                         type="button"
                         onClick={aoFechar}
-                        className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                        className="w-full rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                     >
                         Entendi
                     </button>
@@ -45,7 +45,7 @@ export function SuccessDialog({
                     />
                 </div>
 
-                <p className="max-w-sm text-sm leading-relaxed text-slate-600">
+                <p className="max-w-sm break-words text-sm leading-relaxed text-slate-600">
                     {mensagem}
                 </p>
             </div>

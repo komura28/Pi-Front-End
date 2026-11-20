@@ -33,22 +33,22 @@ export function AppDialog({
           aria-busy={salvando}
           onEscapeKeyDown={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
-          className={`fixed left-1/2 top-1/2 z-[5001] flex max-h-[90dvh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none ${
+          className={`fixed left-1/2 top-1/2 z-[5001] flex max-h-[90vh] max-h-[90dvh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none ${
             tamanho === "lg" ? "max-w-2xl" : "max-w-lg"
           }`}
         >
-          <div className="shrink-0 bg-gradient-to-r from-[#0F172A] to-blue-800 p-4 sm:p-6 text-white">
+          <div className="shrink-0 bg-gradient-to-r from-[#0F172A] to-blue-800 p-4 text-white sm:p-6">
             <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-white/10 p-3">
+              <div className="shrink-0 rounded-xl bg-white/10 p-2.5 sm:p-3">
                 <Icone size={23} className="text-blue-200" />
               </div>
 
               <div className="min-w-0">
-                <Dialog.Title className="text-xl font-bold">
+                <Dialog.Title className="break-words text-lg font-bold sm:text-xl">
                   {titulo}
                 </Dialog.Title>
 
-                <Dialog.Description className="mt-1 text-sm text-blue-100">
+                <Dialog.Description className="mt-1 break-words text-sm text-blue-100">
                   {descricao}
                 </Dialog.Description>
               </div>
