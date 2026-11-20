@@ -75,7 +75,7 @@ const FORM_VAZIO: PerfilForm = {
 };
 
 const classeInput =
-    "mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500";
+    "mt-1 w-full min-w-0 max-w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 sm:px-4 sm:text-sm";
 
 function formatarCPF(valor: string | number) {
     const digitos = String(valor).replace(/\D/g, "");
@@ -108,9 +108,9 @@ function LinhaInformacao({
     valor?: string | null;
 }) {
     return (
-        <div className="flex min-w-0 items-start gap-3 rounded-xl bg-slate-50 p-4">
+        <div className="flex min-w-0 items-start gap-2 rounded-xl bg-slate-50 p-3 sm:gap-3 sm:p-4">
             <div className="rounded-lg bg-blue-100 p-2 text-blue-700">
-                <Icon size={19} aria-hidden="true" />
+                <Icon size={19} aria-hidden="true" className="shrink-0 rounded-lg bg-blue-100 p-2 text-blue-700" />
             </div>
             <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-slate-500">{rotulo}</p>
@@ -318,12 +318,12 @@ export function PerfilPage() {
         : ESTADOS_CIVIS;
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-6 text-white shadow-lg sm:p-8">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
                 <UserRound aria-hidden="true" size={220} className="pointer-events-none absolute -bottom-20 -right-10 hidden rotate-[-14deg] text-white/10 md:block" />
 
-                <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-                    <div className="relative">
+                <div className="relative flex min-w-0 flex-col items-center gap-4 text-center sm:gap-6 xl:flex-row xl:text-left">
+                    <div className="relative shrink-0">
                         <AvatarPerfil foto={user.photo} nome={user.name} tamanho="lg" />
                         <button
                             type="button"
@@ -345,9 +345,9 @@ export function PerfilPage() {
                         />
                     </div>
 
-                    <div className="min-w-0 flex-1">
+                    <div className="w-full min-w-0 flex-1">
                         <p className="text-sm font-semibold tracking-wide text-blue-200">MEU PERFIL</p>
-                        <h1 className="mt-2 break-words text-3xl font-bold">{user.name}</h1>
+                        <h1 className="mt-2 break-words text-2xl font-bold sm:text-3xl">{user.name}</h1>
                         <p className="mt-2 break-all text-sm text-slate-200">{user.email}</p>
                         <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
                             <BadgeCheck size={15} aria-hidden="true" />
@@ -361,7 +361,7 @@ export function PerfilPage() {
                     <button
                         type="button"
                         onClick={abrirEdicao}
-                        className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="inline-flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto"
                     >
                         <Pencil size={17} aria-hidden="true" />
                         Editar dados
@@ -382,14 +382,14 @@ export function PerfilPage() {
                 </p>
             )}
 
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
-                <div className="space-y-6">
-                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 2xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+                <div className="min-w-0 space-y-4 sm:space-y-6">
+                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                         <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-800">
                             <ContactRound size={22} className="text-blue-600" aria-hidden="true" />
                             Informações pessoais
                         </h2>
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
                             <LinhaInformacao icone={UserRound} rotulo="Nome completo" valor={user.name} />
                             <LinhaInformacao icone={CalendarDays} rotulo="Data de nascimento" valor={user.dt_nascimento ? formatDate(user.dt_nascimento) : undefined} />
                             <LinhaInformacao icone={Users} rotulo="Estado civil" valor={user.estado_civil} />
@@ -397,24 +397,24 @@ export function PerfilPage() {
                         </div>
                     </section>
 
-                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                         <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-800">
                             <Phone size={22} className="text-blue-600" aria-hidden="true" />
                             Contato
                         </h2>
-                        <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
                             <LinhaInformacao icone={Phone} rotulo="Telefone principal" valor={user.telefone_principal} />
                             <LinhaInformacao icone={Phone} rotulo="Telefone secundário" valor={user.telefone_secundario} />
                         </div>
                     </section>
 
                     {ehAluno && (
-                        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                             <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-800">
                                 <HeartPulse size={22} className="text-blue-600" aria-hidden="true" />
                                 Informações complementares
                             </h2>
-                            <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
                                 <LinhaInformacao
                                     icone={Users}
                                     rotulo="Já foi ou é palhaço voluntário?"
@@ -426,12 +426,12 @@ export function PerfilPage() {
                     )}
                 </div>
 
-                <section className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <section className="h-fit min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                     <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-800">
                         <ShieldCheck size={22} className="text-blue-600" aria-hidden="true" />
                         Dados da conta
                     </h2>
-                    <div className="space-y-4">
+                    <div className="flex min-w-0 items-start gap-2 rounded-xl bg-slate-50 p-3 sm:gap-3 sm:p-4">
                         <LinhaInformacao icone={Mail} rotulo="E-mail" valor={user.email} />
                         <LinhaInformacao icone={LockKeyhole} rotulo="CPF" valor={formatarCPF(user.cpf)} />
                         <LinhaInformacao icone={BadgeCheck} rotulo="Tipo de usuário" valor={PAPEIS[user.papelUsuario]} />
@@ -454,7 +454,7 @@ export function PerfilPage() {
                 aria-labelledby="titulo-modal-perfil"
                 className="m-auto w-[calc(100%-2rem)] max-h-[calc(100dvh-2rem)] max-w-2xl overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 open:flex open:flex-col"
             >
-                <div className="flex shrink-0 items-center justify-between gap-3 bg-[#0F172A] p-6 text-white">
+                <div className="flex shrink-0 items-center justify-between gap-3 bg-[#0F172A] p-4 text-white sm:p-6">
                     <div>
                         <p className="text-xs font-semibold tracking-wide text-blue-300">ATUALIZAÇÃO DE DADOS</p>
                         <h2 id="titulo-modal-perfil" className="mt-1 text-2xl font-bold">Editar perfil</h2>
@@ -471,36 +471,36 @@ export function PerfilPage() {
                 </div>
 
                 <form onSubmit={(event) => { void salvarEdicao(event); }} className="flex min-h-0 flex-1 flex-col">
-                    <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-6">
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <label className="block sm:col-span-2">
+                    <div className="min-h-0 min-w-0 flex-1 space-y-4 overflow-y-auto p-4 sm:space-y-5 sm:p-6">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">Nome completo</span>
                                 <input className={classeInput} value={form.name} onChange={(event) => setCampo("name", event.target.value)} required minLength={3} />
                             </label>
-                            <label className="block sm:col-span-2">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">E-mail (não editável)</span>
                                 <input className={classeInput} value={user.email} readOnly disabled />
                             </label>
-                            <label className="block">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">Data de nascimento</span>
                                 <input type="date" className={classeInput} value={form.dt_nascimento} onChange={(event) => setCampo("dt_nascimento", event.target.value)} />
                             </label>
-                            <label className="block">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">Estado civil</span>
                                 <select className={classeInput} value={form.estado_civil} onChange={(event) => setCampo("estado_civil", event.target.value)}>
                                     <option value="">Selecione...</option>
                                     {opcoesEstadoCivil.map((estado) => <option key={estado} value={estado}>{estado}</option>)}
                                 </select>
                             </label>
-                            <label className="block">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">Telefone principal</span>
                                 <input className={classeInput} inputMode="tel" placeholder="(00) 00000-0000" value={form.telefone_principal} onChange={(event) => setCampo("telefone_principal", formatarTelefone(event.target.value))} />
                             </label>
-                            <label className="block">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">Telefone secundário</span>
                                 <input className={classeInput} inputMode="tel" placeholder="(00) 00000-0000" value={form.telefone_secundario} onChange={(event) => setCampo("telefone_secundario", formatarTelefone(event.target.value))} />
                             </label>
-                            <label className="block">
+                            <label className="block sm:col-span-2 min-w-0">
                                 <span className="text-sm font-semibold text-slate-700">Profissão</span>
                                 <select className={classeInput} value={form.profissao} onChange={(event) => setCampo("profissao", event.target.value)}>
                                     <option value="">Selecione...</option>
@@ -509,14 +509,14 @@ export function PerfilPage() {
                                 </select>
                             </label>
                             {form.profissao === "Outro" && (
-                                <label className="block">
+                                <label className="block sm:col-span-2 min-w-0">
                                     <span className="text-sm font-semibold text-slate-700">Qual profissão?</span>
                                     <input className={classeInput} value={form.profissao_custom} onChange={(event) => setCampo("profissao_custom", event.target.value)} />
                                 </label>
                             )}
                             {ehAluno && (
                                 <>
-                                    <label className="block">
+                                    <label className="block sm:col-span-2 min-w-0">
                                         <span className="text-sm font-semibold text-slate-700">Já foi ou é palhaço voluntário?</span>
                                         <select className={classeInput} value={form.participacao_anterior} onChange={(event) => setCampo("participacao_anterior", event.target.value)}>
                                             <option value="">Selecione...</option>
@@ -524,7 +524,7 @@ export function PerfilPage() {
                                             <option value="false">Não</option>
                                         </select>
                                     </label>
-                                    <label className="block">
+                                    <label className="block sm:col-span-2 min-w-0">
                                         <span className="text-sm font-semibold text-slate-700">Possui problema de saúde?</span>
                                         <select className={classeInput} value={form.tem_problema_saude} onChange={(event) => setCampo("tem_problema_saude", event.target.value)}>
                                             <option value="">Selecione...</option>
@@ -533,7 +533,7 @@ export function PerfilPage() {
                                         </select>
                                     </label>
                                     {form.tem_problema_saude === "Sim" && (
-                                        <label className="block sm:col-span-2">
+                                        <label className="block sm:col-span-2 min-w-0">
                                             <span className="text-sm font-semibold text-slate-700">Descreva a informação de saúde</span>
                                             <input className={classeInput} value={form.problemas_saude_descricao} onChange={(event) => setCampo("problemas_saude_descricao", event.target.value)} />
                                         </label>
@@ -543,7 +543,7 @@ export function PerfilPage() {
                         </div>
                         {erroForm && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-medium text-red-700">{erroForm}</p>}
                     </div>
-                    <div className="flex shrink-0 flex-wrap justify-end gap-3 border-t border-slate-200 bg-white p-5">
+                    <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-slate-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-5">
                         <button type="button" onClick={() => setModalAberto(false)} disabled={salvando} className="cursor-pointer rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
                             Cancelar
                         </button>

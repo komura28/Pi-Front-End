@@ -52,10 +52,10 @@ export function ResetarSenhaPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
-            <section className="w-full max-w-md bg-white p-8 shadow-lg rounded-lg">
-                <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
-                <h1 className="mb-2 text-center text-2xl font-bold text-gray-800">
+        <main className="flex min-h-dvh items-center justify-center bg-[#0F172A] px-4 py-6 sm:px-6 sm:py-8">
+            <section className="w-full min-w-0 max-w-md rounded-2xl bg-white p-5 shadow-lg sm:p-8">
+                <img src={logo} alt="Logo" className="mx-auto h-12 w-auto object-contain sm:h-16" />
+                <h1 className="mb-2 text-center text-xl font-bold text-gray-800 sm:text-2xl">
                     Redefinir Senha
                 </h1>
 
@@ -64,21 +64,21 @@ export function ResetarSenhaPage() {
                 </p>
 
                 <form onSubmit={handleSubmit(handleResetarSenha)} className="space-y-4">
-                    <div>
+                    <div className="flex w-full min-w-0 items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
                         <label className="mb-1 block text-sm font-medium text-gray-700">
                             Senha
                         </label>
                         <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
                             <input
                                 type={mostrarSenha ? "text" : "password"}
-                                className="w-full bg-transparent outline-none"
+                                className="min-w-0 flex-1 bg-transparent py-1 text-base outline-none"
                                 placeholder="Digite sua Nova Senha"
                                 {...register("senha", {
                                     required: "Senha é obrigatório",
                                 })}
                             />
                             <button
-                                className="cursor-pointer"
+                                className="shrink-0 cursor-pointer p-2"
                                 type="button"
                                 onClick={() => setMostrarSenha(!mostrarSenha)}
                             >
@@ -102,15 +102,14 @@ export function ResetarSenhaPage() {
                         )}
                     </div>
 
-                    {/* Confirmar Senha */}
-                    <div>
+                    <div className="flex w-full min-w-0 items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
                         <label className="mb-1 block text-sm font-medium text-gray-700">
                             Confirmar Senha
                         </label>
                         <div className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 outline-none focus-within:border-blue-500 focus-within:ring-1">
                             <input
                                 type={mostrarConfirmarSenha ? "text" : "password"}
-                                className="w-full bg-transparent outline-none"
+                                className="min-w-0 flex-1 bg-transparent py-1 text-base outline-none"
                                 placeholder="Confirme sua Senha"
                                 {...register("confirmarSenha", {
                                     required: "Confirmação é obrigatório",
@@ -122,7 +121,7 @@ export function ResetarSenhaPage() {
                                 })}
                             />
                             <button
-                                className="cursor-pointer"
+                                className="shrink-0 cursor-pointer p-2"
                                 type="button"
                                 onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
                             >

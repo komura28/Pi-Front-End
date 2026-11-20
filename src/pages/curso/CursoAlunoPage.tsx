@@ -39,7 +39,6 @@ export function CursoAlunoPage() {
     setConfirmarCancelamento(true);
   };
 
-  // Função de Cancelar Matrícula
   const handleCancelarMatricula = async () => {
     setIsSubmitting(true);
     setFormError("");
@@ -139,8 +138,8 @@ export function CursoAlunoPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold text-gray-800">Meus Cursos</h1>
+    <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+      <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">Meus Cursos</h1>
 
       <div className="space-y-4">
         {error && (
@@ -157,16 +156,16 @@ export function CursoAlunoPage() {
           candidaturas.map((candidatura) => (
             <div
               key={candidatura._id}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md"
+              className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-6"
             >
-              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <h2 className="wrap-break-word text-lg font-semibold text-gray-800 sm:text-xl">
+              <div className="mb-4 flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <h2 className="min-w-0 break-words text-lg font-semibold text-gray-800 sm:text-xl">
                   Curso: {candidatura.turma?.curso?.name}
                 </h2>
 
                 <button
                   onClick={() => abrirVerDetalhes(candidatura)}
-                  className="cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition"
+                  className="w-full shrink-0 cursor-pointer rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 md:w-auto"
                 >
                   Ver Detalhes
                 </button>
@@ -190,8 +189,8 @@ export function CursoAlunoPage() {
 
         {matriculaSelecionada && (
           <div className="fixed inset-0 z-5000 flex items-center justify-center overflow-y-auto bg-black/50 p-3 sm:p-4">
-            <div className="my-auto max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-              <div className="border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
+            <div className="my-auto max-h-[90dvh] w-full min-w-0 max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+              <div className="border-b border-slate-200 bg-slate-50 px-4 py-5 sm:px-7 sm:py-6">
                 <div className="mb-2 flex items-center gap-2">
                   <span className="rounded-lg bg-blue-100 p-2 text-blue-700">
                     <i className="fa-solid fa-graduation-cap"></i>
@@ -202,7 +201,7 @@ export function CursoAlunoPage() {
                   </span>
                 </div>
 
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
                   Detalhes do Curso
                 </h2>
 
@@ -211,7 +210,7 @@ export function CursoAlunoPage() {
                 </p>
               </div>
 
-              <div className="space-y-5 p-5 sm:p-7">
+              <div className="min-w-0 space-y-4 p-4 sm:space-y-5 sm:p-7">
                 {(() => {
                   const dados = buscarFrequencia(matriculaSelecionada._id);
                   const percentual = dados?.frequenciaPercentual ?? 0;
@@ -219,7 +218,7 @@ export function CursoAlunoPage() {
                   return (
                     <div className="space-y-5">
                       <div>
-                        <div className="mb-3 flex items-center justify-between gap-3">
+                        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                           <h3 className="text-lg font-semibold text-slate-900">
                             Minha frequência
                           </h3>
@@ -253,7 +252,7 @@ export function CursoAlunoPage() {
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                         <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
                           <p className="text-sm font-medium text-emerald-700">
                             Presenças
@@ -316,7 +315,7 @@ export function CursoAlunoPage() {
                 <div className="flex justify-end border-t border-slate-200 pt-4">
                   <button
                     onClick={() => setMatriculaSelecionada(null)}
-                    className="cursor-pointer rounded-lg bg-slate-100 px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-200"
+                    className="w-full cursor-pointer rounded-lg bg-slate-100 px-5 py-3 font-medium text-slate-700 transition hover:bg-slate-200 sm:w-auto"
                   >
                     Fechar
                   </button>
@@ -328,7 +327,7 @@ export function CursoAlunoPage() {
 
         {cancelamentoMatricula && !confirmarCancelamento && (
           <div className="fixed inset-0 z-5001 flex items-center justify-center overflow-y-auto bg-black/50 p-3 backdrop-blur-sm sm:p-4">
-            <div className="my-auto w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl bg-white p-5 shadow-xl sm:p-6">
+            <div className="my-auto max-h-[90dvh] w-full min-w-0 max-w-md overflow-y-auto rounded-xl bg-white p-4 shadow-xl sm:p-6">
               {" "}
               <h3 className="text-xl font-semibold text-slate-900 mb-4">
                 Antes de cancelar...
@@ -343,7 +342,7 @@ export function CursoAlunoPage() {
                     value={motivo}
                     onChange={(e) => setMotivo(e.target.value)}
                     placeholder="Digite o motivo do cancelamento"
-                    className="border border-slate-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full min-w-0 rounded-md border border-slate-300 px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>

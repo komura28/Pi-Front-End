@@ -37,10 +37,10 @@ export function EsqueciSenhaPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#0F172A] px-4">
-            <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg rounded-lg">
-                <img src={logo} alt="Logo" className="h-16 w-auto object-contain mx-auto" />
-                <h1 className="mb-2 text-center text-2xl font-bold text-gray-800">
+        <main className="flex min-h-dvh items-center justify-center bg-[#0F172A] px-4 py-6 sm:px-6 sm:py-8">
+            <section className="w-full min-w-0 max-w-md rounded-2xl bg-white p-5 shadow-lg sm:p-8">
+                <img src={logo} alt="Logo" className="mx-auto h-12 w-auto object-contain sm:h-16" />
+                <h1 className="mb-2 text-center text-xl font-bold text-gray-800 sm:text-2xl">
                     Esqueci Senha
                 </h1>
 
@@ -61,7 +61,7 @@ export function EsqueciSenhaPage() {
                         </label>
                         <input
                             type="email"
-                            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-blue-500"
+                            className="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-3 text-base outline-none focus:border-blue-500"
                             placeholder="admin@gmail.com"
                             {...register("email", {
                                 required: "O e-mail é obrigatório",
@@ -85,7 +85,7 @@ export function EsqueciSenhaPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+                        className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
                     >
                         {isSubmitting ? "Enviando..." : "Enviar"}
                     </button>
@@ -93,7 +93,7 @@ export function EsqueciSenhaPage() {
                     <button
                         type="button"
                         onClick={handleVoltar}
-                        className="w-full rounded-lg bg-blue-950 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
+                        className="w-full rounded-lg bg-blue-950 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
                     >
                         Voltar
                     </button>
