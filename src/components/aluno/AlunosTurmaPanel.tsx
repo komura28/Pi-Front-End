@@ -156,7 +156,7 @@ export function AlunosTurmaPanel({
                     Turma selecionada
                 </p>
 
-                <h2 className="mt-2 text-2xl font-bold text-slate-800">
+                <h2 className="mt-2 break-words text-xl font-bold text-slate-800 sm:text-2xl">
                     {turma.turma.curso?.name ?? "Curso não informado"}
                 </h2>
 
