@@ -33,7 +33,7 @@ export function Carousel() {
                 className="rounded-2xl shadow-lg"
             >
                 <SwiperSlide>
-                    <div className="relative h-[400px]">
+                    <div className="relative h-400px">
                         <img
                             src={banner1}
                             alt="Aticurando"
@@ -54,7 +54,7 @@ export function Carousel() {
                 </SwiperSlide>
 
                 <SwiperSlide>
-                    <div className="relative h-[400px]">
+                    <div className="relative h-400px">
                         <img
                             src={banner2}
                             alt="Missão"
@@ -74,7 +74,7 @@ export function Carousel() {
                 </SwiperSlide>
 
                 <SwiperSlide>
-                    <div className="relative h-[400px]">
+                    <div className="relative h-400px">
                         <img
                             src={banner3}
                             alt="Impacto Social"
