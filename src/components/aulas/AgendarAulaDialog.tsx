@@ -114,7 +114,7 @@ export function AgendarAulaDialog({
                                     Aula selecionada
                                 </p>
 
-                                <h3 className="mt-1 text-lg font-bold text-slate-800">
+                                <h3 className="mt-1 break-words text-base font-bold text-slate-800 sm:text-lg">
                                     {aula.aula?.titulo ?? "Aula não encontrada"}
                                 </h3>
 
@@ -224,7 +224,7 @@ export function AgendarAulaDialog({
                                     Término previsto
                                 </p>
 
-                                <p className="mt-1 font-bold text-slate-800">
+                                <p className="mt-1 break-words text-sm font-bold text-slate-800 sm:text-base">
                                     {terminoPrevisto ??
                                         "Informe uma data e horário válidos"}
                                 </p>

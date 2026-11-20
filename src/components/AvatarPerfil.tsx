@@ -41,7 +41,7 @@ export function AvatarPerfil({
             ) : (
                 <UserRound
                     aria-hidden="true"
-                    size={tamanho === "lg" ? 48 : 22}
+                    size={tamanho === "lg" ? 40 : 22}
                 />
             )}
         </div>

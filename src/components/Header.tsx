@@ -92,7 +92,7 @@ export function Header({
     }
 
     return (
-        <header className="sticky top-0 z-30 flex h-20 shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-[#0F172A] px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-auto min-h-20 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-2 border-b border-white/10 bg-[#0F172A] px-3 py-2 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0 sm:h-20">
             <div className="flex min-w-0 flex-1 items-center gap-3">
 
                 {mode === "ALUNO" ? (
@@ -103,7 +103,7 @@ export function Header({
                         <img
                             src={logo}
                             alt="Aticurando"
-                            className="h-12 w-auto object-contain"
+                            className="h-10 w-auto object-contain sm:h-12"
                         />
                     </Link>
                 ) : (
@@ -146,7 +146,7 @@ export function Header({
             </div>
 
             {mode === "ALUNO" && (
-                <nav className="flex min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto sm:gap-3">
+                <nav className="order-3 flex w-full min-w-0 basis-full items-center justify-center gap-1 overflow-x-auto overscroll-x-contain pb-1 sm:order-none sm:w-auto sm:basis-auto sm:flex-1 sm:gap-3 sm:pb-0">
                     {navigationItems?.filter(
                         (item) => Boolean(item.href)
                     ).map((item) => (
@@ -235,6 +235,6 @@ export function Header({
                     </>
                 )}
             </div>
-        </header>
-    );
+    </header>
+  );
 }

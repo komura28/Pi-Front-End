@@ -82,12 +82,12 @@ export function AulaAgendaCard({
                         {nomeMateria}
                     </p>
 
-                    <h3 className="text-base font-bold text-slate-800">
+                    <h3 className="break-words text-base font-bold text-slate-800">
                         {ocorrencia.aula?.titulo ?? "Aula não encontrada"}
                     </h3>
 
                     {ocorrencia.aula?.descricao && (
-                        <p className="text-sm text-slate-500">
+                        <p className="break-words text-sm text-slate-500">
                             {ocorrencia.aula.descricao}
                         </p>
                     )}
@@ -143,7 +143,8 @@ export function AulaAgendaCard({
                             Professor responsável
                         </p>
 
-                        <p className="mt-1 text-sm font-medium text-slate-800">
+                        <p className="mt-1 break-words text-sm font-medium text-slate-800">
+
                             {ocorrencia.professor?.name ??
                                 "Não atribuído"}
                         </p>

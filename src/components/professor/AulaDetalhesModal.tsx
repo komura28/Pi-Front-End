@@ -71,7 +71,7 @@ export function AulaDetalhesModal({
             aria-labelledby="titulo-detalhes-aula"
             className="m-auto w-[calc(100%-2rem)] max-w-2xl max-h-[calc(100dvh-2rem)] overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 open:flex open:flex-col"
         >
-            <header className="shrink-0 bg-[#0F172A] p-6 text-white">
+            <header className="shrink-0 bg-[#0F172A] p-4 text-white sm:p-6">
 
                 <div className="mb-4 flex items-center justify-between gap-3">
 
@@ -83,7 +83,7 @@ export function AulaDetalhesModal({
 
                 <h2
                     id="titulo-detalhes-aula"
-                    className="text-2xl font-bold"
+                    className="break-words text-xl font-bold sm:text-2xl"
                 >
                     {aula.aula?.titulo ?? "Aula sem título"}
                 </h2>
@@ -96,7 +96,7 @@ export function AulaDetalhesModal({
                         {aula.status}
                     </span>
 
-                    <span className="text-sm text-slate-300">
+                    <span className="break-words text-sm text-slate-300">
                         {aula.turma?.curso?.name ??
                             "Curso não informado"}
                     </span>
@@ -104,7 +104,7 @@ export function AulaDetalhesModal({
                 </div>
             </header>
 
-            <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
+            <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
 
                 <div className="grid gap-4 sm:grid-cols-2">
 
@@ -165,7 +165,7 @@ export function AulaDetalhesModal({
                         Descrição da aula
                     </h3>
 
-                    <p className="mt-3 whitespace-pre-line leading-relaxed text-slate-600">
+                    <p className="mt-3 break-words whitespace-pre-line leading-relaxed text-slate-600">
                         {aula.aula?.descricao ||
                             "Nenhuma descrição cadastrada para esta aula."}
                     </p>

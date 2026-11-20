@@ -37,7 +37,7 @@ export function DataTable<T>({
     mensagemVazia = "Nenhum registro encontrado."
 }: Readonly<DataTableProps<T>>) {
     return (
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
+        <div className="w-full min-w-0 overflow-x-auto overscroll-x-contain rounded-xl border border-slate-200">
             <table className="w-full min-w-[740px] text-sm">
                 <thead className="bg-slate-50">
                     <tr>
@@ -45,7 +45,7 @@ export function DataTable<T>({
                             <th
                                 key={coluna.id}
                                 scope="col"
-                                className={`border-b border-slate-200 px-5 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500 ${classeAlinhamento(coluna.alinhamento)}`}
+                                className={`whitespace-nowrap border-b border-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5 sm:py-4 ${classeAlinhamento(coluna.alinhamento)}`}
                             >
                                 {coluna.titulo}
                             </th>
@@ -54,7 +54,7 @@ export function DataTable<T>({
                         {acoes && (
                             <th
                                 scope="col"
-                                className="border-b border-slate-200 px-5 py-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500"
+                                className="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5 sm:py-4"
                             >
                                 Ações
                             </th>
@@ -81,14 +81,14 @@ export function DataTable<T>({
                                 {colunas.map((coluna) => (
                                     <td
                                         key={coluna.id}
-                                        className={`px-5 py-4 text-slate-600 ${classeAlinhamento(coluna.alinhamento)}`}
+                                        className={`px-4 py-3 text-slate-600 sm:px-5 sm:py-4 ${classeAlinhamento(coluna.alinhamento)}`}
                                     >
                                         {coluna.renderizar(item)}
                                     </td>
                                 ))}
 
                                 {acoes && (
-                                    <td className="px-5 py-3 text-right">
+                                    <td className="px-4 py-3 text-right sm:px-5">
                                         <TableActionMenu
                                             acoes={acoes(item)}
                                             rotulo={rotuloAcoes?.(item)}

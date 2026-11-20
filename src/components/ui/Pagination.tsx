@@ -40,13 +40,13 @@ export function Pagination({
     return (
         <nav
             aria-label="Paginação"
-            className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-5 sm:flex-row"
+            className="flex w-full min-w-0 flex-col items-center justify-between gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:flex-wrap"
         >
-            <p className="text-sm text-slate-500">
+            <p className="text-center text-sm text-slate-500 sm:text-left">
                 Exibindo {inicio}–{fim} de {totalItens} registros
             </p>
 
-            <div className="flex items-center gap-3">
+            <div className="flex w-full items-center justify-center gap-2 sm:w-auto sm:gap-3">
                 <button
                     type="button"
                     disabled={!temAnterior}

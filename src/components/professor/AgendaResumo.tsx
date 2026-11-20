@@ -23,10 +23,10 @@ export function AgendaResumo({ aulas }: AgendaResumoProps) {
         });
 
     return (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
-            <div className="mb-6 flex items-center justify-between gap-3">
-                <h2 className="flex items-center gap-2 text-xl font-bold text-slate-800">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="flex min-w-0 items-center gap-2 text-lg font-bold text-slate-800 sm:text-xl">
                     <CalendarDays
                         className="text-blue-600"
                         size={24}
@@ -57,11 +57,11 @@ export function AgendaResumo({ aulas }: AgendaResumoProps) {
                             </div>
 
                             <div className="flex-1">
-                                <h3 className="font-semibold text-slate-800">
+                                <h3 className="break-words font-semibold text-slate-800">
                                     {aula.titulo}
                                 </h3>
 
-                                <p className="mt-1 text-sm text-slate-500">
+                                <p className="mt-1 break-words text-sm text-slate-500">
                                     {aula.curso} • {aula.turma}
                                 </p>
 
