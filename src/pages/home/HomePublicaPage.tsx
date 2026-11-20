@@ -26,7 +26,7 @@ export function HomePublicaPage() {
     return (
         <div className="flex min-h-screen flex-col bg-slate-50">
             <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#0F172A]">
-                <div className="mx-auto flex min-h-20 max-w-7xl flex-wrap items-center justify-center gap-3 px-3 py-3 sm:justify-between sm:gap-4 sm:px-6">
+                <div className="mx-auto flex min-h-20 max-w-7xl flex-nowrap items-center justify-between gap-2 px-3 py-2 sm:gap-4 sm:px-6 sm:py-3">
 
                     <Link
                         to="/"
@@ -36,13 +36,13 @@ export function HomePublicaPage() {
                         <img
                             src={logo}
                             alt="Aticurando"
-                            className="h-10 w-auto object-contain sm:h-14"
+                            className="h-8 w-auto shrink-0 object-contain sm:h-14"
                         />
                     </Link>
 
                     <nav
                         aria-label="Navegação principal"
-                        className="flex flex-wrap items-center justify-center gap-2 sm:gap-4"
+                        className="flex shrink-0 flex-nowrap items-center justify-end gap-1.5 sm:gap-4"
                     >
                         <a
                             href="#sobre"
@@ -62,14 +62,14 @@ export function HomePublicaPage() {
                             <>
                                 <Link
                                     to="/login"
-                                    className="rounded-lg border border-slate-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+                                    className="whitespace-nowrap rounded-lg border border-slate-500 px-3 py-2 text-xs font-semibold text-white transition hover:border-white hover:bg-white/10 sm:px-5 sm:py-2.5 sm:text-sm"
                                 >
                                     Entrar
                                 </Link>
 
                                 <Link
                                     to="/cadastro"
-                                    className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                    className="whitespace-nowrap rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 sm:px-5 sm:py-2.5 sm:text-sm"
                                     state={{ origem: "home" }}
                                 >
                                     Cadastre-se
