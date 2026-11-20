@@ -3,12 +3,13 @@ import { getTurma } from "../../services/authService";
 import type { TurmaMatricula } from "../../types/auth/auth-types";
 import { CardTurma } from "../../components/CardTurma";
 import { useAuth } from "../../contexts/AuthContext";
-import { getMinhasMatriculas } from "../../services/matriculaService";
-import type { MatriculaDTO } from "../../types/matricula/matricula-types";
 import { ProfessorStatCard } from "../../components/professor/ProfessorStatCard";
-import { getMinhaFrequencia } from "../../services/matriculaService";
 import { FrequenciaAlunoCard } from "../../components/aluno/FrequenciaAlunoCard";
 import { getMinhaProximaAula } from "../../services/aulaTurmaService";
+import {
+    getMinhasMatriculas,
+    getMinhaFrequencia
+} from "../../services/matriculaService";
 
 import type {
     ProximaAulaAluno
@@ -17,6 +18,7 @@ import type {
 import { ProximaAulaCard } from "../../components/professor/ProximaAulaCard";
 
 import type {
+    MatriculaDTO,
     FrequenciaAlunoDashboard
 } from "../../types/matricula/matricula-types";
 
@@ -272,9 +274,9 @@ export function HomeAlunoPage() {
     }
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
-            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
 
                 <div className="relative z-10">
                     <div className="mb-4 flex items-center gap-2 text-blue-200">
@@ -285,18 +287,17 @@ export function HomeAlunoPage() {
                         </span>
                     </div>
 
-                    <h1 className="text-3xl font-bold md:text-4xl">
+                    <h1 className="break-words text-2xl font-bold sm:text-3xl lg:text-4xl">
                         Olá, {primeiroNome}!
                     </h1>
 
-                    <p className="mt-3 max-w-xl text-blue-100">
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
                         Acompanhe suas turmas, candidaturas e atividades
                         em um só lugar.
                     </p>
 
-                    <div className="mt-6 flex items-center gap-2 text-sm text-blue-200">
-                        <CalendarDays size={18} />
-
+                    <div className="mt-4 flex items-center gap-2 text-xs text-blue-200 sm:mt-6 sm:text-sm">
+                        <CalendarDays size={18} className="shrink-0" />
                         <span className="capitalize">
                             {dataAtual}
                         </span>
@@ -312,7 +313,7 @@ export function HomeAlunoPage() {
 
             <section
                 aria-label="Indicadores do aluno"
-                className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3"
             >
                 {indicadores.map((indicador) => (
                     <ProfessorStatCard
@@ -344,7 +345,7 @@ export function HomeAlunoPage() {
                 <div>
                     <h2
                         id="titulo-frequencia"
-                        className="text-2xl font-bold text-slate-800"
+                        className="text-xl font-bold text-slate-800 sm:text-2xl"
                     >
                         Minha Frequência
                     </h2>
@@ -367,7 +368,7 @@ export function HomeAlunoPage() {
                         Você ainda não possui frequência para acompanhar.
                     </p>
                 ) : (
-                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 sm:gap-6 xl:grid-cols-3">
                         {frequencias.map((frequencia) => {
                             const matricula = minhasMatriculas.find(
                                 (item) => item._id === frequencia.matriculaId
@@ -394,7 +395,7 @@ export function HomeAlunoPage() {
                 <div className="mb-6">
                     <h2
                         id="titulo-oportunidades"
-                        className="text-2xl font-bold text-slate-800"
+                        className="text-xl font-bold text-slate-800 sm:text-2xl"
                     >
                         Explore novas oportunidades
                     </h2>
@@ -405,7 +406,7 @@ export function HomeAlunoPage() {
                     </p>
                 </div>
 
-                <div className="relative mb-6 max-w-xl">
+                <div className="relative mb-4 w-full max-w-xl sm:mb-6">
                     <Search
                         aria-hidden="true"
                         className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -419,16 +420,16 @@ export function HomeAlunoPage() {
                             setBusca(e.target.value);
                             setPaginaAtual(1);
                         }}
-                        placeholder="Pesquise por curso, descrição ou turno..."
+                        placeholder="Pesquisar turmas..."
                         aria-label="Pesquisar turmas"
-                        className="w-full rounded-lg border border-slate-300 bg-white py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-slate-300 bg-white py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-base"
                     />
                 </div>
 
 
                 {turmasFiltradas.length > 0 ? (
                     <>
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 sm:gap-6 xl:grid-cols-3">
                             {turmasPaginadas.map((turma) => (
                                 <CardTurma
                                     key={turma.turma._id}
@@ -440,7 +441,7 @@ export function HomeAlunoPage() {
                         {totalPaginas > 1 && (
                             <nav
                                 aria-label="Paginação das turmas"
-                                className="flex justify-center items-center gap-2 mt-6"
+                                className="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm sm:gap-3"
                             >
                                 <button
                                     type="button"
@@ -480,8 +481,6 @@ export function HomeAlunoPage() {
                     </p>
                 )}
             </section>
-
-
         </main>
     );
 }

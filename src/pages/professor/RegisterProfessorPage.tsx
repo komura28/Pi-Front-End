@@ -9,7 +9,7 @@ export function RegisterProfessorPage() {
     const navigate = useNavigate();
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
             <PageHeader
                 titulo="Cadastrar professor"
                 descricao="Registre os dados de um novo professor no Aticurando."
@@ -19,7 +19,7 @@ export function RegisterProfessorPage() {
                     <button
                         type="button"
                         onClick={() => navigate("/app/user")}
-                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto sm:text-base"
                     >
                         <ArrowLeft size={18} />
                         Voltar aos usuários

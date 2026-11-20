@@ -128,8 +128,8 @@ export function HomePage() {
 
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
 
                 <div className="relative z-10">
                     <div className="mb-4 flex items-center gap-2 text-blue-200">
@@ -140,19 +140,18 @@ export function HomePage() {
                         </span>
                     </div>
 
-                    <h1 className="text-3xl font-bold md:text-4xl">
+                    <h1 className="break-words text-2xl font-bold sm:text-3xl lg:text-4xl">
                         Olá, {primeiroNome}!
                     </h1>
 
-                    <p className="mt-3 max-w-xl text-blue-100">
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
                         Acompanhe os indicadores do Aticurando
                         e gerencie as atividades do projeto
                         em um só lugar.
                     </p>
 
-                    <div className="mt-6 flex items-center gap-2 text-sm text-blue-200">
-                        <CalendarDays size={18} />
-
+                    <div className="mt-4 flex items-center gap-2 text-xs text-blue-200 sm:mt-6 sm:text-sm">
+                        <CalendarDays size={18} className="shrink-0" />
                         <span className="capitalize">
                             {dataAtual}
                         </span>
@@ -168,7 +167,7 @@ export function HomePage() {
 
             <section
                 aria-label="Indicadores administrativos"
-                className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 2xl:grid-cols-3"
             >
                 {indicadores.map((indicador) => (
                     <ProfessorStatCard
@@ -180,7 +179,41 @@ export function HomePage() {
                 ))}
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            {!loading && !error && dashboardData && (
+                <section className="flex min-w-0 flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:flex-row xl:items-center xl:justify-between">
+
+                    <div className="flex items-center gap-4">
+                        <div className="rounded-xl bg-amber-100 p-3 text-amber-600">
+                            <ClipboardList size={26} />
+                        </div>
+
+                        <div>
+                            <h2 className="text-lg font-bold text-slate-800">
+                                Matrículas pendentes
+                            </h2>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                {dashboardData.matriculasPendentes > 0
+                                    ? `Você possui ${dashboardData.matriculasPendentes} matrícula(s) aguardando análise.`
+                                    : "Nenhuma matrícula aguardando análise no momento."}
+                            </p>
+                        </div>
+                    </div>
+
+                    {dashboardData.matriculasPendentes > 0 && (
+                        <Link
+                            to="/app/matricula"
+                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 xl:w-auto"
+                        >
+                            Analisar matrículas
+                            <ArrowRight size={18} />
+                        </Link>
+                    )}
+
+                </section>
+            )}
+
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold text-slate-800">
@@ -204,7 +237,7 @@ export function HomePage() {
                         {error}
                     </p>
                 ) : dashboardData ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-3">
 
                         {tab === "geral" && (
                             <>
@@ -274,40 +307,6 @@ export function HomePage() {
                     </div>
                 ) : null}
             </section>
-
-            {!loading && !error && dashboardData && (
-                <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-
-                    <div className="flex items-center gap-4">
-                        <div className="rounded-xl bg-amber-100 p-3 text-amber-600">
-                            <ClipboardList size={26} />
-                        </div>
-
-                        <div>
-                            <h2 className="text-lg font-bold text-slate-800">
-                                Matrículas pendentes
-                            </h2>
-
-                            <p className="mt-1 text-sm text-slate-500">
-                                {dashboardData.matriculasPendentes > 0
-                                    ? `Você possui ${dashboardData.matriculasPendentes} matrícula(s) aguardando análise.`
-                                    : "Nenhuma matrícula aguardando análise no momento."}
-                            </p>
-                        </div>
-                    </div>
-
-                    {dashboardData.matriculasPendentes > 0 && (
-                        <Link
-                            to="/app/matricula"
-                            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
-                        >
-                            Analisar matrículas
-                            <ArrowRight size={18} />
-                        </Link>
-                    )}
-
-                </section>
-            )}
         </div >
     );
 }

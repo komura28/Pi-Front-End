@@ -104,9 +104,9 @@ export function ProfessorTurmasPage() {
     );
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
-            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
                 <div className="mb-3 flex items-center gap-2 text-blue-200">
                     <Users size={20} />
                     <span className="text-sm font-semibold">
@@ -114,11 +114,11 @@ export function ProfessorTurmasPage() {
                     </span>
                 </div>
 
-                <h1 className="text-3xl font-bold">
+                <h1 className="break-words text-2xl font-bold sm:text-3xl">
                     Minhas Turmas
                 </h1>
 
-                <p className="mt-3 text-blue-100">
+                <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">
                     Acompanhe suas turmas e atividades de ensino.
                 </p>
             </section>
@@ -133,9 +133,9 @@ export function ProfessorTurmasPage() {
                 </p>
             ) : (
                 <>
-                    <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <section className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
 
-                        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                             <div>
                                 <p className="text-sm text-slate-500">
                                     Minhas Turmas
@@ -149,7 +149,7 @@ export function ProfessorTurmasPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                             <div>
                                 <p className="text-sm text-slate-500">
                                     Aulas Vinculadas
@@ -164,7 +164,7 @@ export function ProfessorTurmasPage() {
                         </div>
                     </section>
 
-                    <section>
+                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                         <h2 className="mb-5 text-xl font-bold text-slate-800">
                             Turmas vinculadas
                         </h2>
@@ -174,14 +174,14 @@ export function ProfessorTurmasPage() {
                                 Nenhuma turma vinculada ao professor.
                             </div>
                         ) : (
-                            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                            <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 sm:gap-6 2xl:grid-cols-3">
                                 {turmas.map((turma) => (
                                     <article
                                         key={turma.id}
                                         className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
                                     >
 
-                                        <div className="bg-[#0F172A] p-6 text-white">
+                                        <div className="bg-[#0F172A] p-4 text-white sm:p-6">
 
                                             <div className="mb-4 flex items-center justify-between">
                                                 <GraduationCap
@@ -194,13 +194,13 @@ export function ProfessorTurmasPage() {
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-xl font-bold">
+                                            <h3 className="break-words text-lg font-bold sm:text-xl">
                                                 {turma.curso}
                                             </h3>
 
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4 p-6">
+                                        <div className="grid min-w-0 grid-cols-2 gap-3 p-4 sm:gap-4 sm:p-5">
 
                                             <div>
                                                 <p className="text-sm text-slate-500">
@@ -212,18 +212,18 @@ export function ProfessorTurmasPage() {
                                             </div>
 
                                             <div>
-                                                <p className="flex items-center gap-2 text-sm text-slate-500">
+                                                <p className="flex flex-wrap items-center gap-1 text-xs text-slate-500 sm:gap-2 sm:text-sm">
                                                     <CalendarCheck2 size={16} />
                                                     Agendadas
                                                 </p>
-                                                <p className="mt-2 text-2xl font-bold text-blue-600">
+                                                <p className="text-xs text-slate-500 sm:text-sm">
                                                     {turma.aulasAgendadas}
                                                 </p>
                                             </div>
 
                                         </div>
 
-                                        <div className="border-t border-slate-100 p-5">
+                                        <div className="border-t border-slate-100 p-4 sm:p-5">
 
                                             <button
                                                 type="button"

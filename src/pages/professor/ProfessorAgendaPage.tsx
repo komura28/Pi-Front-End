@@ -173,9 +173,9 @@ export function ProfessorAgendaPage() {
     );
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
-            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
                 <div className="mb-3 flex items-center gap-2 text-blue-200">
                     <CalendarDays size={20} />
                     <span className="text-sm font-semibold">
@@ -183,11 +183,11 @@ export function ProfessorAgendaPage() {
                     </span>
                 </div>
 
-                <h1 className="text-3xl font-bold">
+                <h1 className="break-words text-2xl font-bold sm:text-3xl">
                     Minha Agenda
                 </h1>
 
-                <p className="mt-3 text-blue-100">
+                <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">
                     Consulte e acompanhe suas aulas no Aticurando.
                 </p>
             </section>
@@ -202,7 +202,7 @@ export function ProfessorAgendaPage() {
             {!loading && !erro && (
                 <section
                     aria-label="Resumo das aulas"
-                    className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                    className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 2xl:grid-cols-3"
                 >
                     <ProfessorStatCard
                         titulo="Aulas Agendadas"
@@ -224,19 +224,19 @@ export function ProfessorAgendaPage() {
                 </section>
             )}
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
                 <h2 className="mb-4 text-lg font-bold text-slate-800">
                     Filtrar aulas
                 </h2>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
                     {filtros.map((filtro) => (
                         <button
                             key={filtro.valor}
                             type="button"
                             onClick={() => setFiltroStatus(filtro.valor)}
                             aria-pressed={filtroStatus === filtro.valor}
-                            className={`cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-colors ${filtroStatus === filtro.valor
+                            className={`min-w-0 cursor-pointer rounded-full px-3 py-3 text-xs font-semibold transition-colors sm:px-5 sm:py-2 sm:text-sm ${filtroStatus === filtro.valor
                                 ? "bg-blue-600 text-white shadow-sm"
                                 : "bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
                                 }`}
@@ -246,9 +246,9 @@ export function ProfessorAgendaPage() {
                     ))}
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 gap-4 border-t border-slate-200 pt-6 sm:grid-cols-2">
+                <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 border-t border-slate-200 pt-4 sm:mt-6 sm:grid-cols-2 sm:pt-6">
 
-                    <div>
+                    <div className="min-w-0">
                         <label
                             htmlFor="data-inicial"
                             className="mb-2 block text-sm font-semibold text-slate-700"
@@ -261,11 +261,11 @@ export function ProfessorAgendaPage() {
                             type="date"
                             value={dataInicial}
                             onChange={(e) => setDataInicial(e.target.value)}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            className="w-full min-w-0 max-w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4"
                         />
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                         <label
                             htmlFor="data-final"
                             className="mb-2 block text-sm font-semibold text-slate-700"
@@ -278,7 +278,7 @@ export function ProfessorAgendaPage() {
                             type="date"
                             value={dataFinal}
                             onChange={(e) => setDataFinal(e.target.value)}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            className="w-full min-w-0 max-w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4"
                         />
                     </div>
 
@@ -298,7 +298,7 @@ export function ProfessorAgendaPage() {
                             setDataInicial("");
                             setDataFinal("");
                         }}
-                        className="cursor-pointer rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100"
+                        className="w-full cursor-pointer rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 sm:w-auto"
                     >
                         Limpar filtros
                     </button>
@@ -314,7 +314,7 @@ export function ProfessorAgendaPage() {
                 </p>
             )}
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
                 <h2 className="mb-6 text-xl font-bold text-slate-800">
                     Minhas Aulas
@@ -342,17 +342,17 @@ export function ProfessorAgendaPage() {
                         {aulasOrdenadas.map((item) => (
                             <article
                                 key={item._id}
-                                className="rounded-xl border border-slate-200 bg-slate-50 p-5 transition-colors hover:bg-blue-50"
+                                className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-3 transition-colors hover:bg-blue-50 sm:p-5"
                             >
-                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
 
-                                    <div>
+                                    <div className="break-words text-base font-bold text-slate-800 sm:text-lg">
                                         <h3 className="text-lg font-bold text-slate-800">
                                             {item.aula?.titulo ?? "Aula sem título"}
                                         </h3>
 
-                                        <p className="mt-1 flex items-center gap-2 text-sm text-slate-500">
-                                            <BookOpen size={16} />
+                                        <p className="mt-1 flex min-w-0 items-start gap-2 break-words text-sm text-slate-500">
+                                            <BookOpen size={16} className="shrink-0" />
                                             {item.turma?.curso?.name ?? "Curso não informado"}
                                             {" • "}
                                             {item.turma?.turno ?? "Turno não informado"}
@@ -365,7 +365,7 @@ export function ProfessorAgendaPage() {
 
                                 </div>
 
-                                <div className="mt-5 flex flex-wrap gap-6 border-t border-slate-200 pt-4">
+                                <div className="mt-4 flex flex-col gap-3 border-t border-slate-200 pt-4 sm:mt-5 sm:flex-row sm:flex-wrap sm:gap-6">
 
                                     <div className="flex items-center gap-2 text-sm text-slate-600">
                                         <CalendarDays size={18} className="text-blue-600" />
@@ -415,12 +415,12 @@ export function ProfessorAgendaPage() {
                                         </div>
                                     )}
 
-                                <div className="mt-5 flex flex-wrap justify-end gap-3">
+                                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
 
                                     <button
                                         type="button"
                                         onClick={() => setAulaSelecionada(item)}
-                                        className="cursor-pointer rounded-xl border border-blue-200 bg-white px-5 py-2.5 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-50"
+                                        className="w-full cursor-pointer rounded-xl border border-blue-200 bg-white px-5 py-3 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-50 sm:w-auto"
                                     >
                                         Ver detalhes
                                     </button>
@@ -431,7 +431,7 @@ export function ProfessorAgendaPage() {
                                             onClick={() =>
                                                 navigate(`/professor/aulas/${item._id}/chamada`)
                                             }
-                                            className="cursor-pointer rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                                            className="w-full cursor-pointer rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
                                         >
                                             {item.status === "REALIZADA"
                                                 ? "Consultar chamada"

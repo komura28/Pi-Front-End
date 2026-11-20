@@ -353,7 +353,7 @@ export function ProfessorChamadaPage() {
     }, [confirmarAntecipada]);
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <Link
                 to="/professor/turmas"
@@ -363,7 +363,7 @@ export function ProfessorChamadaPage() {
                 Voltar para Minhas Turmas
             </Link>
 
-            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
 
                 <div className="mb-3 flex items-center gap-2 text-blue-200">
                     <ClipboardCheck size={20} />
@@ -373,11 +373,11 @@ export function ProfessorChamadaPage() {
                     </span>
                 </div>
 
-                <h1 className="text-3xl font-bold">
+                <h1 className="break-words text-2xl font-bold sm:text-3xl">
                     Realizar Chamada
                 </h1>
 
-                <p className="mt-3 text-blue-100">
+                <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">
                     Registre a presença dos alunos e as observações da aula.
                 </p>
             </section>
@@ -411,7 +411,7 @@ export function ProfessorChamadaPage() {
                 </p>
             ) : (
                 <>
-                    <section className="grid gap-4 sm:grid-cols-3">
+                    <section className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-3">
 
                         {[
                             {
@@ -432,7 +432,7 @@ export function ProfessorChamadaPage() {
                         ].map((item) => (
                             <div
                                 key={item.titulo}
-                                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                                className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6"
                             >
                                 <div>
                                     <p className="text-sm text-slate-500">
@@ -453,7 +453,7 @@ export function ProfessorChamadaPage() {
 
                     </section>
 
-                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
                         <h2 className="mb-5 text-xl font-bold text-slate-800">
                             Alunos matriculados ({alunos.length})
@@ -468,21 +468,21 @@ export function ProfessorChamadaPage() {
                                 {alunos.map((matricula) => (
                                     <article
                                         key={matricula._id}
-                                        className="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center"
+                                        className="flex min-w-0 flex-col justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-4 xl:flex-row xl:items-center"
                                     >
-                                        <div>
-                                            <h3 className="font-semibold text-slate-800">
+                                        <div className="min-w-0">
+                                            <h3 className="break-words font-semibold text-slate-800">
                                                 {matricula.user?.name ??
                                                     "Aluno não encontrado"}
                                             </h3>
 
-                                            <p className="mt-1 text-sm text-slate-500">
+                                            <p className="mt-1 break-all text-sm text-slate-500">
                                                 {matricula.user?.email ??
                                                     "E-mail indisponível"}
                                             </p>
                                         </div>
 
-                                        <div className="flex gap-2">
+                                        <div className="grid w-full grid-cols-2 gap-2 xl:flex xl:w-auto xl:shrink-0">
 
                                             <button
                                                 type="button"
@@ -495,7 +495,7 @@ export function ProfessorChamadaPage() {
                                                         "PRESENTE"
                                                     )
                                                 }
-                                                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${presencas[matricula._id] === "PRESENTE"
+                                                className={`min-h-11 w-full cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold transition-colors xl:w-auto xl:px-4 ${presencas[matricula._id] === "PRESENTE"
                                                     ? "bg-green-600 text-white"
                                                     : "border border-slate-300 bg-white text-slate-600 hover:bg-green-50"
                                                     }`}
@@ -514,7 +514,7 @@ export function ProfessorChamadaPage() {
                                                         "FALTA"
                                                     )
                                                 }
-                                                className={`cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${presencas[matricula._id] === "FALTA"
+                                                className={`min-h-11 w-full cursor-pointer rounded-xl px-3 py-3 text-sm font-semibold transition-colors xl:w-auto xl:px-4 ${presencas[matricula._id] === "FALTA"
                                                     ? "bg-red-600 text-white"
                                                     : "border border-slate-300 bg-white text-slate-600 hover:bg-red-50"
                                                     }`}
@@ -529,7 +529,7 @@ export function ProfessorChamadaPage() {
                         )}
                     </section>
 
-                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
                         {aulaAtual?.status === "REALIZADA" && (
                             <div className="mb-5 rounded-xl border border-green-200 bg-green-50 p-5">
@@ -560,7 +560,7 @@ export function ProfessorChamadaPage() {
                             maxLength={1000}
                             rows={4}
                             placeholder="Descreva como foi a aula..."
-                            className="w-full resize-y rounded-xl border border-slate-300 p-4 text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            className="w-full min-w-0 resize-y rounded-xl border border-slate-300 p-3 text-base text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:p-4"
                         />
 
                         {erroSalvar && (
@@ -590,7 +590,7 @@ export function ProfessorChamadaPage() {
                                     alunos.length === 0 ||
                                     totalPendentes > 0
                                 }
-                                className="cursor-pointer rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="w-full cursor-pointer rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                             >
                                 {salvando
                                     ? "Salvando..."
@@ -602,7 +602,7 @@ export function ProfessorChamadaPage() {
                     </section>
 
                     {aulaAtual?.status === "AGENDADA" && (
-                        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
                             <h2 className="text-xl font-bold text-slate-800">
                                 Finalização da aula
@@ -630,7 +630,7 @@ export function ProfessorChamadaPage() {
                                     salvando ||
                                     finalizando
                                 }
-                                className="mt-5 cursor-pointer rounded-xl bg-[#0F172A] px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="mt-5 w-full cursor-pointer rounded-xl bg-[#0F172A] px-6 py-3 font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                             >
                                 {finalizando ? "Finalizando..." : "Finalizar aula"}
                             </button>
@@ -654,7 +654,7 @@ export function ProfessorChamadaPage() {
                     setConfirmarAntecipada(false);
                 }}
                 aria-labelledby="titulo-finalizacao"
-                className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white p-6 shadow-2xl backdrop:bg-slate-900/60"
+                className="m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white p-4 shadow-2xl backdrop:bg-slate-900/60 sm:p-6"
             >
                 <h2
                     id="titulo-finalizacao"
@@ -669,7 +669,7 @@ export function ProfessorChamadaPage() {
                     e a chamada será contabilizada na frequência.
                 </p>
 
-                <div className="mt-6 flex flex-wrap justify-end gap-3">
+                <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
                     <button
                         type="button"
                         onClick={() => setConfirmarAntecipada(false)}

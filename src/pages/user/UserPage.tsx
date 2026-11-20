@@ -208,16 +208,16 @@ export function UserPage() {
     ];
 
     if (loading) {
-        return <div className="p-8"><p>Carregando...</p></div>;
+        return <div className="p-4 sm:p-8"><p>Carregando...</p></div>;
     }
 
     if (error) {
-        return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
+        return <div className="p-4 sm:p-8"><p>Erro: {error}</p></div>;
     }
 
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
             <PageHeader
                 titulo="Gerenciamento de Usuários"
                 descricao="Consulte e gerencie os usuários cadastrados no Aticurando."
@@ -227,7 +227,7 @@ export function UserPage() {
                     <button
                         type="button"
                         onClick={() => navigate("/app/register-professor")}
-                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto sm:text-base"
                     >
                         <UserPlus size={18} />
                         Cadastrar professor
@@ -235,7 +235,7 @@ export function UserPage() {
                 }
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5 lg:p-6">
                 <div className="mb-6">
                     <h2 className="text-xl font-bold text-slate-800">
                         Usuários cadastrados
@@ -246,8 +246,8 @@ export function UserPage() {
                     </p>
                 </div>
 
-                <div className="mb-6 grid grid-cols-1 gap-3 lg:grid-cols-3">
-                    <div className="relative">
+                <div className="mb-4 grid min-w-0 grid-cols-1 gap-3 sm:mb-6 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="relative min-w-0 sm:col-span-2 xl:col-span-1">
                         <Search
                             size={18}
                             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -273,7 +273,7 @@ export function UserPage() {
                             setFiltroPapel(e.target.value);
                             setPaginaAtual(1);
                         }}
-                        className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        className="w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     >
                         <option value="TODOS">Todos os perfis</option>
                         <option value="ALUNO">Alunos</option>
@@ -288,7 +288,7 @@ export function UserPage() {
                             setFiltroSituacao(e.target.value);
                             setPaginaAtual(1);
                         }}
-                        className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        className="w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     >
                         <option value="TODOS">Todas as situações</option>
                         <option value="ATIVOS">Ativos</option>

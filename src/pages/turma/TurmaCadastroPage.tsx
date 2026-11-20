@@ -114,7 +114,7 @@ export function TurmaCadastroPage() {
     }
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <PageHeader
                 titulo="Cadastrar turma"
@@ -125,7 +125,7 @@ export function TurmaCadastroPage() {
                     <button
                         type="button"
                         onClick={() => navigate("/app/turma")}
-                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto sm:text-base"
                     >
                         <ArrowLeft size={18} />
                         Voltar às turmas
@@ -137,15 +137,15 @@ export function TurmaCadastroPage() {
                 onSubmit={handleSubmit(handleCadastro)}
                 className="space-y-6"
             >
-                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
 
-                    <div className="mb-6 flex items-center gap-3">
+                    <div className="mb-4 flex items-start gap-3 sm:mb-6 sm:items-center">
                         <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-                            <BookOpen size={22} />
+                            <BookOpen size={22} className="shrink-0 rounded-xl bg-blue-50 p-2.5 text-blue-600 sm:p-3" />
                         </div>
 
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-800">
+                        <div className="min-w-0">
+                            <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
                                 Informações da turma
                             </h2>
 
@@ -156,7 +156,7 @@ export function TurmaCadastroPage() {
                     </div>
 
                     <div className="space-y-5">
-                        <div>
+                        <div className="min-w-0">
                             <label
                                 htmlFor="turma-curso"
                                 className="mb-2 block text-sm font-semibold text-slate-700"
@@ -166,7 +166,7 @@ export function TurmaCadastroPage() {
 
                             <select
                                 id="turma-curso"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full min-w-0 max-w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-base text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-sm"
                                 {...register("curso", {
                                     required: "O curso é obrigatório"
                                 })}
@@ -192,9 +192,9 @@ export function TurmaCadastroPage() {
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
 
-                            <div>
+                            <div className="min-w-0">
                                 <label
                                     htmlFor="turma-capacidade"
                                     className="mb-2 block text-sm font-semibold text-slate-700"
@@ -208,7 +208,7 @@ export function TurmaCadastroPage() {
                                     min={1}
                                     step={1}
                                     placeholder="Número de vagas"
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                    className="w-full min-w-0 max-w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-base text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-sm"
                                     {...register("capacidade", {
                                         valueAsNumber: true,
                                         required: "A capacidade é obrigatória",
@@ -229,7 +229,7 @@ export function TurmaCadastroPage() {
                                 )}
                             </div>
 
-                            <div>
+                            <div className="min-w-0">
                                 <label
                                     htmlFor="turma-turno"
                                     className="mb-2 block text-sm font-semibold text-slate-700"
@@ -239,7 +239,7 @@ export function TurmaCadastroPage() {
 
                                 <select
                                     id="turma-turno"
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                    className="w-full min-w-0 max-w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-base text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-sm"
                                     {...register("turno", {
                                         required: "O turno é obrigatório"
                                     })}
@@ -263,15 +263,15 @@ export function TurmaCadastroPage() {
                     </div>
                 </section>
 
-                <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
 
-                    <div className="mb-6 flex items-center gap-3">
+                    <div className="mb-4 flex items-start gap-3 sm:mb-6 sm:items-center">
                         <div className="rounded-xl bg-blue-50 p-3 text-blue-600">
-                            <CalendarDays size={22} />
+                            <CalendarDays size={22} className="shrink-0 rounded-xl bg-blue-50 p-2.5 text-blue-600 sm:p-3" />
                         </div>
 
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-800">
+                        <div className="min-w-0">
+                            <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
                                 Período da turma
                             </h2>
 
@@ -281,9 +281,9 @@ export function TurmaCadastroPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
 
-                        <div>
+                        <div className="min-w-0">
                             <label
                                 htmlFor="turma-inicio"
                                 className="mb-2 block text-sm font-semibold text-slate-700"
@@ -294,7 +294,7 @@ export function TurmaCadastroPage() {
                             <input
                                 id="turma-inicio"
                                 type="date"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full min-w-0 max-w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-base text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-sm"
                                 {...register("dataInicio", {
                                     valueAsDate: true,
                                     required: "A data de início é obrigatória"
@@ -308,7 +308,7 @@ export function TurmaCadastroPage() {
                             )}
                         </div>
 
-                        <div>
+                        <div className="min-w-0">
                             <label
                                 htmlFor="turma-fim"
                                 className="mb-2 block text-sm font-semibold text-slate-700"
@@ -319,7 +319,7 @@ export function TurmaCadastroPage() {
                             <input
                                 id="turma-fim"
                                 type="date"
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full min-w-0 max-w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-base text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-sm"
                                 {...register("dataFim", {
                                     valueAsDate: true,
                                     required: "A data de término é obrigatória",

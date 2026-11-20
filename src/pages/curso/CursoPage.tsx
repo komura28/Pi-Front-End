@@ -430,16 +430,16 @@ export function CursoPage() {
     }
 
     if (loading) {
-        return <div className="p-8"><p>Carregando...</p></div>;
+        return <div className="p-4 sm:p-8"><p>Carregando...</p></div>;
     }
 
     if (error) {
-        return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
+        return <div className="p-4 sm:p-8"><p>Erro: {error}</p></div>;
     }
 
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <PageHeader
                 titulo="Gerenciamento de Cursos"
@@ -450,7 +450,7 @@ export function CursoPage() {
                     <button
                         type="button"
                         onClick={() => navigate("/app/register-curso")}
-                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto sm:text-base"
                     >
                         <Plus size={18} />
                         Novo Curso
@@ -458,9 +458,9 @@ export function CursoPage() {
                 }
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5 lg:p-6">
                 <div className="mb-6">
-                    <h2 className="text-xl font-bold text-slate-800">
+                    <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
                         Cursos cadastrados
                     </h2>
                     <p className="mt-2 text-sm text-slate-500">
