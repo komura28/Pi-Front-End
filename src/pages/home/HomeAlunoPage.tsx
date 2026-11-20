@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { getTurma } from "../../services/authService";
-import type { TurmaMatricula } from "../../types/auth/auth-types";
+import type {
+    TurmaMatricula,
+    authCurso
+} from "../../types/auth/auth-types";
 import { CardTurma } from "../../components/CardTurma";
 import { useAuth } from "../../contexts/AuthContext";
 import { ProfessorStatCard } from "../../components/professor/ProfessorStatCard";
@@ -28,7 +31,14 @@ import {
     BookOpen,
     Clock3,
     Search,
+    ArrowLeft,
+    ArrowRight,
+    Users,
+    Sunrise,
+    Sun,
+    Moon
 } from "lucide-react";
+import { Pagination } from "../../components/ui/Pagination";
 
 
 
@@ -37,6 +47,34 @@ const normalizar = (texto: string) =>
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
+
+function obterTurno(item: TurmaMatricula) {
+    return normalizar(
+        item.turma.turno?.trim() || "Não informado"
+    );
+}
+
+function formatarTurno(turno: string) {
+    return ROTULOS_TURNO[turno] ?? turno;
+}
+
+interface CursoComTurmas {
+    curso: authCurso;
+    turmas: TurmaMatricula[];
+}
+
+const ROTULOS_TURNO: Record<string, string> = {
+    manha: "Manhã",
+    tarde: "Tarde",
+    noite: "Noite",
+    "nao informado": "Não informado"
+};
+
+const ORDEM_TURNO: Record<string, number> = {
+    manha: 1,
+    tarde: 2,
+    noite: 3
+};
 
 
 export function HomeAlunoPage() {
@@ -76,8 +114,16 @@ export function HomeAlunoPage() {
 
     const [paginaAtual, setPaginaAtual] = useState(1);
     const itensPorPagina = 6;
+    const [paginaTurmas, setPaginaTurmas] = useState(1);
+    const turmasPorPagina = 6;
 
     const [busca, setBusca] = useState("");
+
+    const [cursoSelecionadoId, setCursoSelecionadoId] =
+        useState<string | null>(null);
+
+    const [turnoSelecionado, setTurnoSelecionado] =
+        useState("todos");
 
     useEffect(() => {
         let ativo = true;
@@ -236,25 +282,95 @@ export function HomeAlunoPage() {
         },
     ];
 
+    const cursosPorId = new Map<string, CursoComTurmas>();
+
+    for (const item of turmas) {
+        const curso = item.turma.curso;
+
+        if (!curso?._id || item.vagasDisponiveis <= 0) {
+            continue;
+        }
+
+        const grupoExistente = cursosPorId.get(curso._id);
+
+        if (grupoExistente) {
+            grupoExistente.turmas.push(item);
+        } else {
+            cursosPorId.set(curso._id, {
+                curso,
+                turmas: [item]
+            });
+        }
+    }
+
+    const cursosAgrupados = Array.from(
+        cursosPorId.values()
+    ).sort((a, b) =>
+        a.curso.name.localeCompare(b.curso.name, "pt-BR")
+    );
+
     const termoBusca = normalizar(busca.trim());
 
-    const turmasFiltradas = turmas.filter(({ turma }) =>
+    const cursosFiltrados = cursosAgrupados.filter(({ curso, turmas }) =>
         [
-            turma.curso?.name,
-            turma.curso?.description,
-            turma.turno
+            curso.name,
+            curso.description,
+            ...turmas.map((item) => obterTurno(item))
         ].some((campo) =>
             normalizar(campo ?? "").includes(termoBusca)
         )
     );
 
+    const totalPaginas = Math.ceil(
+        cursosFiltrados.length / itensPorPagina
+    );
+
     const indiceUltimoItem = paginaAtual * itensPorPagina;
     const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
 
-    const totalPaginas = Math.ceil(turmasFiltradas.length / itensPorPagina);
-    const turmasPaginadas = turmasFiltradas.slice(
+    const cursosPaginados = cursosFiltrados.slice(
         indicePrimeiroItem,
         indiceUltimoItem
+    );
+
+    const cursoSelecionado = cursosAgrupados.find(
+        (item) => item.curso._id === cursoSelecionadoId
+    );
+
+    const turmasPorTurno = new Map<string, TurmaMatricula[]>();
+
+    for (const item of cursoSelecionado?.turmas ?? []) {
+        const turno = obterTurno(item);
+        const grupo = turmasPorTurno.get(turno);
+
+        if (grupo) {
+            grupo.push(item);
+        } else {
+            turmasPorTurno.set(turno, [item]);
+        }
+    }
+
+    const gruposTurno = Array.from(
+        turmasPorTurno.entries()
+    ).sort(([a], [b]) =>
+        (ORDEM_TURNO[a] ?? 99) - (ORDEM_TURNO[b] ?? 99)
+    );
+
+    const gruposTurnoFiltrados = gruposTurno.filter(
+        ([turno]) =>
+            turnoSelecionado === "todos" ||
+            turnoSelecionado === turno
+    );
+
+    const turmasFiltradas = gruposTurnoFiltrados.flatMap(
+        ([, turmas]) => turmas
+    );
+
+    const totalTurmasFiltradas = turmasFiltradas.length;
+
+    const turmasPaginadas = turmasFiltradas.slice(
+        (paginaTurmas - 1) * turmasPorPagina,
+        paginaTurmas * turmasPorPagina
     );
 
     if (loading) {
@@ -391,8 +507,12 @@ export function HomeAlunoPage() {
             </section>
 
 
-            <section aria-labelledby="titulo-oportunidades" className="mt-4">
-                <div className="mb-6">
+
+            <section
+                aria-labelledby="titulo-oportunidades"
+                className="mt-4 space-y-5"
+            >
+                <div>
                     <h2
                         id="titulo-oportunidades"
                         className="text-xl font-bold text-slate-800 sm:text-2xl"
@@ -401,86 +521,270 @@ export function HomeAlunoPage() {
                     </h2>
 
                     <p className="mt-2 text-sm text-slate-500">
-                        Conheça as turmas disponíveis e encontre
-                        novas atividades para participar.
+                        Conheça os cursos disponíveis e encontre
+                        a turma ideal para você.
                     </p>
                 </div>
 
-                <div className="relative mb-4 w-full max-w-xl sm:mb-6">
-                    <Search
-                        aria-hidden="true"
-                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                        size={18}
-                    />
-
-                    <input
-                        type="search"
-                        value={busca}
-                        onChange={(e) => {
-                            setBusca(e.target.value);
-                            setPaginaAtual(1);
-                        }}
-                        placeholder="Pesquisar turmas..."
-                        aria-label="Pesquisar turmas"
-                        className="w-full rounded-lg border border-slate-300 bg-white py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-base"
-                    />
-                </div>
-
-
-                {turmasFiltradas.length > 0 ? (
+                {!cursoSelecionado && (
                     <>
-                        <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-                            {turmasPaginadas.map((turma) => (
-                                <CardTurma
-                                    key={turma.turma._id}
-                                    turma={turma}
-                                />
-                            ))}
+                        <div className="relative w-full max-w-xl">
+                            <Search
+                                aria-hidden="true"
+                                size={18}
+                                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                            />
+
+                            <input
+                                type="search"
+                                value={busca}
+                                onChange={(e) => {
+                                    setBusca(e.target.value);
+                                    setPaginaAtual(1);
+                                }}
+                                placeholder="Pesquisar cursos..."
+                                aria-label="Pesquisar cursos"
+                                className="w-full min-w-0 rounded-xl border border-slate-300 bg-white py-3 pl-12 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
                         </div>
 
+                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+
+                            {cursosPaginados.map(({ curso, turmas }) => {
+                                const turnos = Array.from(
+                                    new Set(turmas.map(obterTurno))
+                                );
+
+                                return (
+                                    <button
+                                        key={curso._id}
+                                        type="button"
+                                        onClick={() => {
+                                            setCursoSelecionadoId(curso._id);
+                                            setTurnoSelecionado("todos");
+                                            setPaginaTurmas(1);
+                                        }}
+                                        className="group flex min-w-0 cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-blue-300 hover:shadow-md sm:p-6"
+                                    >
+                                        <span className="mb-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                                            <BookOpen size={28} />
+                                        </span>
+
+                                        <span className="break-words text-xl font-bold text-slate-800">
+                                            {curso.name}
+                                        </span>
+
+                                        <span className="mt-2 mb-5 break-words text-sm leading-relaxed text-slate-500">
+                                            {curso.description ||
+                                                "Conheça as turmas disponíveis neste curso."}
+                                        </span>
+
+                                        <span className="mt-auto space-y-4 border-t border-slate-200 pt-4">
+
+                                            <span className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                                                <Users
+                                                    size={18}
+                                                    className="shrink-0 text-blue-600"
+                                                />
+
+                                                {turmas.length} turma(s) com vagas
+                                            </span>
+
+                                            <span className="flex flex-wrap gap-2">
+                                                {turnos.map((turno) => (
+                                                    <span
+                                                        key={turno}
+                                                        className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"
+                                                    >
+                                                        {formatarTurno(turno)}
+                                                    </span>
+                                                ))}
+                                            </span>
+
+                                            <span className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition group-hover:bg-blue-700">
+                                                Ver turmas
+                                                <ArrowRight size={18} />
+                                            </span>
+
+                                        </span>
+                                    </button>
+                                );
+                            })}
+
+                        </div>
+
+                        {cursosFiltrados.length === 0 && (
+                            <p className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+                                {busca.trim()
+                                    ? "Nenhum curso encontrado para essa pesquisa."
+                                    : "Nenhum curso com vagas disponíveis no momento."}
+                            </p>
+                        )}
+
                         {totalPaginas > 1 && (
-                            <nav
-                                aria-label="Paginação das turmas"
-                                className="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm sm:gap-3"
-                            >
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setPaginaAtual((p) => Math.max(p - 1, 1))
-                                    }
-                                    disabled={paginaAtual === 1}
-                                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                >
-                                    Anterior
-                                </button>
-
-                                <span className="text-slate-600" aria-live="polite">
-                                    Página {paginaAtual} de {totalPaginas}
-                                </span>
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setPaginaAtual((p) =>
-                                            Math.min(p + 1, totalPaginas)
-                                        )
-                                    }
-                                    disabled={paginaAtual === totalPaginas}
-                                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-md hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                >
-                                    Próxima
-                                </button>
-                            </nav>
+                            <div className="mt-6">
+                                <Pagination
+                                    paginaAtual={paginaAtual}
+                                    totalItens={cursosFiltrados.length}
+                                    itensPorPagina={itensPorPagina}
+                                    onPageChange={setPaginaAtual}
+                                />
+                            </div>
                         )}
                     </>
-                ) : (
-                    <p className="text-gray-600">
-                        {busca.trim()
-                            ? "Nenhuma turma encontrada para essa pesquisa."
-                            : "Nenhuma turma disponível no momento."}
-                    </p>
                 )}
+
+                {cursoSelecionado && (
+                    <div className="min-w-0 space-y-6">
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setCursoSelecionadoId(null);
+                                setTurnoSelecionado("todos");
+                                setPaginaTurmas(1);
+                            }}
+                            className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-800"
+                        >
+                            <ArrowLeft size={18} />
+                            Voltar aos cursos
+                        </button>
+
+                        <div className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-sm sm:p-8">
+
+                            <BookOpen
+                                size={32}
+                                className="mb-4 text-blue-200"
+                            />
+
+                            <h3 className="break-words text-2xl font-bold sm:text-3xl">
+                                {cursoSelecionado.curso.name}
+                            </h3>
+
+                            <p className="mt-3 break-words text-sm leading-relaxed text-blue-100 sm:text-base">
+                                {cursoSelecionado.curso.description}
+                            </p>
+
+                            <div className="mt-5 flex items-center gap-2 text-sm text-blue-200">
+                                <Users size={18} />
+
+                                {cursoSelecionado.turmas.length} turma(s)
+                                com vagas disponíveis
+                            </div>
+
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+
+                            <h3 className="mb-4 text-sm font-semibold text-slate-700">
+                                Filtrar por turno
+                            </h3>
+
+
+                            <div className="flex flex-wrap gap-2">
+
+                                {/* TODOS */}
+                                <button
+                                    type="button"
+                                    aria-pressed={turnoSelecionado === "todos"}
+                                    onClick={() => {
+                                        setTurnoSelecionado("todos");
+                                        setPaginaTurmas(1);
+                                    }}
+                                    className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${turnoSelecionado === "todos"
+                                            ? "bg-blue-600 text-white"
+                                            : "bg-slate-100 text-slate-600 hover:bg-blue-50"
+                                        }`}
+                                >
+                                    <Users size={17} aria-hidden="true" />
+                                    Todos
+                                </button>
+
+                                {/* MANHÃ, TARDE E NOITE */}
+                                {gruposTurno.map(([turno]) => {
+                                    const IconeTurno =
+                                        turno === "manha"
+                                            ? Sunrise
+                                            : turno === "tarde"
+                                                ? Sun
+                                                : turno === "noite"
+                                                    ? Moon
+                                                    : Clock3;
+
+                                    return (
+                                        <button
+                                            key={turno}
+                                            type="button"
+                                            aria-pressed={turnoSelecionado === turno}
+                                            onClick={() => {
+                                                setTurnoSelecionado(turno);
+                                                setPaginaTurmas(1);
+                                            }}
+                                            className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${turnoSelecionado === turno
+                                                    ? "bg-blue-600 text-white"
+                                                    : "bg-slate-100 text-slate-600 hover:bg-blue-50"
+                                                }`}
+                                        >
+                                            <IconeTurno size={17} aria-hidden="true" />
+                                            {formatarTurno(turno)}
+                                        </button>
+                                    );
+                                })}
+
+                            </div>
+
+                        </div>
+
+                        <div className="min-w-0 space-y-4">
+
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800 sm:text-xl">
+                                    Turmas disponíveis
+                                </h3>
+
+                                <p className="mt-1 text-sm text-slate-500">
+                                    {totalTurmasFiltradas} turma(s) com vagas
+                                </p>
+                            </div>
+
+                            <div
+                                className="flex w-full min-w-0 snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:gap-6"
+                                aria-label="Turmas disponíveis"
+                            >
+
+                                {turmasPaginadas.map((turma) => (
+                                    <div
+                                        key={turma.turma._id}
+                                        className="w-[85%] shrink-0 snap-start sm:w-[calc((100%-1.5rem)/2)] xl:w-[calc((100%-3rem)/3)]"
+                                    >
+                                        <CardTurma
+                                            turma={turma}
+                                            mostrarIconeTurno
+                                        />
+                                    </div>
+                                ))}
+
+                            </div>
+
+                        </div>
+
+
+                        {totalTurmasFiltradas > turmasPorPagina && (
+                            <div className="mt-6">
+                                <Pagination
+                                    paginaAtual={paginaTurmas}
+                                    totalItens={totalTurmasFiltradas}
+                                    itensPorPagina={turmasPorPagina}
+                                    onPageChange={setPaginaTurmas}
+                                />
+                            </div>
+                        )}
+
+                    </div>
+                )}
+
             </section>
+
         </main>
     );
 }
