@@ -177,9 +177,9 @@ export function ProfessorHomePage() {
     }, []);
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
-            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+            <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
 
                 <div className="relative z-10">
                     <div className="mb-4 flex items-center gap-2 text-blue-200">
@@ -189,18 +189,18 @@ export function ProfessorHomePage() {
                         </span>
                     </div>
 
-                    <h1 className="text-3xl font-bold md:text-4xl">
+                    <h1 className="break-words text-2xl font-bold sm:text-3xl lg:text-4xl">
                         Olá, {primeiroNome}!
                     </h1>
 
-                    <p className="mt-3 max-w-xl text-blue-100">
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
                         Bem-vindo ao seu espaço de ensino.
                         Acompanhe suas turmas, aulas e atividades
                         em um só lugar.
                     </p>
 
-                    <div className="mt-6 flex items-center gap-2 text-sm text-blue-200">
-                        <CalendarDays size={18} />
+                    <div className="mt-4 flex items-center gap-2 text-xs text-blue-200 sm:mt-6 sm:text-sm">
+                        <CalendarDays size={18} className="shrink-0" />
                         <span className="capitalize">
                             {dataAtual}
                         </span>
@@ -226,7 +226,7 @@ export function ProfessorHomePage() {
 
             <section
                 aria-label="Indicadores do professor"
-                className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+                className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 2xl:grid-cols-3"
             >
                 {indicadores.map((indicador) => (
                     <ProfessorStatCard
@@ -247,11 +247,17 @@ export function ProfessorHomePage() {
                     {erroAulas}
                 </p>
             ) : (
-                <>
-                    <ProximaAulaCard aula={proximaAula} />
+                <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 2xl:grid-cols-2">
 
-                    <AgendaResumo aulas={agenda} />
-                </>
+                    <div className="min-w-0">
+                        <ProximaAulaCard aula={proximaAula} />
+                    </div>
+
+                    <div className="min-w-0">
+                        <AgendaResumo aulas={agenda} />
+                    </div>
+
+                </div>
             )}
         </div>
     );

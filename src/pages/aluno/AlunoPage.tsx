@@ -93,7 +93,7 @@ export function AlunoPage() {
   ) ?? null;
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+    <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
       <PageHeader
         titulo="Alunos por Turma"
         descricao="Consulte os alunos matriculados e acompanhe a ocupação das turmas."
@@ -104,22 +104,21 @@ export function AlunoPage() {
       {loading ? (
         <p
           role="status"
-          className="rounded-xl bg-white p-8 text-center text-slate-500"
+          className="p-4 sm:p-8"
         >
           Carregando turmas e alunos...
         </p>
       ) : erro ? (
         <p
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700"
+          className="p-4 sm:p-8"
         >
           {erro}
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 2xl:grid-cols-[320px_minmax(0,1fr)]">
 
-          {/* SELEÇÃO DE TURMAS */}
-          <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
             <TurmaSelector
               turmas={turmasPaginadas}
               selecionadaId={turmaSelecionadaId}
@@ -145,8 +144,7 @@ export function AlunoPage() {
             )}
           </section>
 
-          {/* PAINEL DE ALUNOS */}
-          <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5 lg:p-6">
             <AlunosTurmaPanel
               key={turmaSelecionadaId ?? "sem-turma"}
               turma={turmaSelecionada}

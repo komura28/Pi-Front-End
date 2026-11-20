@@ -47,7 +47,7 @@ interface ModalAulaState {
 }
 
 const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100";
+    "w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-base text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 sm:px-4 sm:text-sm";
 
 export function CursoCadastroPage() {
     const navigate = useNavigate();
@@ -276,7 +276,7 @@ export function CursoCadastroPage() {
 
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <PageHeader
                 titulo="Cadastrar curso"
@@ -287,7 +287,7 @@ export function CursoCadastroPage() {
                     <button
                         type="button"
                         onClick={() => navigate("/app/curso")}
-                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto sm:text-base"
                     >
                         <ArrowLeft size={18} />
                         Voltar aos cursos
@@ -295,10 +295,10 @@ export function CursoCadastroPage() {
                 }
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
 
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-slate-800">
+                    <h2 className="text-xl font-bold text-slate-800 sm:text-2xl">
                         Informações do curso
                     </h2>
 
@@ -361,7 +361,7 @@ export function CursoCadastroPage() {
                             )}
                         </div>
 
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 md:p-6">
+                        <div className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:p-5 lg:p-6">
 
                             <div className="mb-5 flex items-center gap-3">
                                 <div className="rounded-xl bg-blue-100 p-3 text-blue-600">
@@ -435,9 +435,9 @@ export function CursoCadastroPage() {
                                 return (
                                     <div
                                         key={field.id}
-                                        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200"
+                                        className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-blue-200 sm:p-5"
                                     >
-                                        <div className="flex items-start justify-between gap-3">
+                                        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                             <div>
                                                 <h3 className="text-base font-bold text-slate-800">
                                                     {field.name}
@@ -473,7 +473,7 @@ export function CursoCadastroPage() {
                                         />
 
                                         <div className="mt-4 border-t border-gray-200 pt-3">
-                                            <div className="flex items-center justify-between gap-3">
+                                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                                 <p className="text-sm font-semibold text-gray-700">
                                                     {aulas.length} aula(s)
                                                 </p>
@@ -485,7 +485,7 @@ export function CursoCadastroPage() {
                                                             materiaIndex: index
                                                         })
                                                     }
-                                                    className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+                                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 sm:w-auto"
                                                 >
                                                     <Plus size={16} />
                                                     Adicionar aula
@@ -497,10 +497,10 @@ export function CursoCadastroPage() {
                                                     {aulas.map((aula, aulaIndex) => (
                                                         <div
                                                             key={aulaIndex}
-                                                            className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-3"
+                                                            className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 sm:gap-3 sm:p-3"
                                                         >
                                                             <div className="min-w-0">
-                                                                <p className="truncate text-sm font-semibold text-gray-800">
+                                                                <p className="break-words text-sm font-semibold text-gray-800">
                                                                     {aulaIndex + 1}. {aula.titulo}
                                                                 </p>
 

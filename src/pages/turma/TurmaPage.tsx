@@ -119,11 +119,11 @@ export function TurmaPage() {
     }, []);
 
     if (loading) {
-        return <div className="p-8"><p>Carregando...</p></div>;
+        return <div className="p-4 sm:p-8"><p>Carregando...</p></div>;
     }
 
     if (error) {
-        return <div className="p-8 text-red-600"><p>Erro: {error}</p></div>;
+        return <div className="p-4 sm:p-8"><p>Erro: {error}</p></div>;
     }
 
     function abrirModalEdicao(turma: authTurma) {
@@ -264,7 +264,7 @@ export function TurmaPage() {
     ];
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <PageHeader
                 titulo="Gerenciamento de Turmas"
@@ -275,7 +275,7 @@ export function TurmaPage() {
                     <button
                         type="button"
                         onClick={() => navigate("/app/register-turma")}
-                        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 font-semibold text-slate-900 transition hover:bg-blue-50"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 sm:w-auto sm:text-base"
                     >
                         <Plus size={18} />
                         Nova Turma
@@ -283,8 +283,8 @@ export function TurmaPage() {
                 }
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="mb-5 text-xl font-bold text-slate-800">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5 lg:p-6">
+                <h2 className="mb-4 text-lg font-bold text-slate-800 sm:mb-5 sm:text-xl">
                     Turmas cadastradas
                 </h2>
 

@@ -130,7 +130,7 @@ export function ProfessorFrequenciaPage() {
     );
 
     return (
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <Link
                 to="/professor/turmas"
@@ -140,7 +140,7 @@ export function ProfessorFrequenciaPage() {
                 Voltar para Minhas Turmas
             </Link>
 
-            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-8 text-white shadow-lg">
+            <section className="rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
                 <div className="mb-3 flex items-center gap-2 text-blue-200">
                     <ChartNoAxesColumn size={20} />
                     <span className="text-sm font-semibold">
@@ -148,11 +148,11 @@ export function ProfessorFrequenciaPage() {
                     </span>
                 </div>
 
-                <h1 className="text-3xl font-bold">
+                <h1 className="break-words text-2xl font-bold sm:text-3xl">
                     Frequência da Turma
                 </h1>
 
-                <p className="mt-3 text-blue-100">
+                <p className="mt-3 text-sm leading-relaxed text-blue-100 sm:text-base">
                     {nomeTurma || "Consulte presenças e faltas dos alunos."}
                 </p>
             </section>
@@ -171,7 +171,7 @@ export function ProfessorFrequenciaPage() {
                 </p>
             ) : (
                 <>
-                    <section className="grid gap-6 sm:grid-cols-3">
+                    <section className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 2xl:grid-cols-3">
                         <ProfessorStatCard
                             titulo="Alunos"
                             valor={alunos.length}
@@ -189,7 +189,7 @@ export function ProfessorFrequenciaPage() {
                         />
                     </section>
 
-                    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
 
                         <h2 className="mb-5 text-xl font-bold text-slate-800">
                             Frequência dos Alunos
@@ -204,29 +204,29 @@ export function ProfessorFrequenciaPage() {
                                 {alunos.map((aluno) => (
                                     <article
                                         key={aluno.matriculaId}
-                                        className="rounded-xl border border-slate-200 bg-slate-50 p-5"
+                                        className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-5"
                                     >
-                                        <div className="flex flex-wrap items-start justify-between gap-3">
-                                            <div>
-                                                <h3 className="font-semibold text-slate-800">
+                                        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                            <div className="min-w-0">
+                                                <h3 className="break-words font-semibold text-slate-800">
                                                     {aluno.nome}
                                                 </h3>
-                                                <p className="mt-1 text-sm text-slate-500">
+                                                <p className="mt-1 break-all text-sm text-slate-500">
                                                     {aluno.email}
                                                 </p>
                                             </div>
 
-                                            <span className="font-bold text-blue-700">
+                                            <span className="shrink-0 text-lg font-bold text-blue-700">
                                                 {aluno.frequenciaPercentual === null
                                                     ? "Sem registro"
                                                     : `${aluno.frequenciaPercentual.toFixed(2)}%`}
                                             </span>
                                         </div>
 
-                                        <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
+                                        <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600 sm:flex sm:flex-wrap sm:gap-4 sm:text-sm">
                                             <span>{aluno.presentes} presenças</span>
                                             <span>{aluno.faltas} faltas</span>
-                                            <span>
+                                            <span className="col-span-2">
                                                 {aluno.aulasContabilizadas} aulas contabilizadas
                                             </span>
                                         </div>

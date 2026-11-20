@@ -404,19 +404,19 @@ export function MatriculaPage() {
         ];
 
     if (loading) {
-        return <div className="p-8"><p>Carregando...</p></div>;
+        return <div className="p-4 sm:p-8"><p>Carregando...</p></div>;
     }
 
     if (loadError) {
         return (
-            <div className="p-8 text-red-600">
+            <div className="p-4 sm:p-8">
                 <p>Erro: {loadError}</p>
             </div>
         );
     }
 
     return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <PageHeader
                 titulo="Gerenciamento de Matrículas"
@@ -425,10 +425,10 @@ export function MatriculaPage() {
                 icone={ClipboardCheck}
             />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5 lg:p-6">
 
                 <div className="mb-6">
-                    <h2 className="text-xl font-bold text-slate-800">
+                    <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
                         Solicitações de matrícula
                     </h2>
 
@@ -437,7 +437,7 @@ export function MatriculaPage() {
                     </p>
                 </div>
 
-                <div className="mb-6 flex flex-wrap gap-2 border-b border-slate-200 pb-4">
+                <div className="mb-4 grid grid-cols-2 gap-2 border-b border-slate-200 pb-4 sm:mb-6 sm:flex sm:flex-wrap">
                     {abas.map((aba) => (
                         <button
                             key={aba.status}
@@ -447,7 +447,7 @@ export function MatriculaPage() {
                                 setPaginaAtual(1);
                             }}
                             aria-pressed={abaAtiva === aba.status}
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${abaAtiva === aba.status
+                            className={`flex min-w-0 items-center justify-center gap-1.5 rounded-xl px-2 py-3 text-xs font-semibold transition sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm ${abaAtiva === aba.status
                                 ? "bg-blue-600 text-white shadow-sm"
                                 : "bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-700"
                                 }`}
@@ -466,7 +466,7 @@ export function MatriculaPage() {
                     ))}
                 </div>
 
-                <div className="relative mb-6 max-w-lg">
+                <div className="relative mb-4 w-full max-w-lg sm:mb-6">
                     <Search
                         size={18}
                         className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
