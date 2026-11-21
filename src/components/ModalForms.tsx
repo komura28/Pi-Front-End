@@ -83,7 +83,7 @@ export function ModalForms({
             type="button"
             onClick={opNao}
             disabled={carregando}
-            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50"
+            className="w-full rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 sm:w-auto"
           >
             {visualizacao ? "Fechar" : "Cancelar"}
           </button>
@@ -98,7 +98,7 @@ export function ModalForms({
                   carregandoDados ||
                   !dados_formulario
                 }
-                className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50 sm:w-auto"
               >
                 <XCircle size={17} />
                 {carregando ? "Processando..." : "Recusar"}
@@ -112,7 +112,7 @@ export function ModalForms({
                   carregandoDados ||
                   !dados_formulario
                 }
-                className="flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-50 sm:w-auto"
               >
                 <CheckCircle2 size={17} />
                 {carregando ? "Processando..." : "Aprovar"}
@@ -122,11 +122,11 @@ export function ModalForms({
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         {erro && (
           <p
             role="alert"
-            className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+            className="break-words rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:p-4"
           >
             {erro}
           </p>
@@ -135,7 +135,7 @@ export function ModalForms({
         {erroDados && (
           <div
             role="alert"
-            className="space-y-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
+            className="min-w-0 space-y-3 break-words rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 sm:p-4"
           >
             <p>{erroDados}</p>
 
@@ -152,7 +152,7 @@ export function ModalForms({
         )}
 
         <section className="space-y-3">
-          <h3 className="font-bold text-slate-800">
+          <h3 className="break-words text-base font-bold text-slate-800 sm:text-lg">
             Dados do candidato
           </h3>
 
@@ -162,7 +162,7 @@ export function ModalForms({
             </p>
           )}
 
-          <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2 sm:p-4">
             <Campo titulo="Nome" valor={usuario?.name} />
             <Campo titulo="CPF" valor={usuario?.cpf} />
             <Campo titulo="E-mail" valor={usuario?.email} />
@@ -217,11 +217,11 @@ export function ModalForms({
         </section>
 
         <section className="space-y-3">
-          <h3 className="font-bold text-slate-800">
+          <h3 className="break-words text-base font-bold text-slate-800 sm:text-lg">
             Dados da candidatura
           </h3>
 
-          <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-2 sm:p-4">
             <Campo
               titulo="Curso"
               valor={matricula?.turma?.curso?.name}
