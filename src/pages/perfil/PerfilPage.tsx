@@ -227,6 +227,8 @@ export function PerfilPage() {
         try {
             setEnviandoFoto(true);
             const resposta = await AtualizarFotoPerfilAPI(arquivo);
+            console.log("Resposta completa:", resposta.data);
+console.log("Foto recebida:", resposta.data?.user?.photo);
             const fotoAtualizada: unknown = resposta.data?.user?.photo;
             if (typeof fotoAtualizada !== "string") {
                 throw new Error("A API não retornou o caminho da foto.");

@@ -9,11 +9,15 @@ export default defineConfig({
   ],
 
   server: {
-    proxy: {
-      '/aticurando': {
-        target: 'http://localhost:3002',
-        changeOrigin: true
-      }
+  proxy: {
+    '/aticurando': {
+      target: 'http://localhost:3002',
+      changeOrigin: true
+    },
+    '/storage': {
+      target: 'http://localhost:3002',
+      changeOrigin: true
     }
   }
+}
 })
