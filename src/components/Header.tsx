@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { ChevronRight, LogOut, Menu, UserRound } from "lucide-react";
@@ -28,6 +28,26 @@ export function Header({
   const { user, logout } = useAuth();
 
   const [menuPerfilAberto, setMenuPerfilAberto] = useState(false);
+  const menuPerfilRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuPerfilAberto) return;
+
+    function handleClickFora(event: PointerEvent) {
+      if (
+        menuPerfilRef.current &&
+        !menuPerfilRef.current.contains(event.target as Node)
+      ) {
+        setMenuPerfilAberto(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handleClickFora);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleClickFora);
+    };
+  }, [menuPerfilAberto]);
 
   const secaoAtual = navigationItems?.find(
     (item) =>
@@ -148,7 +168,10 @@ export function Header({
         </nav>
       )}
 
-      <div className="relative flex shrink-0 items-center gap-3">
+      <div
+        ref={menuPerfilRef}
+        className="relative flex shrink-0 items-center gap-3"
+      >
         {mode !== "ALUNO" && (
           <div className="hidden text-right sm:block">
             <p className="max-w-40 truncate text-sm font-semibold text-white">
@@ -167,25 +190,19 @@ export function Header({
           aria-label="Abrir menu da conta"
           aria-expanded={menuPerfilAberto}
           aria-haspopup="menu"
-          className="rounded-full outline-offset-4 focus-visible:outline-2 focus-visible:outline-blue-400"
+          className="rounded-full outline-offset-4 focus-visible:outline-2 focus-visible:outline-blue-400 cursor-pointer"
         >
           <AvatarPerfil foto={user?.photo} nome={user?.name} tamanho="sm" />
         </button>
 
         {menuPerfilAberto && (
           <>
-            <button
-              type="button"
-              aria-label="Fechar menu da conta"
-              onClick={() => setMenuPerfilAberto(false)}
-              className="fixed inset-0 z-40"
-            />
 
             <div className="absolute right-0 top-full z-50 mt-3 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
               <button
                 type="button"
                 onClick={handlePerfil}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100 cursor-pointer"
               >
                 <UserRound size={18} />
                 Meu perfil
@@ -196,7 +213,7 @@ export function Header({
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50 cursor-pointer"
               >
                 <LogOut size={18} />
                 Sair da conta
