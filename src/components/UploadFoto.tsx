@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { X } from "lucide-react";
 
 interface UploadFotoProps {
   foto?: File;
@@ -32,6 +33,16 @@ export function UploadFoto({ foto, onChange, onError }: UploadFotoProps) {
     }
     onError("");
     onChange(arquivo);
+  };
+
+  const removerFoto = () => {
+    onChange(undefined);
+    onError("");
+    setVisualizarFoto(false);
+
+    if (fotoRef.current) {
+      fotoRef.current.value = "";
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -106,37 +117,56 @@ export function UploadFoto({ foto, onChange, onError }: UploadFotoProps) {
         </button>
       )}
       {previewURL && (
-        <div className="flex flex-col items-center gap-3">
+        <div className="relative flex flex-col items-center gap-3">
           <button
             type="button"
             onClick={() => setVisualizarFoto(true)}
-            aria-label="Ampliar Foto de Perfil"
+            aria-label="Ampliar foto de perfil"
             className="max-w-full cursor-pointer rounded-full"
           >
             <img
               src={previewURL}
-              alt="Preview"
-              className="relative z-10 h-28 w-28 rounded-full border-2 border-gray-300 object-cover sm:h-32 sm:w-32"
+              alt="Foto de perfil"
+              className="h-28 w-28 rounded-full border-2 border-gray-300 object-cover sm:h-32 sm:w-32"
             />
+          </button>
+
+          <button
+            type="button"
+            onClick={removerFoto}
+            aria-label="Remover foto de perfil"
+            className="absolute right-0 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow-md transition hover:bg-red-700"
+          >
+            <X size={18} />
           </button>
         </div>
       )}
 
       {visualizarFoto && previewURL && (
-        <div className="fixed inset-0 z-[5000] flex items-center justify-center overflow-y-auto bg-black/80 p-4">
-          <button
-            type="button"
-            onClick={() => setVisualizarFoto(false)}
-            aria-label="Fechar Visualização"
-            className="absolute inset-0 cursor-pointer border-0 bg-transparent"
-          />
-          <img
-            src={previewURL}
-            alt="preview"
-            className="relative z-10 max-h-[calc(100dvh-2rem)] max-w-[90vw] rounded-lg object-contain"
-          />
-        </div>
-      )}
+  <div className="fixed inset-0 z-[5000] flex items-center justify-center overflow-y-auto bg-black/80 p-4">
+    <button
+      type="button"
+      onClick={() => setVisualizarFoto(false)}
+      aria-label="Fechar visualização"
+      className="absolute inset-0 cursor-pointer border-0 bg-transparent"
+    />
+
+    <button
+      type="button"
+      onClick={() => setVisualizarFoto(false)}
+      aria-label="Fechar foto ampliada"
+      className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-800 shadow-lg transition hover:bg-slate-200"
+    >
+      <X size={24} />
+    </button>
+
+    <img
+      src={previewURL}
+      alt="Foto de perfil ampliada"
+      className="relative z-10 max-h-[calc(100dvh-2rem)] max-w-[90vw] rounded-lg object-contain"
+    />
+  </div>
+)}
     </div>
   );
 }
