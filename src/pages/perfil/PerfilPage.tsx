@@ -109,12 +109,12 @@ function LinhaInformacao({
 }) {
     return (
         <div className="flex min-w-0 items-start gap-2 rounded-xl bg-slate-50 p-3 sm:gap-3 sm:p-4">
-            <div className="rounded-lg bg-blue-100 p-2 text-blue-700">
-                <Icon size={19} aria-hidden="true" className="shrink-0 rounded-lg bg-blue-100 p-2 text-blue-700" />
+            <div className="shrink-0 rounded-lg bg-blue-100 p-2 text-blue-700">
+                <Icon size={19} aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-slate-500">{rotulo}</p>
-                <p className="mt-1 break-words text-sm font-semibold text-slate-800">
+                <p className="mt-1 min-w-0 break-words text-sm font-semibold text-slate-800 [overflow-wrap:anywhere]">
                     {valor?.trim() || "Não informado"}
                 </p>
             </div>
@@ -431,10 +431,24 @@ export function PerfilPage() {
                         <ShieldCheck size={22} className="text-blue-600" aria-hidden="true" />
                         Dados da conta
                     </h2>
-                    <div className="flex min-w-0 items-start gap-2 rounded-xl bg-slate-50 p-3 sm:gap-3 sm:p-4">
-                        <LinhaInformacao icone={Mail} rotulo="E-mail" valor={user.email} />
-                        <LinhaInformacao icone={LockKeyhole} rotulo="CPF" valor={formatarCPF(user.cpf)} />
-                        <LinhaInformacao icone={BadgeCheck} rotulo="Tipo de usuário" valor={PAPEIS[user.papelUsuario]} />
+                    <div className="grid min-w-0 grid-cols-1 gap-3">
+                        <LinhaInformacao
+                            icone={Mail}
+                            rotulo="E-mail"
+                            valor={user.email}
+                        />
+
+                        <LinhaInformacao
+                            icone={LockKeyhole}
+                            rotulo="CPF"
+                            valor={formatarCPF(user.cpf)}
+                        />
+
+                        <LinhaInformacao
+                            icone={BadgeCheck}
+                            rotulo="Tipo de usuário"
+                            valor={PAPEIS[user.papelUsuario]}
+                        />
                     </div>
                     <div className="mt-5 rounded-xl bg-blue-50 p-4 text-xs leading-relaxed text-blue-800">
                         Por segurança, CPF e e-mail não podem ser alterados nesta tela.
