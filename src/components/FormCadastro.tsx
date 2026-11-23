@@ -488,7 +488,11 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
 
         <CampoSenha
           id="senha"
-          label="Senha *"
+          label={
+            <>
+              Senha <span className="text-red-500" aria-hidden="true">*</span>
+            </>
+          }
           placeholder="Digite sua senha"
           register={register}
           error={errors.senha?.message}
@@ -496,7 +500,11 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
 
         <CampoSenha
           id="confirmarSenha"
-          label="Confirmar Senha *"
+          label={
+            <>
+              Confirmar Senha <span className="text-red-500" aria-hidden="true">*</span>
+            </>
+          }
           placeholder="Confirme sua senha"
           register={register}
           error={errors.confirmarSenha?.message}

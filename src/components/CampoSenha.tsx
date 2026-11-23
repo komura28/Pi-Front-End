@@ -3,7 +3,7 @@ import type { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
 interface CampoSenhaProps<T extends FieldValues> {
   id: Path<T>;
-  label: string;
+  label: React.ReactElement;
   placeholder: string;
   error?: string;
   register: UseFormRegister<T>;

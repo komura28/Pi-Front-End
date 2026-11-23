@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 import {
     TableActionMenu,
@@ -45,7 +46,7 @@ export function DataTable<T>({
                             <th
                                 key={coluna.id}
                                 scope="col"
-                                className={`whitespace-nowrap border-b border-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5 sm:py-4 ${classeAlinhamento(coluna.alinhamento)}`}
+                                className={`whitespace-nowrap border-b border-slate-200 px-3 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-4 sm:py-4 md:px-5 ${classeAlinhamento(coluna.alinhamento)}`}
                             >
                                 {coluna.titulo}
                             </th>
@@ -54,7 +55,7 @@ export function DataTable<T>({
                         {acoes && (
                             <th
                                 scope="col"
-                                className="whitespace-nowrap border-b border-slate-200 px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-5 sm:py-4"
+                                className="whitespace-nowrap border-b border-slate-200 px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-4 sm:py-4 md:px-5"
                             >
                                 Ações
                             </th>
@@ -67,7 +68,7 @@ export function DataTable<T>({
                         <tr>
                             <td
                                 colSpan={colunas.length + (acoes ? 1 : 0)}
-                                className="px-5 py-12 text-center text-slate-500"
+                                className="px-4 py-10 text-center text-slate-500 sm:px-5 sm:py-12"
                             >
                                 {mensagemVazia}
                             </td>
@@ -81,14 +82,14 @@ export function DataTable<T>({
                                 {colunas.map((coluna) => (
                                     <td
                                         key={coluna.id}
-                                        className={`px-4 py-3 text-slate-600 sm:px-5 sm:py-4 ${classeAlinhamento(coluna.alinhamento)}`}
+                                        className={`min-w-0 break-words px-3 py-3 text-slate-600 sm:px-4 sm:py-4 md:px-5 ${classeAlinhamento(coluna.alinhamento)}`}
                                     >
                                         {coluna.renderizar(item)}
                                     </td>
                                 ))}
 
                                 {acoes && (
-                                    <td className="px-4 py-3 text-right sm:px-5">
+                                    <td className="whitespace-nowrap px-3 py-3 text-right sm:px-4 sm:py-4 md:px-5">
                                         <TableActionMenu
                                             acoes={acoes(item)}
                                             rotulo={rotuloAcoes?.(item)}
