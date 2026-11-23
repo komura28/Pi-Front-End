@@ -11,13 +11,13 @@ export function CardDashboard({
 }: CardDashboardProps) {
     return (
         <article
-            className={`rounded-xl border border-l-4 border-slate-200 bg-slate-50 p-5 transition-shadow hover:shadow-md ${className}`}
+            className={`min-w-0 rounded-xl border border-l-4 border-slate-200 bg-slate-50 p-4 sm:p-5 transition-shadow hover:shadow-md ${className}`}
         >
-            <p className="text-sm font-medium text-slate-500">
+            <p className="break-words text-sm font-medium text-slate-500">
                 {title}
             </p>
 
-            <h3 className="mt-3 text-3xl font-bold text-slate-800">
+            <h3 className="mt-2 break-words text-2xl font-bold text-slate-800 sm:mt-3 sm:text-3xl">
                 {value}
             </h3>
         </article>
