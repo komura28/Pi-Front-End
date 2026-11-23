@@ -1,8 +1,10 @@
+
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   BadgeCheck,
+  CalendarDays,
   Camera,
   CheckCircle2,
   ContactRound,
@@ -113,12 +115,12 @@ function LinhaInformacao({
 }) {
   return (
     <div className="flex min-w-0 items-start gap-2 rounded-xl bg-slate-50 p-3 sm:gap-3 sm:p-4">
-      <div className="rounded-lg bg-blue-100 p-2 text-blue-700">
-        <Icon size={19} aria-hidden="true" className="shrink-0 text-blue-700" />
+      <div className="shrink-0 rounded-lg bg-blue-100 p-2 text-blue-700">
+        <Icon size={19} aria-hidden="true" />
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-slate-500">{rotulo}</p>
-        <p className="mt-1 break-words text-sm font-semibold text-slate-800">
+        <p className="mt-1 min-w-0 break-words text-sm font-semibold text-slate-800 [overflow-wrap:anywhere]">
           {valor?.trim() || "Não informado"}
         </p>
       </div>
@@ -168,6 +170,7 @@ export function PerfilPage() {
 
   useEffect(() => {
     let ativo = true;
+
     async function carregarPerfil() {
       try {
         const dados = await getMe();
@@ -182,7 +185,9 @@ export function PerfilPage() {
         if (ativo) setCarregando(false);
       }
     }
+
     void carregarPerfil();
+
     return () => {
       ativo = false;
     };
@@ -225,10 +230,12 @@ export function PerfilPage() {
 
     setErroFoto("");
     setSucesso("");
+
     if (!["image/jpeg", "image/png", "image/webp"].includes(arquivo.type)) {
       setErroFoto("Selecione uma imagem JPEG, PNG ou WebP.");
       return;
     }
+
     if (arquivo.size > 5 * 1024 * 1024) {
       setErroFoto("A imagem deve ter no máximo 5 MB.");
       return;
@@ -240,9 +247,11 @@ export function PerfilPage() {
       console.log("Resposta completa:", resposta.data);
       console.log("Foto recebida:", resposta.data?.user?.photo);
       const fotoAtualizada: unknown = resposta.data?.user?.photo;
+
       if (typeof fotoAtualizada !== "string") {
         throw new Error("A API não retornou o caminho da foto.");
       }
+
       atualizarUsuario({ ...user, photo: fotoAtualizada });
       setSucesso("Foto de perfil atualizada com sucesso.");
     } catch (error) {
@@ -257,10 +266,12 @@ export function PerfilPage() {
     if (!user || salvando) return;
 
     const nome = form.name.trim();
+
     if (nome.length < 3) {
       setErroForm("O nome deve ter pelo menos 3 caracteres.");
       return;
     }
+
     if (
       form.telefone_principal &&
       form.telefone_principal.replace(/\D/g, "").length < 10
@@ -268,6 +279,7 @@ export function PerfilPage() {
       setErroForm("Telefone principal inválido.");
       return;
     }
+
     if (
       form.telefone_secundario &&
       form.telefone_secundario.replace(/\D/g, "").length < 10
@@ -275,10 +287,12 @@ export function PerfilPage() {
       setErroForm("Telefone secundário inválido.");
       return;
     }
+
     if (form.profissao === "Outro" && !form.profissao_custom.trim()) {
       setErroForm("Especifique sua profissão.");
       return;
     }
+
     if (
       user.papelUsuario === "ALUNO" &&
       form.tem_problema_saude === "Sim" &&
@@ -299,10 +313,12 @@ export function PerfilPage() {
           ? form.profissao_custom.trim()
           : form.profissao,
     };
+
     if (user.papelUsuario === "ALUNO") {
       if (form.participacao_anterior !== "") {
         payload.participacao_anterior = form.participacao_anterior === "true";
       }
+
       if (form.tem_problema_saude === "Sim") {
         payload.problemas_saude = form.problemas_saude_descricao.trim();
       } else if (form.tem_problema_saude === "Não") {
@@ -314,11 +330,13 @@ export function PerfilPage() {
       setSalvando(true);
       setErroForm("");
       const atualizado = await editarUser(payload);
+
       atualizarUsuario({
         ...user,
         ...atualizado,
         id: atualizado?.id ?? atualizado?._id ?? user.id,
       } as authUser);
+
       setModalAberto(false);
       setSucesso("Dados pessoais atualizados com sucesso.");
     } catch (error) {
@@ -331,6 +349,7 @@ export function PerfilPage() {
   if (carregando && !user) {
     return <p className="p-8 text-slate-500">Carregando seu perfil...</p>;
   }
+
   if (!user) {
     return (
       <p role="alert" className="p-8 text-red-600">
@@ -357,6 +376,7 @@ export function PerfilPage() {
         <div className="relative flex min-w-0 flex-col items-center gap-4 text-center sm:gap-6 xl:flex-row xl:text-left">
           <div className="relative shrink-0">
             <AvatarPerfil foto={user.photo} nome={user.name} tamanho="lg" />
+
             <button
               type="button"
               onClick={() => inputFotoRef.current?.click()}
@@ -367,6 +387,7 @@ export function PerfilPage() {
             >
               <Camera size={18} aria-hidden="true" />
             </button>
+
             <input
               ref={inputFotoRef}
               type="file"
@@ -383,16 +404,20 @@ export function PerfilPage() {
             <p className="text-sm font-semibold tracking-wide text-blue-200">
               MEU PERFIL
             </p>
+
             <h1 className="mt-2 break-words text-2xl font-bold sm:text-3xl">
               {user.name}
             </h1>
+
             <p className="mt-2 break-all text-sm text-slate-200">
               {user.email}
             </p>
+
             <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
               <BadgeCheck size={15} aria-hidden="true" />
               {PAPEIS[user.papelUsuario]}
             </div>
+
             <p className="mt-3 text-xs text-blue-100">
               {enviandoFoto
                 ? "Enviando foto..."
@@ -419,6 +444,7 @@ export function PerfilPage() {
           {erroCarregamento}
         </p>
       )}
+
       {erroFoto && (
         <p
           role="alert"
@@ -427,6 +453,7 @@ export function PerfilPage() {
           {erroFoto}
         </p>
       )}
+
       {sucesso && (
         <p
           role="status"
@@ -448,23 +475,36 @@ export function PerfilPage() {
               />
               Informações pessoais
             </h2>
-            <div className="grid min-w-0 grid-cols-1 gap-3">
+
+            <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
               <LinhaInformacao
-                icone={Mail}
-                rotulo="E-mail"
-                valor={user.email}
+                icone={UserRound}
+                rotulo="Nome completo"
+                valor={user.name}
               />
 
               <LinhaInformacao
-                icone={LockKeyhole}
-                rotulo="CPF"
-                valor={formatarCPF(user.cpf)}
+                icone={CalendarDays}
+                rotulo="Data de nascimento"
+                valor={
+                  user.dt_nascimento
+                    ? new Date(
+                        `${user.dt_nascimento.split("T")[0]}T00:00:00`,
+                      ).toLocaleDateString("pt-BR")
+                    : undefined
+                }
               />
 
               <LinhaInformacao
-                icone={BadgeCheck}
-                rotulo="Tipo de usuário"
-                valor={PAPEIS[user.papelUsuario]}
+                icone={Users}
+                rotulo="Estado civil"
+                valor={user.estado_civil}
+              />
+
+              <LinhaInformacao
+                icone={ContactRound}
+                rotulo="Profissão"
+                valor={user.profissao}
               />
             </div>
           </section>
@@ -474,12 +514,14 @@ export function PerfilPage() {
               <Phone size={22} className="text-blue-600" aria-hidden="true" />
               Contato
             </h2>
+
             <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
               <LinhaInformacao
                 icone={Phone}
                 rotulo="Telefone principal"
                 valor={user.telefone_principal}
               />
+
               <LinhaInformacao
                 icone={Phone}
                 rotulo="Telefone secundário"
@@ -498,6 +540,7 @@ export function PerfilPage() {
                 />
                 Informações complementares
               </h2>
+
               <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2">
                 <LinhaInformacao
                   icone={Users}
@@ -510,6 +553,7 @@ export function PerfilPage() {
                         : "Não"
                   }
                 />
+
                 <LinhaInformacao
                   icone={HeartPulse}
                   rotulo="Informações de saúde"
@@ -529,8 +573,13 @@ export function PerfilPage() {
             />
             Dados da conta
           </h2>
+
           <div className="grid min-w-0 grid-cols-1 gap-3">
-            <LinhaInformacao icone={Mail} rotulo="E-mail" valor={user.email} />
+            <LinhaInformacao
+              icone={Mail}
+              rotulo="E-mail"
+              valor={user.email}
+            />
 
             <LinhaInformacao
               icone={LockKeyhole}
@@ -544,6 +593,7 @@ export function PerfilPage() {
               valor={PAPEIS[user.papelUsuario]}
             />
           </div>
+
           <div className="mt-5 rounded-xl bg-blue-50 p-4 text-xs leading-relaxed text-blue-800">
             Por segurança, CPF e e-mail não podem ser alterados nesta tela.
           </div>
@@ -567,10 +617,12 @@ export function PerfilPage() {
             <p className="text-xs font-semibold tracking-wide text-blue-300">
               ATUALIZAÇÃO DE DADOS
             </p>
+
             <h2 id="titulo-modal-perfil" className="mt-1 text-2xl font-bold">
               Editar perfil
             </h2>
           </div>
+
           <button
             type="button"
             aria-label="Fechar edição de perfil"
@@ -590,10 +642,11 @@ export function PerfilPage() {
         >
           <div className="min-h-0 min-w-0 flex-1 space-y-4 overflow-y-auto p-4 sm:space-y-5 sm:p-6">
             <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="block sm:col-span-2 min-w-0">
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   Nome completo
                 </span>
+
                 <input
                   className={classeInput}
                   value={form.name}
@@ -602,10 +655,12 @@ export function PerfilPage() {
                   minLength={3}
                 />
               </label>
-              <label className="block sm:col-span-2 min-w-0">
+
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   E-mail (não editável)
                 </span>
+
                 <input
                   className={classeInput}
                   value={user.email}
@@ -613,10 +668,12 @@ export function PerfilPage() {
                   disabled
                 />
               </label>
-              <label className="block sm:col-span-2 min-w-0">
+
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   Data de nascimento
                 </span>
+
                 <input
                   type="date"
                   className={classeInput}
@@ -626,10 +683,12 @@ export function PerfilPage() {
                   }
                 />
               </label>
-              <label className="block sm:col-span-2 min-w-0">
+
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   Estado civil
                 </span>
+
                 <select
                   className={classeInput}
                   value={form.estado_civil}
@@ -638,6 +697,7 @@ export function PerfilPage() {
                   }
                 >
                   <option value="">Selecione...</option>
+
                   {opcoesEstadoCivil.map((estado) => (
                     <option key={estado} value={estado}>
                       {estado}
@@ -645,10 +705,12 @@ export function PerfilPage() {
                   ))}
                 </select>
               </label>
-              <label className="block sm:col-span-2 min-w-0">
+
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   Telefone principal
                 </span>
+
                 <input
                   className={classeInput}
                   inputMode="tel"
@@ -662,10 +724,12 @@ export function PerfilPage() {
                   }
                 />
               </label>
-              <label className="block sm:col-span-2 min-w-0">
+
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   Telefone secundário
                 </span>
+
                 <input
                   className={classeInput}
                   inputMode="tel"
@@ -679,10 +743,12 @@ export function PerfilPage() {
                   }
                 />
               </label>
-              <label className="block sm:col-span-2 min-w-0">
+
+              <label className="block min-w-0 sm:col-span-2">
                 <span className="text-sm font-semibold text-slate-700">
                   Profissão
                 </span>
+
                 <select
                   className={classeInput}
                   value={form.profissao}
@@ -691,19 +757,23 @@ export function PerfilPage() {
                   }
                 >
                   <option value="">Selecione...</option>
+
                   {PROFISSOES.map((profissao) => (
                     <option key={profissao} value={profissao}>
                       {profissao}
                     </option>
                   ))}
+
                   <option value="Outro">Outro</option>
                 </select>
               </label>
+
               {form.profissao === "Outro" && (
-                <label className="block sm:col-span-2 min-w-0">
+                <label className="block min-w-0 sm:col-span-2">
                   <span className="text-sm font-semibold text-slate-700">
                     Qual profissão?
                   </span>
+
                   <input
                     className={classeInput}
                     value={form.profissao_custom}
@@ -713,12 +783,14 @@ export function PerfilPage() {
                   />
                 </label>
               )}
+
               {ehAluno && (
                 <>
-                  <label className="block sm:col-span-2 min-w-0">
+                  <label className="block min-w-0 sm:col-span-2">
                     <span className="text-sm font-semibold text-slate-700">
                       Já foi ou é palhaço voluntário?
                     </span>
+
                     <select
                       className={classeInput}
                       value={form.participacao_anterior}
@@ -731,10 +803,12 @@ export function PerfilPage() {
                       <option value="false">Não</option>
                     </select>
                   </label>
-                  <label className="block sm:col-span-2 min-w-0">
+
+                  <label className="block min-w-0 sm:col-span-2">
                     <span className="text-sm font-semibold text-slate-700">
                       Possui problema de saúde?
                     </span>
+
                     <select
                       className={classeInput}
                       value={form.tem_problema_saude}
@@ -747,11 +821,13 @@ export function PerfilPage() {
                       <option value="Não">Não</option>
                     </select>
                   </label>
+
                   {form.tem_problema_saude === "Sim" && (
-                    <label className="block sm:col-span-2 min-w-0">
+                    <label className="block min-w-0 sm:col-span-2">
                       <span className="text-sm font-semibold text-slate-700">
                         Descreva a informação de saúde
                       </span>
+
                       <input
                         className={classeInput}
                         value={form.problemas_saude_descricao}
@@ -767,6 +843,7 @@ export function PerfilPage() {
                 </>
               )}
             </div>
+
             {erroForm && (
               <p
                 role="alert"
@@ -776,6 +853,7 @@ export function PerfilPage() {
               </p>
             )}
           </div>
+
           <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-slate-200 bg-white p-4 sm:flex-row sm:justify-end sm:p-5">
             <button
               type="button"
@@ -785,6 +863,7 @@ export function PerfilPage() {
             >
               Cancelar
             </button>
+
             <button
               type="submit"
               disabled={salvando}
