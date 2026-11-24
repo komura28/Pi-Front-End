@@ -4,6 +4,7 @@ import { RegistroPage } from "../pages/auth/RegisterPage";
 import { EsqueciSenhaPage } from "../pages/auth/EsqueciSenhaPage";
 import { ResetarSenhaPage } from "../pages/auth/RedefinirSenhaPage";
 import { HomePublicaPage } from "../pages/home/HomePublicaPage";
+import { ValidarCertificadoPage } from "../pages/certificado/ValidarCertificadoPage";
 
 export function PublicRoutes() {
     return (
@@ -13,6 +14,7 @@ export function PublicRoutes() {
             <Route path="/cadastro" element={<RegistroPage/>} />
             <Route path="/forgot-password" element={<EsqueciSenhaPage/>} />
             <Route path="/reset-password" element={<ResetarSenhaPage/>} />
+            <Route path="/validar-certificado/:codigo" element={<ValidarCertificadoPage />} />
             <Route path="/*" element={<Navigate to="/" replace/>}/>
         </Routes>
     )

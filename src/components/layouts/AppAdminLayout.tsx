@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 
 import {
+    Award,
     BookOpen,
     CalendarDays,
     ClipboardCheck,
@@ -67,6 +68,11 @@ const adminNavItems: NavigationItem[] = [
                 label: "Matrículas",
                 href: "/app/matricula",
                 iconF: <ClipboardCheck size={16} />
+            },
+            {
+                label: "Certificados",
+                href: "/app/certificados",
+                iconF: <Award size={16} />
             },
             {
                 label: "Cadastrar turma",
