@@ -10,13 +10,12 @@ import {
     UsersRound
 } from "lucide-react";
 
-import { getTurma } from "../../services/authService";
-
 import {
     getElegibilidadeTurma,
     getCertificadosEmitidos,
     emitirCertificado,
-    baixarCertificado
+    baixarCertificado,
+    getTurmasParaCertificados
 } from "../../services/certificadoService";
 
 import type {
@@ -100,7 +99,7 @@ export function CertificadosPage() {
 
         async function carregarTurmas() {
             try {
-                const resultado = await getTurma();
+                const resultado = await getTurmasParaCertificados()
 
                 if (ativo) {
                     setTurmas(resultado);

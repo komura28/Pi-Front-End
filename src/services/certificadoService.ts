@@ -7,6 +7,17 @@ import type {
     ResultadoValidacao
 } from "../types/certificado/certificado-types";
 
+import type { TurmaMatricula } from "../types/auth/auth-types";
+
+export async function getTurmasParaCertificados():
+    Promise<TurmaMatricula[]> {
+    const response = await api.get<TurmaMatricula[]>("/turma", {
+        params: { incluirInativas: true }
+    });
+
+    return response.data;
+}
+
 export async function getElegibilidadeTurma(
     turmaId: string
 ): Promise<ElegibilidadeTurma> {
