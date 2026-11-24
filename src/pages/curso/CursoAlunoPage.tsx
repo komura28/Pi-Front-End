@@ -31,7 +31,7 @@ export function CursoAlunoPage() {
   };
 
   const handleConfirmarCancelamento = () => {
-    if (!motivo) {
+    if (!motivo.trim()) {
       setFormError("Por favor, informe o motivo do cancelamento.");
       return;
     }
@@ -51,7 +51,7 @@ export function CursoAlunoPage() {
         return;
       }
 
-      await cancelarMatricula(cancelamentoMatricula._id, motivo);
+      await cancelarMatricula(cancelamentoMatricula._id, motivo.trim());
       setCandidaturas((prev) =>
         prev.map((c) =>
           c._id === cancelamentoMatricula._id
@@ -139,7 +139,9 @@ export function CursoAlunoPage() {
 
   return (
     <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
-      <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">Meus Cursos</h1>
+      <h1 className="text-2xl font-bold text-slate-800 sm:text-3xl">
+        Meus Cursos
+      </h1>
 
       <div className="space-y-4">
         {error && (
@@ -154,21 +156,20 @@ export function CursoAlunoPage() {
           </div>
         ) : (
           candidaturas.map((candidatura) => (
-            <div
+            <button
               key={candidatura._id}
-              className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-6"
+              type="button"
+              onClick={() => abrirVerDetalhes(candidatura)}
+              className="group w-full min-w-0 cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 sm:p-6"
             >
-              <div className="mb-4 flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                <h2 className="min-w-0 break-words text-lg font-semibold text-gray-800 sm:text-xl">
+              <div className="mb-4 flex min-w-0 items-center justify-between gap-3">
+                <h2 className="min-w-0 break-words text-lg font-semibold text-gray-800 transition-colors group-hover:text-blue-700 sm:text-xl">
                   Curso: {candidatura.turma?.curso?.name}
                 </h2>
 
-                <button
-                  onClick={() => abrirVerDetalhes(candidatura)}
-                  className="w-full shrink-0 cursor-pointer rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 md:w-auto"
-                >
-                  Ver Detalhes
-                </button>
+                <span className="shrink-0 whitespace-nowrap text-sm font-semibold text-gray-600 transition-colors group-hover:text-blue-700">
+                  Clique para ver detalhes <span aria-hidden="true">→</span>
+                </span>
               </div>
 
               <p className="mb-2 text-gray-600">
@@ -183,7 +184,7 @@ export function CursoAlunoPage() {
               >
                 {getStatusLabel(candidatura.status)}
               </span>
-            </div>
+            </button>
           ))
         )}
 

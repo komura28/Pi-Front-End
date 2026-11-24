@@ -406,10 +406,10 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
         {tipo === "comum" && (
           <>
             <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
+              <div className="flex min-w-0 flex-col">
                 <label
                   htmlFor="tem_problema_saude"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  className="mb-1 flex min-h-10 items-end text-sm font-medium text-gray-700"
                 >
                   Possui problema de saúde? <span className="text-red-500" aria-hidden="true">*</span>
                 </label>
@@ -431,10 +431,10 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
                 )}
               </div>
 
-              <div>
+              <div className="flex min-w-0 flex-col">
                 <label
                   htmlFor="participacao_anterior"
-                  className="mb-1 block text-sm font-medium text-gray-700"
+                  className="mb-1 flex min-h-10 items-end text-sm font-medium text-gray-700"
                 >
                   Você já foi ou é palhaço voluntário? <span className="text-red-500" aria-hidden="true">*</span>
                 </label>

@@ -95,7 +95,7 @@ export function Header({
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-auto min-h-20 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-2 border-b border-white/10 bg-[#0F172A] px-3 py-2 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0 sm:h-20">
+    <header className="sticky top-0 z-30 flex h-auto min-h-20 shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-2 border-b border-white/10 bg-[#0F172A] px-3 py-2 sm:relative sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0 sm:h-20">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         {mode === "ALUNO" ? (
           <Link to={link ?? "/api/home"} className="shrink-0">
@@ -145,7 +145,7 @@ export function Header({
       {mode === "ALUNO" && (
         <nav
           aria-label="Navegação principal"
-          className="order-3 flex w-full min-w-0 basis-full items-center justify-center gap-1 overflow-x-auto overscroll-x-contain pb-1 sm:order-none sm:ml-auto sm:w-auto sm:basis-auto sm:flex-none sm:justify-end sm:gap-3 sm:pb-0"
+          className="order-3 flex w-full min-w-0 basis-full items-center justify-center gap-1 overflow-x-auto overscroll-x-contain pb-1 sm:absolute sm:left-1/2 sm:top-1/2 sm:order-none sm:w-auto sm:-translate-x-1/2 sm:-translate-y-1/2 sm:basis-auto sm:flex-none sm:gap-3 sm:pb-0"
         >
           {navigationItems
             ?.filter((item) => Boolean(item.href))
