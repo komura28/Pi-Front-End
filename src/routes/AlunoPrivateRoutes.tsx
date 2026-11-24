@@ -3,8 +3,7 @@ import { ProtectedRoutes } from "./ProtectedRoutes";
 import { HomeAlunoPage } from "../pages/home/HomeAlunoPage";
 import { PerfilPage } from "../pages/perfil/PerfilPage";
 import { CursoAlunoPage } from "../pages/curso/CursoAlunoPage";
-
-
+import { MeusCertificadosPage } from "../pages/certificado/MeusCertificadosPage";
 
 export function AlunoPrivateRoutes() {
     return (
@@ -19,6 +18,10 @@ export function AlunoPrivateRoutes() {
 
             <Route path="/cursos" element={<ProtectedRoutes allowedRoles={["ALUNO"]}>
                 <CursoAlunoPage />
+            </ProtectedRoutes>} />
+
+            <Route path="/certificados" element={<ProtectedRoutes allowedRoles={["ALUNO"]}>
+                <MeusCertificadosPage />
             </ProtectedRoutes>} />
         </Routes>
     );
