@@ -128,7 +128,7 @@ export function HomePage() {
 
 
     return (
-        <div className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+        <div className="@container mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
 
                 <div className="relative z-10">
@@ -165,29 +165,37 @@ export function HomePage() {
                 />
             </section>
 
+
             <section
                 aria-label="Indicadores administrativos"
-                className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 2xl:grid-cols-3"
+                className="w-full min-w-0"
             >
-                {indicadores.map((indicador) => (
-                    <ProfessorStatCard
-                        key={indicador.titulo}
-                        titulo={indicador.titulo}
-                        valor={indicador.valor}
-                        icone={indicador.icone}
-                    />
-                ))}
+                <div className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-2">
+                    <div className="grid w-full min-w-[690px] grid-cols-3 gap-3 sm:gap-4">
+
+                        {indicadores.map((indicador) => (
+                            <ProfessorStatCard
+                                key={indicador.titulo}
+                                titulo={indicador.titulo}
+                                valor={indicador.valor}
+                                icone={indicador.icone}
+                            />
+                        ))}
+
+                    </div>
+                </div>
             </section>
 
-            {!loading && !error && dashboardData && (
-                <section className="flex min-w-0 flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:flex-row xl:items-center xl:justify-between">
 
-                    <div className="flex items-center gap-4">
+            {!loading && !error && dashboardData && (
+                <section className="flex min-w-0 flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 @5xl:flex-row @5xl:items-center @5xl:justify-between">
+
+                    <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
                         <div className="rounded-xl bg-amber-100 p-3 text-amber-600">
                             <ClipboardList size={26} />
                         </div>
 
-                        <div>
+                        <div className="min-w-0">
                             <h2 className="text-lg font-bold text-slate-800">
                                 Matrículas pendentes
                             </h2>
@@ -203,7 +211,7 @@ export function HomePage() {
                     {dashboardData.matriculasPendentes > 0 && (
                         <Link
                             to="/app/matricula"
-                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 xl:w-auto"
+                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 @5xl:w-auto"
                         >
                             Analisar matrículas
                             <ArrowRight size={18} />
@@ -237,73 +245,75 @@ export function HomePage() {
                         {error}
                     </p>
                 ) : dashboardData ? (
-                    <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-3">
+                    <div className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-2">
+                        <div className="grid w-full min-w-[690px] grid-cols-3 gap-3 sm:gap-4">
 
-                        {tab === "geral" && (
-                            <>
-                                <CardDashboard
-                                    title="Total de Matrículas"
-                                    value={totalMatriculas}
-                                    className="border-l-blue-600"
-                                />
+                            {tab === "geral" && (
+                                <>
+                                    <CardDashboard
+                                        title="Total de Matrículas"
+                                        value={totalMatriculas}
+                                        className="border-l-blue-600"
+                                    />
 
-                                <CardDashboard
-                                    title="Total de Cursos"
-                                    value={totalCursos}
-                                    className="border-l-blue-600"
-                                />
+                                    <CardDashboard
+                                        title="Total de Cursos"
+                                        value={totalCursos}
+                                        className="border-l-blue-600"
+                                    />
 
-                                <CardDashboard
-                                    title="Total de Turmas"
-                                    value={totalTurmas}
-                                    className="border-l-blue-600"
-                                />
-                            </>
-                        )}
+                                    <CardDashboard
+                                        title="Total de Turmas"
+                                        value={totalTurmas}
+                                        className="border-l-blue-600"
+                                    />
+                                </>
+                            )}
 
-                        {tab === "matriculas" && (
-                            <>
-                                <CardDashboard
-                                    title="Matrículas Aprovadas"
-                                    value={dashboardData.matriculasAtivas}
-                                    className="border-l-green-600"
-                                />
+                            {tab === "matriculas" && (
+                                <>
+                                    <CardDashboard
+                                        title="Matrículas Aprovadas"
+                                        value={dashboardData.matriculasAtivas}
+                                        className="border-l-green-600"
+                                    />
 
-                                <CardDashboard
-                                    title="Matrículas Recusadas"
-                                    value={dashboardData.matriculasRecusadas}
-                                    className="border-l-red-600"
-                                />
+                                    <CardDashboard
+                                        title="Matrículas Recusadas"
+                                        value={dashboardData.matriculasRecusadas}
+                                        className="border-l-red-600"
+                                    />
 
-                                <CardDashboard
-                                    title="Matrículas Pendentes"
-                                    value={dashboardData.matriculasPendentes}
-                                    className="border-l-amber-500"
-                                />
-                            </>
-                        )}
+                                    <CardDashboard
+                                        title="Matrículas Pendentes"
+                                        value={dashboardData.matriculasPendentes}
+                                        className="border-l-amber-500"
+                                    />
+                                </>
+                            )}
 
-                        {tab === "inativos" && (
-                            <>
-                                <CardDashboard
-                                    title="Matrículas Canceladas"
-                                    value={dashboardData.matriculasCanceladas}
-                                    className="border-l-slate-500"
-                                />
+                            {tab === "inativos" && (
+                                <>
+                                    <CardDashboard
+                                        title="Matrículas Canceladas"
+                                        value={dashboardData.matriculasCanceladas}
+                                        className="border-l-slate-500"
+                                    />
 
-                                <CardDashboard
-                                    title="Turmas Inativas"
-                                    value={dashboardData.turmasInativas}
-                                    className="border-l-slate-500"
-                                />
+                                    <CardDashboard
+                                        title="Turmas Inativas"
+                                        value={dashboardData.turmasInativas}
+                                        className="border-l-slate-500"
+                                    />
 
-                                <CardDashboard
-                                    title="Cursos Inativos"
-                                    value={dashboardData.cursosInativos}
-                                    className="border-l-slate-500"
-                                />
-                            </>
-                        )}
+                                    <CardDashboard
+                                        title="Cursos Inativos"
+                                        value={dashboardData.cursosInativos}
+                                        className="border-l-slate-500"
+                                    />
+                                </>
+                            )}
+                        </div>
                     </div>
                 ) : null}
             </section>
