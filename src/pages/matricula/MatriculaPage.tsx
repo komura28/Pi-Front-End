@@ -8,21 +8,17 @@ import {
     Search,
     ClipboardCheck,
     UserRound,
-    Pencil,
     Eye,
-    Save
 } from "lucide-react";
 import { PageHeader } from "../../components/ui/PageHeader";
 import { DataTable, type TableColumn } from "../../components/ui/DataTable";
 import { Pagination } from "../../components/ui/Pagination";
 import {
-    atualizarStatusMatricula,
     aprovarMatricula,
     recusarMatricula,
     getMatriculas
 } from "../../services/matriculaService";
 import { SuccessDialog } from "../../components/ui/SuccessDialog";
-import { AppDialog } from "../../components/ui/AppDialog";
 
 type StatusTab = "PENDENTE" | "APROVADA" | "RECUSADA" | "CANCELADA";
 type AdminOutletContext = {
@@ -77,14 +73,6 @@ export function MatriculaPage() {
         indicePrimeiroItem,
         indiceUltimoItem
     );
-
-    const [isModalEdicaoOpen, setIsModalEdicaoOpen] = useState(false);
-    const [formEdicao, setFormEdicao] =
-        useState<{
-            status: "APROVADA" | "RECUSADA";
-        }>({
-            status: "APROVADA",
-        });
 
     const [matriculaSelecionada, setMatriculaSelecionada] = useState<MatriculaDTO | null>(null);
     const [isModalVisualizarOpen, setIsModalVisualizarOpen] = useState(false);
@@ -152,52 +140,6 @@ export function MatriculaPage() {
             );
         } finally {
             setProcessandoDecisao(false);
-        }
-    }
-
-    function handleAbrirEdicao(matricula: MatriculaDTO) {
-        setIdSelecionado(matricula._id);
-        setMatriculaSelecionada(matricula);
-        setActionError("");
-
-        setFormEdicao({
-            status:
-                matricula.status === "RECUSADA"
-                    ? "RECUSADA"
-                    : "APROVADA",
-        });
-
-        setIsModalEdicaoOpen(true);
-    }
-
-    async function handleSalvarEdicao() {
-        if (!idSelecionado) return;
-
-        try {
-            setActionError("");
-
-            await atualizarStatusMatricula(idSelecionado, formEdicao.status);
-
-            setMatriculas((listaAtual) =>
-                listaAtual.map((item) =>
-                    item._id === idSelecionado
-                        ? {
-                            ...item,
-                            status: formEdicao.status,
-                        }
-                        : item
-                )
-            );
-
-            await atualizarMatriculasPendentes();
-
-            setIsModalEdicaoOpen(false);
-            setIdSelecionado(null);
-            setMatriculaSelecionada(null);
-        } catch {
-            setActionError(
-                "Erro ao atualizar o status da matrícula"
-            );
         }
     }
 
@@ -302,13 +244,6 @@ export function MatriculaPage() {
         setMatriculaSelecionada(null);
 
         limparDadosConsulta();
-    }
-
-    function fecharEdicao() {
-        setIsModalEdicaoOpen(false);
-        setIdSelecionado(null);
-        setMatriculaSelecionada(null);
-        setActionError("");
     }
 
     const colunas: TableColumn<MatriculaDTO>[] = [
@@ -502,6 +437,7 @@ export function MatriculaPage() {
                     rotuloAcoes={(matricula) =>
                         `Ações da matrícula de ${matricula.user?.name ?? "usuário"}`
                     }
+
                     acoes={(matricula) =>
                         matricula.status === "PENDENTE"
                             ? [
@@ -522,12 +458,6 @@ export function MatriculaPage() {
                                     texto: "Ver detalhes",
                                     icone: Eye,
                                     executar: () => abrirVisualizacao(matricula)
-                                },
-                                {
-                                    texto: "Editar situação",
-                                    icone: Pencil,
-                                    executar: () =>
-                                        handleAbrirEdicao(matricula)
                                 }
                             ]
                     }
@@ -542,106 +472,6 @@ export function MatriculaPage() {
                     />
                 </div>
             </section>
-
-
-            <AppDialog
-                aberto={isModalEdicaoOpen}
-                aoFechar={fecharEdicao}
-                titulo="Editar matrícula"
-                descricao="Atualize a situação da matrícula selecionada."
-                icone={Pencil}
-                rodape={
-                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                        <button
-                            type="button"
-                            onClick={fecharEdicao}
-                            className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-                        >
-                            Cancelar
-                        </button>
-
-                        <button
-                            type="submit"
-                            form="form-editar-matricula"
-                            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
-                        >
-                            <Save size={17} />
-                            Salvar alterações
-                        </button>
-                    </div>
-                }
-            >
-                <form
-                    id="form-editar-matricula"
-                    onSubmit={(evento) => {
-                        evento.preventDefault();
-                        void handleSalvarEdicao();
-                    }}
-                    className="space-y-5"
-                >
-                    <div>
-                        <label className="mb-2 block text-sm font-semibold text-slate-700">
-                            Aluno
-                        </label>
-
-                        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                            <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
-                                <UserRound size={19} />
-                            </div>
-
-                            <div className="min-w-0">
-                                <p className="font-semibold text-slate-800">
-                                    {matriculaSelecionada?.user?.name ??
-                                        "Usuário não disponível"}
-                                </p>
-
-                                <p className="text-xs text-slate-500">
-                                    {matriculaSelecionada?.user?.email ??
-                                        "E-mail não disponível"}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="editar-matricula-status"
-                            className="mb-2 block text-sm font-semibold text-slate-700"
-                        >
-                            Situação da matrícula *
-                        </label>
-
-                        <select
-                            id="editar-matricula-status"
-                            required
-                            value={formEdicao.status}
-                            onChange={(evento) =>
-                                setFormEdicao({
-                                    status: evento.target.value as
-                                        "APROVADA" | "RECUSADA"
-                                })
-                            }
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
-                        >
-                            <option value="APROVADA">Aprovada</option>
-                            <option value="RECUSADA">Recusada</option>
-                        </select>
-
-                        <p className="mt-2 text-xs text-slate-500">
-                            Selecione a situação desejada para esta matrícula.
-                        </p>
-                    </div>
-
-                    {actionError && (
-                        <p
-                            role="alert"
-                            className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
-                        >
-                            {actionError}
-                        </p>
-                    )}
-                </form>
-            </AppDialog>
 
             {isModalOpen && matriculaSelecionada && (
                 <ModalForms
