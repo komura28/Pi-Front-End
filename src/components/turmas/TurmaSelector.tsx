@@ -12,6 +12,7 @@ interface TurmaSelectorProps {
   turmas: TurmaMatricula[];
   selecionadaId: string | null;
   busca: string;
+  descricao?: string;
   onBuscaChange: (valor: string) => void;
   onSelecionar: (turma: TurmaMatricula) => void;
 }
@@ -35,6 +36,7 @@ export function TurmaSelector({
   turmas,
   selecionadaId,
   busca,
+  descricao = "Selecione uma turma para planejar suas aulas.",
   onBuscaChange,
   onSelecionar,
 }: Readonly<TurmaSelectorProps>) {
@@ -44,7 +46,7 @@ export function TurmaSelector({
         <h2 className="break-words text-lg font-bold text-slate-800">Turmas</h2>
 
         <p className="mt-1 break-words text-sm text-slate-500">
-          Selecione uma turma para planejar suas aulas.
+          {descricao}
         </p>
       </div>
 
@@ -80,20 +82,18 @@ export function TurmaSelector({
                 type="button"
                 onClick={() => onSelecionar(item)}
                 aria-pressed={selecionada}
-                className={`w-full min-w-0 rounded-xl border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:p-4 ${
-                  selecionada
+                className={`w-full min-w-0 rounded-xl border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:p-4 ${selecionada
                     ? "border-blue-500 bg-blue-50 shadow-sm"
                     : "border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-start gap-3">
                     <div
-                      className={`rounded-lg p-2 ${
-                        selecionada
+                      className={`rounded-lg p-2 ${selecionada
                           ? "bg-blue-100 text-blue-700"
                           : "bg-slate-100 text-slate-600"
-                      }`}
+                        }`}
                     >
                       <GraduationCap size={20} />
                     </div>

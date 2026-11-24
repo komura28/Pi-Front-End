@@ -6,13 +6,15 @@ interface SuccessDialogProps {
     aoFechar: () => void;
     titulo: string;
     mensagem: string;
+    textoBotao?: string;
 }
 
 export function SuccessDialog({
     aberto,
     aoFechar,
     titulo,
-    mensagem
+    mensagem,
+    textoBotao = "Entendi"
 }: Readonly<SuccessDialogProps>) {
     return (
         <AppDialog
@@ -28,7 +30,7 @@ export function SuccessDialog({
                         onClick={aoFechar}
                         className="w-full rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
                     >
-                        Entendi
+                        {textoBotao}
                     </button>
                 </div>
             }

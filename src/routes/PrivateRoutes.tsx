@@ -11,6 +11,7 @@ import { UserPage } from "../pages/user/UserPage";
 import { AlunoPage } from "../pages/aluno/AlunoPage";
 import { AulaTurmaPage } from "../pages/aula/AulaTurmaPage";
 import { RegisterProfessorPage } from "../pages/professor/RegisterProfessorPage";
+import { CertificadosPage } from "../pages/certificado/CertificadosPage";
 
 export function PrivateRoutes() {
     return (
@@ -38,6 +39,10 @@ export function PrivateRoutes() {
 
             <Route path="/matricula" element={<ProtectedRoutes allowedRoles={["ADM"]}>
                 <MatriculaPage />
+            </ProtectedRoutes>} />
+
+            <Route path="/certificados" element={<ProtectedRoutes allowedRoles={["ADM"]}>
+                <CertificadosPage />
             </ProtectedRoutes>} />
 
             <Route path="/register-curso" element={<ProtectedRoutes allowedRoles={["ADM"]}>

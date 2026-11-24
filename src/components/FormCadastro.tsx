@@ -6,7 +6,6 @@ import axios from "axios";
 import { formatarCPF, formatarTelefone } from "../utils/formatters";
 import { cpf } from "cpf-cnpj-validator";
 import { UploadFoto } from "./UploadFoto.tsx";
-import { Modal } from "./Modal";
 import { CampoSenha } from "./CampoSenha.tsx";
 import { cadastrarProfessor } from "../services/admService";
 import { SuccessDialog } from "./ui/SuccessDialog.tsx";
@@ -595,30 +594,30 @@ export function FormCadastro({ tipo = "comum" }: CadastroFormDataProps) {
         )}
       </form>
 
-      {tipo === "professor" ? (
-        <SuccessDialog
-          aberto={modal}
-          aoFechar={() => {
-            setModal(false);
+
+      <SuccessDialog
+        aberto={modal}
+        aoFechar={() => {
+          setModal(false);
+
+          if (tipo === "professor") {
             navigate("/app/user");
-          }}
-          titulo="Professor cadastrado!"
-          mensagem="O professor foi cadastrado com sucesso e já possui uma conta no Aticurando."
-        />
-      ) : (
-        modal && (
-          <Modal
-            titulo="Cadastro"
-            message="Usuário cadastrado com sucesso!"
-            decisao={null}
-            texto="Ok"
-            opSim={() => {
-              setModal(false);
-              navigate("/login");
-            }}
-          />
-        )
-      )}
+          } else {
+            navigate("/login");
+          }
+        }}
+        titulo={
+          tipo === "professor"
+            ? "Professor cadastrado!"
+            : "Cadastro realizado!"
+        }
+        mensagem={
+          tipo === "professor"
+            ? "O professor foi cadastrado com sucesso e já possui uma conta no Aticurando."
+            : "Sua conta foi criada com sucesso! Você já pode acessar o Aticurando."
+        }
+      />
+
 
       <AppDialog
         aberto={modalLgpdOpen}
