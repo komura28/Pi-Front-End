@@ -17,8 +17,8 @@ export function PageHeader({
     acao
 }: Readonly<PageHeaderProps>) {
     return (
-        <section className="relative w-full min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-4 text-white shadow-lg sm:p-6 md:p-8">
-            <div className="relative z-10 flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="@container relative w-full min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-4 text-white shadow-lg sm:p-6 lg:p-8">
+            <div className="relative z-10 flex min-w-0 flex-col gap-5 @4xl:flex-row @4xl:items-center @4xl:justify-between">
                 <div className="min-w-0">
                     <div className="mb-3 flex items-center gap-2 text-blue-200">
                         <Icone size={20} aria-hidden="true" />
@@ -38,7 +38,7 @@ export function PageHeader({
                 </div>
 
                 {acao && (
-                    <div className="shrink-0">
+                    <div className="w-full min-w-0 @4xl:w-auto @4xl:shrink-0">
                         {acao}
                     </div>
                 )}

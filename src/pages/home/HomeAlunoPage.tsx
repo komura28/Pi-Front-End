@@ -390,7 +390,7 @@ export function HomeAlunoPage() {
     }
 
     return (
-        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+        <main className="@container mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
 
             <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
 
@@ -429,16 +429,22 @@ export function HomeAlunoPage() {
 
             <section
                 aria-label="Indicadores do aluno"
-                className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3"
+                className="w-full min-w-0"
             >
-                {indicadores.map((indicador) => (
-                    <ProfessorStatCard
-                        key={indicador.titulo}
-                        titulo={indicador.titulo}
-                        valor={indicador.valor}
-                        icone={indicador.icone}
-                    />
-                ))}
+                <div className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-2">
+                    <div className="grid w-full min-w-[690px] grid-cols-3 gap-3 sm:gap-4">
+
+                        {indicadores.map((indicador) => (
+                            <ProfessorStatCard
+                                key={indicador.titulo}
+                                titulo={indicador.titulo}
+                                valor={indicador.valor}
+                                icone={indicador.icone}
+                            />
+                        ))}
+
+                    </div>
+                </div>
             </section>
 
             <section aria-label="Próxima aula do aluno">
@@ -484,7 +490,7 @@ export function HomeAlunoPage() {
                         Você ainda não possui frequência para acompanhar.
                     </p>
                 ) : (
-                    <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+                    <div className="grid min-w-0 grid-cols-1 gap-4 sm:gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
                         {frequencias.map((frequencia) => {
                             const matricula = minhasMatriculas.find(
                                 (item) => item._id === frequencia.matriculaId
@@ -548,7 +554,7 @@ export function HomeAlunoPage() {
                             />
                         </div>
 
-                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
 
                             {cursosPaginados.map(({ curso, turmas }) => {
                                 const turnos = Array.from(
@@ -683,7 +689,6 @@ export function HomeAlunoPage() {
 
                             <div className="flex flex-wrap gap-2">
 
-                                {/* TODOS */}
                                 <button
                                     type="button"
                                     aria-pressed={turnoSelecionado === "todos"}
@@ -692,15 +697,14 @@ export function HomeAlunoPage() {
                                         setPaginaTurmas(1);
                                     }}
                                     className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${turnoSelecionado === "todos"
-                                            ? "bg-blue-600 text-white"
-                                            : "bg-slate-100 text-slate-600 hover:bg-blue-50"
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-slate-100 text-slate-600 hover:bg-blue-50"
                                         }`}
                                 >
                                     <Users size={17} aria-hidden="true" />
                                     Todos
                                 </button>
 
-                                {/* MANHÃ, TARDE E NOITE */}
                                 {gruposTurno.map(([turno]) => {
                                     const IconeTurno =
                                         turno === "manha"
@@ -721,8 +725,8 @@ export function HomeAlunoPage() {
                                                 setPaginaTurmas(1);
                                             }}
                                             className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${turnoSelecionado === turno
-                                                    ? "bg-blue-600 text-white"
-                                                    : "bg-slate-100 text-slate-600 hover:bg-blue-50"
+                                                ? "bg-blue-600 text-white"
+                                                : "bg-slate-100 text-slate-600 hover:bg-blue-50"
                                                 }`}
                                         >
                                             <IconeTurno size={17} aria-hidden="true" />

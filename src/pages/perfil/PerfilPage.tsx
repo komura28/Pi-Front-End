@@ -365,7 +365,7 @@ export function PerfilPage() {
       : ESTADOS_CIVIS;
 
   return (
-    <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+    <main className="@container mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] to-blue-800 p-5 text-white shadow-lg sm:p-6 lg:p-8">
         <UserRound
           aria-hidden="true"
@@ -464,7 +464,7 @@ export function PerfilPage() {
         </p>
       )}
 
-      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 2xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 @6xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
         <div className="min-w-0 space-y-4 sm:space-y-6">
           <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-800">

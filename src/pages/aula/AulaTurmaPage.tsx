@@ -426,7 +426,7 @@ export function AulaTurmaPage() {
     }
 
     return (
-        <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
+        <main className="@container mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 sm:gap-6">
             <PageHeader
                 titulo="Gerenciamento de Aulas"
                 descricao="Organize o planejamento, os horários e os professores responsáveis pelas aulas."
@@ -443,9 +443,9 @@ export function AulaTurmaPage() {
                 </p>
             )}
 
-            <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 2xl:grid-cols-[320px_minmax(0,1fr)]">
+            <div className="grid min-w-0 grid-cols-1 items-start gap-4 @2xl:grid-cols-[minmax(220px,28%)_minmax(0,1fr)] @4xl:gap-6">
 
-                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm @md:p-4 @5xl:p-5">
                     <TurmaSelector
                         turmas={turmasPaginadas}
                         selecionadaId={turmaEmFoco?.turma._id ?? null}
@@ -470,7 +470,7 @@ export function AulaTurmaPage() {
                     </div>
                 </section>
 
-                <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5 lg:p-6">
+                <section className="@container min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm @md:p-4 @5xl:p-6">
                     <AgendaTurmaPanel
                         key={turmaEmFoco?.turma._id ?? "sem-turma"}
                         turma={turmaEmFoco}
