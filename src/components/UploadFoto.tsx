@@ -31,6 +31,10 @@ export function UploadFoto({ foto, onChange, onError }: UploadFotoProps) {
       onError("Escolha uma imagem válida.");
       return;
     }
+    if (arquivo.size > 5 * 1024 * 1024) {
+      onError("A imagem deve ter no máximo 5 MB.");
+      return;
+    }
     onError("");
     onChange(arquivo);
   };
