@@ -500,16 +500,6 @@ export function CursoAlunoPage() {
                   )
                 )}
 
-                {matriculaSelecionada.status === "APROVADA" &&
-                  percentualSelecionado >= Freq_Min && (
-                    <button
-                      type="button"
-                      className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
-                    >
-                      Emitir certificado
-                    </button>
-                  )}
-
               </div>
 
             </div>
